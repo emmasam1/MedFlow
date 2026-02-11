@@ -5,27 +5,51 @@ import StatCard from "../../components/StatCard";
 import DoctorStatus from "../../components/DoctorStatus";
 import { Link } from "react-router-dom";
 import { AiOutlineUserAdd } from "react-icons/ai";
+import { useLocation } from "react-router-dom";
 
 import Appointments from "../../components/Appointments";
 import BookAppointment from "../../components/BookAppointment";
 import AppointmentTable from "../../components/AppointmentTable";
 import NewPatientChart from "../../components/NewPatientChart";
+import { useStore } from "../../store/store";
+import Modal from "../../components/Modal";
+import AddPatients from "../../components/AddPatients";
 
 const Dashboard = () => {
+  const { darkMode } = useStore();
+  const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+  const pathName =
+    location.pathname.split("/").filter(Boolean).pop() || "Dashboard";
   return (
     <>
-      <div className="flex justify-end items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-center text-center sm:text-left mb-8 gap-4 px-4">
         <div>
+          <h2
+            className={`text-xl font-bold capitalize ${darkMode ? "text-white" : "text-slate-800"}`}
+          >
+            {pathName.replace(/-/g, " ")}
+          </h2>
+          <p className="text-xs text-gray-400 mt-1 flex items-center justify-center sm:justify-start gap-2">
+            Dashboard <span className="text-[10px]">🏠</span> Home{" "}
+            <span className="text-[10px]">&gt;</span>{" "}
+            <span className="text-blue-500 font-medium capitalize">
+              {pathName}
+            </span>
+          </p>
+        </div>
+
+        <div className="flex gap-2">
           <motion.div
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
-            <Link
-              to="/dashboard/patients-add"
+            <button
+              onClick={() => setIsOpen(true)}
               className="hover:bg-[#9DCEF8]! px-3 py-2 rounded-full! 
                text-[#005CBB]! font-bold flex items-center gap-2
-               transition-colors duration-300"
+               transition-colors duration-300 text-sm cursor-pointer"
             >
               <motion.span
                 whileHover={{ x: 4 }}
@@ -35,10 +59,24 @@ const Dashboard = () => {
                 <AiOutlineUserAdd size={18} />
                 Add Patient
               </motion.span>
-            </Link>
+            </button>
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <button
+              className="hover:bg-[#9DCEF8]! px-3 py-2 rounded-full! 
+               text-[#005CBB]! font-bold flex items-center gap-2
+               transition-colors duration-300 text-sm cursor-pointer"
+            >
+              📅 Appointment
+            </button>
           </motion.div>
         </div>
       </div>
+
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -69,6 +107,17 @@ const Dashboard = () => {
           <NewPatientChart />
         </div>
       </div>
+
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
+        <h2 className="text-sm font-bold mb-4">Patient Registration</h2>
+       <AddPatients />
+        {/* <button
+          className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition"
+          onClick={() => alert("Action!")}
+        >
+          Take Action
+        </button> */}
+      </Modal>
     </>
   );
 };

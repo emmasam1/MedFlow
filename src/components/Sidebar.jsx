@@ -1,5 +1,4 @@
 
-
 import { motion } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
 import { useStore } from '../store/store';
@@ -85,9 +84,9 @@ const Sidebar = () => {
             onClick={handleLinkClick}
           />
           <SidebarItem 
-            to="/appointments" 
+            to="/dashboard/appointment" 
             icon={<RiCalendarCheckLine size={22} />} 
-            label="Appointments" 
+            label="Appointment" 
             isOpen={isSidebarOpen} 
             theme={sidebarTheme}
             onClick={handleLinkClick}

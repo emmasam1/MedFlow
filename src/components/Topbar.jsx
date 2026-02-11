@@ -26,7 +26,7 @@ const Topbar = () => {
             <RiNotification3Line size={22} />
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">3</span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 hover:bg-[#9DCEF8]! cursor-pointer py-1 px-3 rounded-full hover:text-black">
           <p className="text-sm font-bold hidden md:block">Zara Judge</p>
           <img src="https://i.pravatar.cc/150?u=ella" className="w-8 h-8 rounded-full" alt="profile" />
         </div>

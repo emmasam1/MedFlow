@@ -80,25 +80,7 @@ const DashboardLayout = () => {
                 ? (isSidebarOpen ? "lg:pr-[260px] pr-0" : "lg:pr-[80px] pr-0") 
                 : (isSidebarOpen ? "lg:pl-[260px] pl-0" : "lg:pl-[80px] pl-0")} px-4`}>
             
-            <div className="flex flex-col sm:flex-row justify-between items-center text-center sm:text-left mb-8 gap-4 px-4">
-                <div>
-                    <h2 className={`text-xl font-bold capitalize ${darkMode ? 'text-white' : 'text-slate-800'}`}>
-                      {pathName.replace(/-/g, ' ')}
-                    </h2>
-                    <p className="text-xs text-gray-400 mt-1 flex items-center justify-center sm:justify-start gap-2">
-                        Dashboard <span className="text-[10px]">🏠</span> Home <span className="text-[10px]">&gt;</span> <span className="text-blue-500 font-medium capitalize">{pathName}</span>
-                    </p>
-                </div>
-                
-                <div className="flex gap-2">
-                    <button className="text-[#6777ef] px-4 py-2  text-xs font-bold flex items-center gap-2 cursor-pointer">
-                        + Add Patient
-                    </button>
-                    <button className="text-[#6777ef] px-4 py-2 text-xs font-bold flex items-center gap-2  cursor-pointer">
-                        📅 Appointment
-                    </button>
-                </div>
-            </div>
+     
 
             <div className="px-4">
                 <Outlet />
