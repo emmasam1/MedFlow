@@ -5,6 +5,7 @@ import { TbHomeCheck, TbPhoneCall } from "react-icons/tb";
 import { MdOutlineMarkEmailRead } from "react-icons/md";
 import { motion, AnimatePresence } from "framer-motion";
 import { RiInformationLine, RiSettings3Line } from "react-icons/ri";
+import About from "./About";
 
 const UserProfile = () => {
   const [currentTab, setCurrentTab] = useState("About");
@@ -144,7 +145,6 @@ const UserProfile = () => {
 
           <div className="p-4 bg-white rounded-lg mt-5">
             <AnimatePresence mode="wait">
-
               <Tabs
                 activeKey={activeTab}
                 items={items}
@@ -156,76 +156,80 @@ const UserProfile = () => {
         </div>
 
         {/* Right Column */}
-       {/* Right Column */}
-<div className="md:w-2/3 bg-white rounded-xl p-6">
-  {/* Tab Buttons */}
-  <div className="flex bg-gray-100 rounded-full p-1 relative w-fit">
-    {tabs.map((tab) => {
-      const isActive = currentTab === tab.label;
+        <div className="md:w-2/3 bg-white rounded-xl p-6">
+          {/* Tab Buttons */}
+          <div className="flex bg-gray-100 rounded-full p-1 relative w-fit">
+            {tabs.map((tab) => {
+              const isActive = currentTab === tab.label;
 
-      return (
-        <button
-          key={tab.label}
-          onClick={() => setCurrentTab(tab.label)}
-          className="relative flex items-center justify-center gap-2 px-6 py-2 rounded-full text-sm font-medium"
-        >
-          {isActive && (
-            <motion.div
-              layoutId="tab-highlight"
-              className="absolute inset-0 bg-blue-600 rounded-full"
-              transition={{
-                type: "spring",
-                stiffness: 400,
-                damping: 30,
-              }}
-            />
-          )}
+              return (
+                <motion.button
+                  key={tab.label}
+                  onClick={() => setCurrentTab(tab.label)}
+                  layout
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  className={`relative flex items-center justify-center gap-2 py-2 rounded-full text-sm font-medium overflow-hidden`}
+                  animate={{
+                    paddingLeft: isActive ? 28 : 20,
+                    paddingRight: isActive ? 28 : 20,
+                  }}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="tab-highlight"
+                      className="absolute inset-0 bg-blue-600 rounded-full"
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 30,
+                      }}
+                    />
+                  )}
 
-          <span
-            className={`relative z-10 flex items-center gap-2 transition-colors duration-200 ${
-              isActive ? "text-white" : "text-gray-700"
-            }`}
-          >
-            {tab.icon}
-            {tab.label}
-          </span>
-        </button>
-      );
-    })}
-  </div>
+                  <span
+                    className={`relative z-10 flex items-center gap-2 transition-colors duration-200 ${
+                      isActive ? "text-white" : "text-gray-700"
+                    }`}
+                  >
+                    {tab.icon}
+                    {tab.label}
+                  </span>
+                </motion.button>
+              );
+            })}
+          </div>
 
-  {/* Animated Tab Content */}
-  <div className="mt-6">
-    <AnimatePresence mode="wait">
-      {currentTab === "About" && (
-        <motion.div
-          key="about"
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -15 }}
-          transition={{ duration: 0.25 }}
-          className="p-5 border rounded-xl shadow-sm"
-        >
-          <p>{doctorProfile.bio}</p>
-        </motion.div>
-      )}
+          {/* Animated Tab Content */}
+          <div className="mt-6">
+            <AnimatePresence mode="wait">
+              {currentTab === "About" && (
+                <motion.div
+                  key="about"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  transition={{ duration: 0.25 }}
+                  className=""
+                >
+                  <About />
+                </motion.div>
+              )}
 
-      {currentTab === "Settings" && (
-        <motion.div
-          key="settings"
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -15 }}
-          transition={{ duration: 0.25 }}
-          className="p-5 border rounded-xl shadow-sm"
-        >
-          <p>Settings content goes here.</p>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  </div>
-</div>
-
+              {currentTab === "Settings" && (
+                <motion.div
+                  key="settings"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  transition={{ duration: 0.25 }}
+                  className="p-5 border rounded-xl shadow-sm"
+                >
+                  <p>Settings content goes here.</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
     </div>
   );
