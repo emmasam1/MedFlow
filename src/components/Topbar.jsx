@@ -1,3 +1,4 @@
+
 import {
   RiMenuFoldLine,
   RiMenuUnfoldLine,
@@ -13,13 +14,24 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 
 const Topbar = () => {
-  const { isSidebarOpen, toggleSidebar, topbarColor, isRTL, darkMode } =
-    useStore();
+  const { isSidebarOpen, toggleSidebar, topbarColor, isRTL, darkMode } = useStore();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const isLightTopbar =
-    topbarColor === "bg-white" || topbarColor === "bg-gray-50";
+  // --- Fullscreen Logic ---
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  };
+
+  const isLightTopbar = topbarColor === "bg-white" || topbarColor === "bg-gray-50";
   const textColor = isLightTopbar
     ? darkMode
       ? "text-white"
@@ -64,10 +76,13 @@ const Topbar = () => {
       </button>
 
       <div className="flex items-center gap-6">
+        {/* Fullscreen Toggle Icon */}
         <RiExpandDiagonalLine
-          className="cursor-pointer hidden sm:block"
+          className="cursor-pointer hidden sm:block hover:opacity-80 transition-opacity"
           size={20}
+          onClick={toggleFullscreen}
         />
+        
         <div className="relative">
           <RiNotification3Line size={22} />
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">
