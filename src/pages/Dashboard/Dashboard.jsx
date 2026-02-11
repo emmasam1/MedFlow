@@ -114,11 +114,6 @@ const Dashboard = () => {
         </h2>
         <AddPatients />
       </Modal>
-{/* 
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-        <h2 className="text-sm font-bold mb-4">Patient Registration</h2>
-       <AddPatients />
-      </Modal> */}
     </>
   );
 };
