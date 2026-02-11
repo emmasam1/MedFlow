@@ -3,14 +3,20 @@ import {
   RiMenuUnfoldLine,
   RiExpandDiagonalLine,
   RiNotification3Line,
+  RiUserLine,
+  RiSettings3Line,
+  RiLogoutBoxRLine,
 } from "react-icons/ri";
 import { useStore } from "../store/store";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
 
 const Topbar = () => {
   const { isSidebarOpen, toggleSidebar, topbarColor, isRTL, darkMode } =
     useStore();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const isLightTopbar =
     topbarColor === "bg-white" || topbarColor === "bg-gray-50";
@@ -19,6 +25,17 @@ const Topbar = () => {
       ? "text-white"
       : "text-gray-800"
     : "text-white";
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <header
@@ -29,11 +46,12 @@ const Topbar = () => {
               ? "lg:pr-[260px] pr-0"
               : "lg:pr-[80px] pr-0"
             : isSidebarOpen
-              ? "lg:pl-[260px] pl-0"
-              : "lg:pl-[80px] pl-0"
+            ? "lg:pl-[260px] pl-0"
+            : "lg:pl-[80px] pl-0"
         }
         ${topbarColor} ${textColor} shadow-sm`}
     >
+      {/* Sidebar Toggle */}
       <button
         onClick={toggleSidebar}
         className="p-2 hover:bg-black/5 rounded-lg"
@@ -56,20 +74,58 @@ const Topbar = () => {
             3
           </span>
         </div>
-        <motion.div
-          whileHover={{ backgroundColor: "#9DCEF8", color: "#000" }} // hover animation
-          transition={{ duration: 0.3 }} // smooth transition
-          className="flex items-center gap-3 cursor-pointer py-1 px-3 rounded-full"
-        >
-          <Link to="/user-profile" className="flex items-center gap-3">
+
+        {/* Profile with Dropdown */}
+        <div className="relative" ref={dropdownRef}>
+          <motion.div
+            whileHover={{ backgroundColor: "#9DCEF8", color: "#000" }}
+            transition={{ duration: 0.3 }}
+            onClick={() => setDropdownOpen((prev) => !prev)}
+            className="flex items-center gap-3 cursor-pointer py-1 px-3 rounded-full"
+          >
             <p className="text-sm font-bold hidden md:block">Zara Judge</p>
             <img
               src="https://i.pravatar.cc/150?u=ella"
               className="w-8 h-8 rounded-full"
               alt="profile"
             />
-          </Link>
-        </motion.div>
+          </motion.div>
+
+          {/* Dropdown Menu */}
+          <AnimatePresence>
+            {dropdownOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg overflow-hidden z-50 border border-gray-200"
+              >
+                <Link
+                  to="/user-profile"
+                  className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 transition text-gray-800"
+                >
+                  <RiUserLine size={18} />
+                  <span>Account</span>
+                </Link>
+                <Link
+                  to="/settings"
+                  className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 transition text-gray-800"
+                >
+                  <RiSettings3Line size={18} />
+                  <span>Settings</span>
+                </Link>
+                <button
+                  onClick={() => console.log("Logout clicked")}
+                  className="w-full text-left flex items-center gap-3 px-4 py-2 hover:bg-blue-50 transition text-gray-800"
+                >
+                  <RiLogoutBoxRLine size={18} />
+                  <span>Logout</span>
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </header>
   );
