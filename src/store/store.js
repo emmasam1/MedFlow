@@ -18,5 +18,5 @@ export const useStore = create(
       toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
     }),
     { name: 'cliniva-theme-settings' }
-  )
+  ),
 );
