@@ -6,6 +6,7 @@ import { MdOutlineMarkEmailRead } from "react-icons/md";
 import { motion, AnimatePresence } from "framer-motion";
 import { RiInformationLine, RiSettings3Line } from "react-icons/ri";
 import About from "./About";
+import Settings from "./Settings";
 
 const UserProfile = () => {
   const [currentTab, setCurrentTab] = useState("About");
@@ -209,7 +210,6 @@ const UserProfile = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -15 }}
                   transition={{ duration: 0.25 }}
-                  className=""
                 >
                   <About />
                 </motion.div>
@@ -222,9 +222,8 @@ const UserProfile = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -15 }}
                   transition={{ duration: 0.25 }}
-                  className="p-5 border rounded-xl shadow-sm"
                 >
-                  <p>Settings content goes here.</p>
+                  <Settings />
                 </motion.div>
               )}
             </AnimatePresence>
