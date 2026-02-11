@@ -73,49 +73,55 @@ const AddPatients = () => {
               </Upload>
             </div>
 
-            <Form.Item label="First Name" name="firstName" rules={[{ required: true }]} className="mb-0!">
-              <Input />
-            </Form.Item>
+            <div className="col-span-full grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Form.Item label="Patient Type" name="type" rules={[{ required: true }]} className="mb-0!">
+                <Select onChange={handlePatientTypeChange}>
+                  <Option value="single">Single</Option>
+                  <Option value="family">Family</Option>
+                  <Option value="nhis">NHIS</Option>
+                  <Option value="kadcham">KADCHAM</Option>
+                </Select>
+              </Form.Item>
 
-            <Form.Item label="Last Name" name="lastName" rules={[{ required: true }]} className="mb-0!">
-              <Input />
-            </Form.Item>
+              <Form.Item label="Card Number" name="cardNumber" className="mb-0!">
+                <Input disabled />
+              </Form.Item>
 
-            <Form.Item label="Phone Number" name="phone" rules={[{ required: true }]} className="mb-0!">
-              <Input />
-            </Form.Item>
+              <Form.Item label="Status" name="status" className="mb-0!">
+                <Input disabled />
+              </Form.Item>
+            </div>
 
-            <Form.Item label="Address" name="address" className="mb-0!">
-              <Input />
-            </Form.Item>
+            <div className="col-span-full grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Form.Item label="First Name" name="firstName" rules={[{ required: true }]} className="mb-0!">
+                <Input />
+              </Form.Item>
 
-            <Form.Item label="Date of Birth" name="dob" className="mb-0!">
-              <Input type="date" />
-            </Form.Item>
+              <Form.Item label="Last Name" name="lastName" rules={[{ required: true }]} className="mb-0!">
+                <Input />
+              </Form.Item>
 
-            <Form.Item label="Gender" name="gender" className="mb-0!">
-              <Select>
-                <Option value="male">Male</Option>
-                <Option value="female">Female</Option>
-              </Select>
-            </Form.Item>
+              <Form.Item label="Phone Number" name="phone" rules={[{ required: true }]} className="mb-0!">
+                <Input />
+              </Form.Item>
+            </div>
 
-            <Form.Item label="Patient Type" name="type" rules={[{ required: true }]} className="mb-0!">
-              <Select onChange={handlePatientTypeChange}>
-                <Option value="single">Single</Option>
-                <Option value="family">Family</Option>
-                <Option value="nhis">NHIS</Option>
-                <Option value="kadcham">KADCHAM</Option>
-              </Select>
-            </Form.Item>
+            <div className="col-span-full grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Form.Item label="Address" name="address" className="mb-0!">
+                <Input />
+              </Form.Item>
 
-            <Form.Item label="Card Number" name="cardNumber" className="mb-0!">
-              <Input disabled />
-            </Form.Item>
+              <Form.Item label="Date of Birth" name="dob" className="mb-0!">
+                <Input type="date" />
+              </Form.Item>
 
-            <Form.Item label="Status" name="status" className="mb-0!">
-              <Input disabled />
-            </Form.Item>
+              <Form.Item label="Gender" name="gender" className="mb-0!">
+                <Select>
+                  <Option value="male">Male</Option>
+                  <Option value="female">Female</Option>
+                </Select>
+              </Form.Item>
+            </div>
 
             {patientType === "nhis" && (
               <motion.div
