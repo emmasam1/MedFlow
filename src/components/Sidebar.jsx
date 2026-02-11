@@ -8,7 +8,7 @@ const Sidebar = () => {
   const { isSidebarOpen, toggleSidebar, sidebarTheme, isRTL, darkMode } = useStore();
 
   const bgColor = sidebarTheme === 'dark' ? 'bg-[#1a202c]' : 'bg-white';
-  const borderColor = darkMode ? 'border-gray-700' : 'border-gray-100';
+  const borderColor = darkMode ? 'border-gray-200' : 'border-gray-100';
   const titleColor = sidebarTheme === 'dark' ? 'text-white' : 'text-slate-800';
   const nameColor = sidebarTheme === 'dark' ? 'text-gray-200' : 'text-slate-700';
 
@@ -26,13 +26,13 @@ const Sidebar = () => {
         x: (window.innerWidth < 1024 && !isSidebarOpen) ? (isRTL ? 260 : -260) : 0,
       }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className={`fixed top-0 h-screen z-50 overflow-hidden border-r ${bgColor} ${borderColor} shadow-sm flex flex-col
+      className={`fixed top-0 h-screen z-50 overflow-hidden ${bgColor} ${borderColor} shadow-sm flex flex-col
         ${isRTL ? 'right-0' : 'left-0'}`}
     >
       {/* Brand Logo Section */}
-      <div className={`h-[70px] flex items-center justify-center border-b ${borderColor} px-4`}>
+      <div className={`h-[70px] flex items-center justify-center ${borderColor} px-4`}>
         <div className="flex items-center gap-2">
-          <div className="bg-[#6777ef] p-1.5 rounded-lg shrink-0 shadow-md shadow-blue-200">
+          <div className="bg-[#6777ef] p-1.5 rounded-lg shrink-0 shadow-blue-200">
             <span className="text-white font-bold text-xl leading-none">M</span>
           </div>
           {(isSidebarOpen || window.innerWidth < 1024) && (
