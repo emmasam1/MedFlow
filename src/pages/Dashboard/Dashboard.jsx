@@ -109,14 +109,10 @@ const Dashboard = () => {
       </div>
 
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-        <h2 className="text-sm font-bold mb-4">Patient Registration</h2>
-       <AddPatients />
-        {/* <button
-          className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition"
-          onClick={() => alert("Action!")}
-        >
-          Take Action
-        </button> */}
+        <h2 className={`text-xl font-bold mb-6 ${darkMode ? "text-white" : "text-slate-800"}`}>
+          Patient Registration
+        </h2>
+        <AddPatients />
       </Modal>
     </>
   );
