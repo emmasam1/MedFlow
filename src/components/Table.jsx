@@ -7,6 +7,7 @@ const Table = ({
   searchableKeys = [],
   actions,
   pageSize = 10,
+  onRowClick,
 }) => {
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState(null);
@@ -17,8 +18,8 @@ const Table = ({
     if (!search) return data;
     return data.filter((item) =>
       searchableKeys.some((key) =>
-        String(item[key]).toLowerCase().includes(search.toLowerCase())
-      )
+        String(item[key]).toLowerCase().includes(search.toLowerCase()),
+      ),
     );
   }, [search, data, searchableKeys]);
 
@@ -40,7 +41,7 @@ const Table = ({
   const totalPages = Math.ceil(sortedData.length / pageSize);
   const paginatedData = sortedData.slice(
     (currentPage - 1) * pageSize,
-    currentPage * pageSize
+    currentPage * pageSize,
   );
 
   const requestSort = (key) => {
@@ -53,7 +54,6 @@ const Table = ({
 
   return (
     <div className="space-y-6">
-
       {/* Search */}
       <div className="flex justify-between items-center">
         <div className="relative w-80">
@@ -102,9 +102,7 @@ const Table = ({
                 ))}
 
                 {actions && (
-                  <th className="px-6 py-4 text-center font-medium">
-                    Action
-                  </th>
+                  <th className="px-6 py-4 text-center font-medium">Action</th>
                 )}
               </tr>
             </thead>
@@ -114,7 +112,8 @@ const Table = ({
               {paginatedData.map((row, index) => (
                 <tr
                   key={row.id}
-                  className="hover:bg-gray-50/60 transition-colors duration-200"
+                  onClick={() => onRowClick && onRowClick(row)}
+                  className="hover:bg-gray-50/60 transition-colors duration-200 cursor-pointer"
                 >
                   <td className="px-6 py-4 text-gray-500">
                     {(currentPage - 1) * pageSize + index + 1}
