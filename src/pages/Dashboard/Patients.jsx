@@ -573,137 +573,145 @@ const Patients = () => {
 
       {/* ================== EDIT PATIENTS ========================*/}
       <AnimatePresence>
-        {editPatient && (
-          <motion.div
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="bg-white w-full max-w-5xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh]"
-            >
-              {/* HEADER */}
-              <div className="flex justify-between items-center px-8 py-6 border-b">
-                <h2 className="text-xl font-semibold text-gray-800">
-                  Edit Patient
-                </h2>
+            {editPatient && (
+                <motion.div
+                className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                >
+                {/* Modal Container */}
+                <motion.div
+                    initial={{ y: 40, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: 40, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="bg-white w-full max-w-4xl rounded-xl shadow-xl overflow-hidden"
+                >
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-6 py-4 border-b">
+                    <div className="flex items-center gap-3">
+                        <img
+                        src="https://i.pravatar.cc/40"
+                        alt="avatar"
+                        className="w-10 h-10 rounded-full"
+                        />
+                        <h2 className="text-lg font-semibold">
+                        Edit {editPatient.name}
+                        </h2>
+                    </div>
 
-                <button
+                   <button
                   onClick={() => setEditPatient(null)}
                   className="p-2 rounded-full hover:bg-gray-100 transition"
                 >
                   <FiX size={20} />
                 </button>
-              </div>
+                    </div>
 
-              {/* BODY (SCROLLS ONLY Y AXIS) */}
-              <div className="px-8 py-6 overflow-y-auto space-y-10">
-                {/* ================= PATIENT INFORMATION ================= */}
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-6">
-                    Patient Information
-                  </h3>
+                    {/* Body */}
+                    <div className="p-6 max-h-[70vh] overflow-y-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        {/* Age */}
+                        <div>
+                        <label className="text-sm text-gray-600">
+                            Age*
+                        </label>
+                        <input
+                            type="number"
+                            className="w-full border rounded-lg px-3 py-2 mt-1"
+                            defaultValue="30"
+                        />
+                        </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Input label="Full Name" value={editPatient.fullName} />
-                    <Input
-                      label="Card Number"
-                      value={editPatient.patientId}
-                      disabled
-                    />
+                        {/* Email */}
+                        <div>
+                        <label className="text-sm text-gray-600">
+                            Email*
+                        </label>
+                        <input
+                            type="email"
+                            className="w-full border rounded-lg px-3 py-2 mt-1"
+                            defaultValue="ashton.cox@example.com"
+                        />
+                        </div>
 
-                    <Select
-                      label="Gender"
-                      value={editPatient.gender}
-                      options={["Male", "Female"]}
-                    />
+                        {/* Admission Date */}
+                        <div>
+                        <label className="text-sm text-gray-600">
+                            Admission Date*
+                        </label>
+                        <input
+                            type="date"
+                            className="w-full border rounded-lg px-3 py-2 mt-1"
+                        />
+                        </div>
 
-                    <Input label="Age" type="number" value={editPatient.age} />
+                        {/* Discharge Date */}
+                        <div>
+                        <label className="text-sm text-gray-600">
+                            Discharge Date
+                        </label>
+                        <input
+                            type="date"
+                            className="w-full border rounded-lg px-3 py-2 mt-1"
+                        />
+                        </div>
 
-                    <Input
-                      label="Date of Birth"
-                      type="date"
-                      value={editPatient.dob}
-                    />
+                        {/* Doctor */}
+                        <div>
+                        <label className="text-sm text-gray-600">
+                            Doctor Assigned*
+                        </label>
+                        <input
+                            className="w-full border rounded-lg px-3 py-2 mt-1"
+                            defaultValue="Dr. John Doe"
+                        />
+                        </div>
 
-                    <Select
-                      label="Blood Group"
-                      value={editPatient.bloodGroup}
-                      options={[
-                        "O+",
-                        "O-",
-                        "A+",
-                        "A-",
-                        "B+",
-                        "B-",
-                        "AB+",
-                        "AB-",
-                      ]}
-                    />
+                        {/* Status */}
+                        <div>
+                        <label className="text-sm text-gray-600">
+                            Status*
+                        </label>
+                        <select className="w-full border rounded-lg px-3 py-2 mt-1">
+                            <option>Recovered</option>
+                            <option>Under Treatment</option>
+                            <option>Under Observation</option>
+                        </select>
+                        </div>
 
-                    <Select
-                      label="Patient Type"
-                      value={editPatient.patientType}
-                      options={["NHIS", "Single", "Family", "Kadcha"]}
-                    />
+                        {/* Address (full width) */}
+                        <div className="md:col-span-2">
+                        <label className="text-sm text-gray-600">
+                            Address
+                        </label>
+                        <textarea
+                            rows="3"
+                            className="w-full border rounded-lg px-3 py-2 mt-1"
+                            defaultValue="11, Shyam Appt., Rajkot"
+                        />
+                        </div>
+                    </div>
+                    </div>
 
-                    <Input label="Phone" value={editPatient.phone} />
-
-                    <Select
-                      label="Status"
-                      value={editPatient.status}
-                      options={["Active", "Admitted", "Discharged"]}
-                    />
-                  </div>
-
-                  <div className="mt-6">
-                    <label className="text-xs font-medium text-gray-500 mb-2 block">
-                      Address
-                    </label>
-                    <textarea
-                      rows={3}
-                      defaultValue={editPatient.address}
-                      className="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                    />
-                  </div>
-                </div>
-
-                {/* ================= NEXT OF KIN ================= */}
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-6">
-                    Next of Kin
-                  </h3>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Input label="Full Name" value={editPatient.nextOfKin} />
-                    <Input label="Phone" value={editPatient.nextOfKinPhone} />
-                    <Input label="Allergies" value={editPatient.allergies} />
-                  </div>
-                </div>
-              </div>
-
-              {/* FOOTER */}
-              <div className="flex justify-end gap-4 px-8 py-6 border-t">
-                <button
-                  onClick={() => setEditPatient(null)}
-                  className="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 transition"
-                >
-                  Cancel
-                </button>
-
-                <button className="px-6 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition">
-                  Save Changes
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                    {/* Footer */}
+                    <div className="flex gap-3 px-6 py-4 border-t">
+                    <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
+                        Save
+                    </button>
+                    <button
+                        onClick={() => setEditPatient(null)}
+                        className="bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700"
+                    >
+                        Cancel
+                    </button>
+                    </div>
+                </motion.div>
+                </motion.div>
+            )}
+        </AnimatePresence>
+     
     </div>
   );
 };
