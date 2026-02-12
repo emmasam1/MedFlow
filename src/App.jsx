@@ -5,6 +5,8 @@ import DashboardLayout from "./layout/DashboardLayout";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import UserProfile from "./components/UserProfile";
 import Appointment from "./pages/Dashboard/Appointment";
+import Patients from "./pages/Dashboard/Patients";
+
 
 const App = () => {
   return (
@@ -14,6 +16,7 @@ const App = () => {
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/appointment" element={<Appointment />} />
+          <Route path="/dashboard/patients" element={<Patients />} />
           <Route path="/user-profile" element={<UserProfile />} />
         </Route>
       </Routes>
