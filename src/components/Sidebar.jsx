@@ -69,7 +69,7 @@ const Sidebar = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 mt-2 overflow-y-auto no-scrollbar">
+      <nav className="flex-1 px-4 overflow-y-auto no-scrollbar">
         <p className={`text-[10px] font-bold uppercase mb-4 px-2 tracking-widest ${sidebarTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>
           {(isSidebarOpen || window.innerWidth < 1024) ? 'Main Menu' : '•••'}
         </p>
@@ -103,6 +103,14 @@ const Sidebar = () => {
             to="/settings" 
             icon={<RiSettings4Line size={22} />} 
             label="Settings" 
+            isOpen={isSidebarOpen} 
+            theme={sidebarTheme}
+            onClick={handleLinkClick}
+          />
+          <SidebarItem 
+            to="/dashboard/test" 
+            icon={<RiSettings4Line size={22} />} 
+            label="Test" 
             isOpen={isSidebarOpen} 
             theme={sidebarTheme}
             onClick={handleLinkClick}
