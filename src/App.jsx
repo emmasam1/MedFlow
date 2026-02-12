@@ -8,8 +8,6 @@ import Appointment from "./pages/Dashboard/Appointment";
 import Test from "./pages/Dashboard/Test";
 import Patients from "./pages/Dashboard/Patients";
 
-import Test from "./pages/Dashboard/Test";
-
 const App = () => {
   return (
     <>

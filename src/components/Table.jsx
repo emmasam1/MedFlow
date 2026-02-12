@@ -1,5 +1,16 @@
 import React, { useState, useMemo } from "react";
 import { FiChevronUp, FiChevronDown, FiSearch } from "react-icons/fi";
+import {
+  PencilSquareIcon,
+  TrashIcon,
+  XMarkIcon,
+  MagnifyingGlassIcon,
+  FunnelIcon,
+  PlusCircleIcon,
+  ArrowPathIcon,
+  ArrowDownTrayIcon,
+  HomeIcon,
+} from "@heroicons/react/24/outline";
 
 const Table = ({
   columns,
@@ -70,6 +81,52 @@ const Table = ({
           />
         </div>
       </div> */}
+
+        {/* ================= TOP BAR ================= */}
+            <div className="mb-6">
+              {/* Breadcrumb */}
+              <div className="flex items-center text-sm text-gray-600 mb-3">
+                <span className="font-semibold text-gray-800">All Patients</span>
+                <span className="mx-2">›</span>
+                <HomeIcon className="w-4 h-4" />
+                <span className="mx-2">›</span>
+                Patients
+                <span className="mx-2">›</span>
+                All Patients
+              </div>
+      
+              {/* Toolbar Container */}
+              <div className="bg-[#eef2fb] rounded-xl px-6 py-4 flex items-center justify-between">
+                {/* Left Section */}
+                <div className="flex items-center gap-6">
+                  <h2 className="text-lg font-semibold text-gray-800">Patients</h2>
+      
+                  {/* Search */}
+                  <div className="relative">
+                    <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search"
+                      className="pl-10 pr-4 py-2 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+      
+                {/* Right Icons */}
+                <div className="flex items-center gap-5">
+                  <FunnelIcon className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-600 transition" />
+      
+                  <PlusCircleIcon
+                    onClick={() => setIsOpen(true)}
+                    className="w-6 h-6 text-green-600 cursor-pointer hover:scale-110 transition"
+                  />
+      
+                  <ArrowPathIcon className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-600 transition" />
+      
+                  <ArrowDownTrayIcon className="w-5 h-5 text-blue-600 cursor-pointer hover:text-blue-800 transition" />
+                </div>
+              </div>
+            </div>
 
       {/* Table Card */}
       <div className=" border border-gray-100 overflow-hidden">
