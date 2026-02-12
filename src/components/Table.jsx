@@ -55,7 +55,7 @@ const Table = ({
   return (
     <div className="space-y-6">
       {/* Search */}
-      <div className="flex justify-between items-center">
+      {/* <div className="flex justify-between items-center">
         <div className="relative w-80">
           <FiSearch className="absolute left-3 top-3 text-gray-400" />
           <input
@@ -69,7 +69,7 @@ const Table = ({
             className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
           />
         </div>
-      </div>
+      </div> */}
 
       {/* Table Card */}
       <div className=" border border-gray-100 overflow-hidden">
@@ -139,7 +139,7 @@ const Table = ({
         </div>
       </div>
 
-      {/* Modern Pagination */}
+      {/* Pagination */}
       <div className="flex justify-between items-center text-sm">
         <p className="text-gray-500">
           Showing page <span className="font-medium">{currentPage}</span> of{" "}
