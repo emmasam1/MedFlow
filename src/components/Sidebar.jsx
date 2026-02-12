@@ -92,9 +92,9 @@ const Sidebar = () => {
             onClick={handleLinkClick}
           />
           <SidebarItem 
-            to="/doctors" 
+            to="/dashboard/patients" 
             icon={<RiUserHeartLine size={22} />} 
-            label="Doctors" 
+            label="Patients" 
             isOpen={isSidebarOpen} 
             theme={sidebarTheme}
             onClick={handleLinkClick}
