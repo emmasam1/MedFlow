@@ -1,16 +1,13 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { FiChevronUp, FiChevronDown, FiSearch } from "react-icons/fi";
 import {
-  PencilSquareIcon,
-  TrashIcon,
-  XMarkIcon,
   MagnifyingGlassIcon,
-  FunnelIcon,
   PlusCircleIcon,
   ArrowPathIcon,
   ArrowDownTrayIcon,
   HomeIcon,
 } from "@heroicons/react/24/outline";
+import { LiaFilterSolid } from "react-icons/lia";
 
 const Table = ({
   columns,
@@ -40,20 +37,19 @@ const Table = ({
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const toggleColumn = (key) => {
     setVisibleColumns((prev) =>
       prev.includes(key)
         ? prev.filter((colKey) => colKey !== key)
-        : [...prev, key]
+        : [...prev, key],
     );
   };
 
   const filteredColumns = columns.filter((col) =>
-    visibleColumns.includes(col.key)
+    visibleColumns.includes(col.key),
   );
 
   // 🔍 Search
@@ -135,49 +131,54 @@ const Table = ({
 
             {/* Search */}
             <div className="relative">
-              <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
+              <FiSearch className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search"
-                className="pl-10 pr-4 py-2 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Search patients..."
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-50 focus:border-blue-500 outline-none transition"
               />
             </div>
           </div>
 
           {/* Right Icons */}
           <div className="flex items-center gap-5">
-                {/* Column Filter */}
-        <div className="relative" ref={filterRef}>
-          <FunnelIcon
-            onClick={() => setShowColumnFilter((prev) => !prev)}
-            className="w-6 h-6 text-gray-600 cursor-pointer hover:text-blue-600 transition"
-          />
+            {/* Column Filter */}
+            <div className="relative" ref={filterRef}>
+              <LiaFilterSolid
+                onClick={() => setShowColumnFilter((prev) => !prev)}
+                className="w-6 h-6 text-gray-600 cursor-pointer hover:text-blue-600 hover:scale-110 transition"
+              />
 
-          {showColumnFilter && (
-            <div className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50 animate-fadeIn">
-              <h4 className="text-sm font-semibold text-gray-700 mb-3">
-                Show / Hide Columns
-              </h4>
+              {showColumnFilter && (
+                <div className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50 animate-fadeIn">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                    Show / Hide Columns
+                  </h4>
 
-              <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
-                {columns.map((col) => (
-                  <label
-                    key={col.key}
-                    className="flex items-center gap-3 text-sm text-gray-600 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded-lg transition"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={visibleColumns.includes(col.key)}
-                      onChange={() => toggleColumn(col.key)}
-                      className="w-4 h-4 accent-blue-600"
-                    />
-                    {col.title}
-                  </label>
-                ))}
-              </div>
+                  <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
+                    {columns.map((col) => (
+                      <label
+                        key={col.key}
+                        className="flex items-center gap-3 text-sm text-gray-600 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded-lg transition"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={visibleColumns.includes(col.key)}
+                          onChange={() => toggleColumn(col.key)}
+                          className="w-4 h-4 accent-blue-600"
+                        />
+                        {col.title}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
             <PlusCircleIcon
               onClick={() => setIsOpen(true)}
