@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { FiChevronUp, FiChevronDown, FiSearch } from "react-icons/fi";
 import {
   PencilSquareIcon,
@@ -23,6 +23,38 @@ const Table = ({
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showColumnFilter, setShowColumnFilter] = useState(false);
+
+  // store visible column keys
+  const [visibleColumns, setVisibleColumns] = useState(
+    columns.map((col) => col.key),
+  );
+
+  const filterRef = useRef();
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (filterRef.current && !filterRef.current.contains(e.target)) {
+        setShowColumnFilter(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const toggleColumn = (key) => {
+    setVisibleColumns((prev) =>
+      prev.includes(key)
+        ? prev.filter((colKey) => colKey !== key)
+        : [...prev, key]
+    );
+  };
+
+  const filteredColumns = columns.filter((col) =>
+    visibleColumns.includes(col.key)
+  );
 
   // 🔍 Search
   const filteredData = useMemo(() => {
@@ -82,51 +114,82 @@ const Table = ({
         </div>
       </div> */}
 
-        {/* ================= TOP BAR ================= */}
-            <div className="mb-6">
-              {/* Breadcrumb */}
-              <div className="flex items-center text-sm text-gray-600 mb-3">
-                <span className="font-semibold text-gray-800">All Patients</span>
-                <span className="mx-2">›</span>
-                <HomeIcon className="w-4 h-4" />
-                <span className="mx-2">›</span>
-                Patients
-                <span className="mx-2">›</span>
-                All Patients
-              </div>
-      
-              {/* Toolbar Container */}
-              <div className="bg-[#eef2fb] rounded-xl px-6 py-4 flex items-center justify-between">
-                {/* Left Section */}
-                <div className="flex items-center gap-6">
-                  <h2 className="text-lg font-semibold text-gray-800">Patients</h2>
-      
-                  {/* Search */}
-                  <div className="relative">
-                    <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
+      {/* ================= TOP BAR ================= */}
+      <div className="mb-6">
+        {/* Breadcrumb */}
+        <div className="flex items-center text-sm text-gray-600 mb-3">
+          <span className="font-semibold text-gray-800">All Patients</span>
+          <span className="mx-2">›</span>
+          <HomeIcon className="w-4 h-4" />
+          <span className="mx-2">›</span>
+          Patients
+          <span className="mx-2">›</span>
+          All Patients
+        </div>
+
+        {/* Toolbar Container */}
+        <div className="bg-[#eef2fb] rounded-xl px-6 py-4 flex items-center justify-between">
+          {/* Left Section */}
+          <div className="flex items-center gap-6">
+            <h2 className="text-lg font-semibold text-gray-800">Patients</h2>
+
+            {/* Search */}
+            <div className="relative">
+              <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search"
+                className="pl-10 pr-4 py-2 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* Right Icons */}
+          <div className="flex items-center gap-5">
+                {/* Column Filter */}
+        <div className="relative" ref={filterRef}>
+          <FunnelIcon
+            onClick={() => setShowColumnFilter((prev) => !prev)}
+            className="w-6 h-6 text-gray-600 cursor-pointer hover:text-blue-600 transition"
+          />
+
+          {showColumnFilter && (
+            <div className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50 animate-fadeIn">
+              <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                Show / Hide Columns
+              </h4>
+
+              <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
+                {columns.map((col) => (
+                  <label
+                    key={col.key}
+                    className="flex items-center gap-3 text-sm text-gray-600 cursor-pointer hover:bg-gray-50 px-2 py-1 rounded-lg transition"
+                  >
                     <input
-                      type="text"
-                      placeholder="Search"
-                      className="pl-10 pr-4 py-2 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      type="checkbox"
+                      checked={visibleColumns.includes(col.key)}
+                      onChange={() => toggleColumn(col.key)}
+                      className="w-4 h-4 accent-blue-600"
                     />
-                  </div>
-                </div>
-      
-                {/* Right Icons */}
-                <div className="flex items-center gap-5">
-                  <FunnelIcon className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-600 transition" />
-      
-                  <PlusCircleIcon
-                    onClick={() => setIsOpen(true)}
-                    className="w-6 h-6 text-green-600 cursor-pointer hover:scale-110 transition"
-                  />
-      
-                  <ArrowPathIcon className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-600 transition" />
-      
-                  <ArrowDownTrayIcon className="w-5 h-5 text-blue-600 cursor-pointer hover:text-blue-800 transition" />
-                </div>
+                    {col.title}
+                  </label>
+                ))}
               </div>
             </div>
+          )}
+        </div>
+
+            <PlusCircleIcon
+              onClick={() => setIsOpen(true)}
+              className="w-6 h-6 text-green-600 cursor-pointer hover:scale-110 transition"
+            />
+
+            <ArrowPathIcon className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-600 transition" />
+
+            <ArrowDownTrayIcon className="w-5 h-5 text-blue-600 cursor-pointer hover:text-blue-800 transition" />
+          </div>
+        </div>
+      </div>
 
       {/* Table Card */}
       <div className=" border border-gray-100 overflow-hidden">
@@ -136,7 +199,7 @@ const Table = ({
               <tr>
                 <th className="px-6 py-4 text-left font-medium">S/N</th>
 
-                {columns.map((col) => (
+                {filteredColumns.map((col) => (
                   <th
                     key={col.key}
                     onClick={() => col.sortable && requestSort(col.key)}
@@ -176,7 +239,7 @@ const Table = ({
                     {(currentPage - 1) * pageSize + index + 1}
                   </td>
 
-                  {columns.map((col) => (
+                  {filteredColumns.map((col) => (
                     <td key={col.key} className="px-6 py-4">
                       {col.render
                         ? col.render(row[col.key], row)
