@@ -4,17 +4,17 @@ import DataTable from "../../components/Table";
 import Modal from "../../components/Modal";
 import AddPatients from "../../components/AddPatients";
 import { FiEdit, FiTrash2, FiEye, FiX } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate  } from "react-router-dom";
 import { useStore } from "../../store/store";
 
 const Patients = () => {
-
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [editPatient, setEditPatient] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
-  const { darkMode, patients  } = useStore();
+  const { darkMode, patients } = useStore();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
+  const navigate = useNavigate();
 
   const columns = [
     { title: "Card No", key: "patientId", sortable: true },
@@ -100,9 +100,9 @@ const Patients = () => {
       <div className=" overflow-hidden">
         <DataTable
           columns={columns}
-          data={patients }
+          data={patients}
           searchableKeys={["fullName", "patientId", "phone"]}
-          onRowClick={(row) => setEditPatient(row)} // open on row click
+          onRowClick={(row) => navigate(`/dashboard/patient-profile/${row.id}`)}
           actions={(row) => (
             <div className="flex gap-3" onClick={(e) => e.stopPropagation()}>
               <Link to={`/dashboard/patient-profile/${row.id}`}>
