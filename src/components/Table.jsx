@@ -8,6 +8,9 @@ import {
   HomeIcon,
 } from "@heroicons/react/24/outline";
 import { LiaFilterSolid } from "react-icons/lia";
+import AddPatients from "../components/AddPatients";
+import Modal from "../components/Modal";
+import { useStore } from "../store/store";
 
 const Table = ({
   columns,
@@ -21,6 +24,9 @@ const Table = ({
   const [sortConfig, setSortConfig] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [showColumnFilter, setShowColumnFilter] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+   const { darkMode } = useStore();
 
   // store visible column keys
   const [visibleColumns, setVisibleColumns] = useState(
@@ -285,6 +291,16 @@ const Table = ({
           </button>
         </div>
       </div>
+
+        {/* ================= MODAL ADD PATIENT ================= */}
+            <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
+              <h2
+                className={`text-xl font-bold mb-6 ${darkMode ? "text-white" : "text-slate-800"}`}
+              >
+                Patient Registration
+              </h2>
+              <AddPatients />
+            </Modal>
     </div>
   );
 };

@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import AddPatients from "../../components/AddPatients";
 import { useStore } from "../../store/store";
-import Modal from "../../components/Modal";
 import DataTable from "../../components/Table";
-
 import { FiEdit, FiTrash2, FiEye, FiX } from "react-icons/fi";
 
 const Patients = () => {
@@ -353,7 +350,7 @@ const Patients = () => {
   const [patientsData, setPatientsData] = useState(patients);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [editPatient, setEditPatient] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
+  
   const { darkMode } = useStore();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
@@ -465,15 +462,7 @@ const Patients = () => {
         />
       </div>
 
-      {/* ================= MODAL ADD PATIENT ================= */}
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-        <h2
-          className={`text-xl font-bold mb-6 ${darkMode ? "text-white" : "text-slate-800"}`}
-        >
-          Patient Registration
-        </h2>
-        <AddPatients />
-      </Modal>
+    
 
       {/* ================= DELETE CONFIRM MODAL ================= */}
       <AnimatePresence>
