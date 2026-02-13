@@ -7,10 +7,12 @@ import UserProfile from "./components/UserProfile";
 import Appointment from "./pages/Dashboard/Appointment";
 import Patients from "./pages/Dashboard/Patients";
 import PatientProfile from "./pages/Dashboard/PatientProfile";
+import ScrollToTop from "./components/ScrollToTop";
 
 const App = () => {
   return (
     <>
+    <ScrollToTop />
       <Routes>
         <Route path="/" element={<Login />} />
         <Route element={<DashboardLayout />}>
