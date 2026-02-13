@@ -47,7 +47,7 @@ const DashboardLayout = () => {
 
   const colorOptions = [
     { name: 'White', class: 'bg-white' },
-    { name: 'Dark', class: 'bg-slate-800' },
+    { name: 'Dark', class: 'bg-slate-900' },
     { name: 'Blue', class: 'bg-blue-600' },
     { name: 'Orange', class: 'bg-orange-500' },
     { name: 'Purple', class: 'bg-purple-600' },

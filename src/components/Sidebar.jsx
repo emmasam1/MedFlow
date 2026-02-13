@@ -12,7 +12,7 @@ const Sidebar = () => {
   const { isSidebarOpen, toggleSidebar, sidebarTheme, isRTL, darkMode } =
     useStore();
 
-  const bgColor = sidebarTheme === "dark" ? "bg-[#1a202c]" : "bg-white";
+  const bgColor = sidebarTheme === "dark" ? "bg-slate-900" : "bg-white";
   const borderColor = darkMode ? "border-gray-200" : "border-gray-100";
   const titleColor =
     sidebarTheme === "dark" ? "text-white" : "text-slate-800";
