@@ -1,3 +1,4 @@
+
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -54,7 +55,7 @@ const treatments = [
 ];
 
 /* ===============================
-   BASE PATIENTS (Your original)
+   BASE PATIENTS
 ================================= */
 
 const basePatients = [
@@ -401,14 +402,54 @@ const basePatients = [
   ];
 
 /* ===============================
+   BALANCE GENERATOR
+================================= */
+
+const generateRunningBalance = (index) => {
+  // Rotate between 3 types
+  const type = index % 3;
+
+  if (type === 0) {
+    // Credit (advance payment)
+    const amount = 20000 + index * 1000;
+    return {
+      runningBalance: amount,
+      balanceStatus: "CR",
+      balanceLabel: `₦${amount.toLocaleString()} CR`,
+    };
+  }
+
+  if (type === 1) {
+    // Outstanding
+    const amount = 10000 + index * 500;
+    return {
+      runningBalance: -amount,
+      balanceStatus: "OS",
+      balanceLabel: `₦${amount.toLocaleString()} OS`,
+    };
+  }
+
+  // Settled
+  return {
+    runningBalance: 0,
+    balanceStatus: "ZERO",
+    balanceLabel: "₦0.00",
+  };
+};
+
+/* ===============================
    ENHANCE PATIENTS
 ================================= */
 
 const enhancedPatients = basePatients.map((patient, index) => {
   const i = index % 5;
 
+  const balance = generateRunningBalance(index);
+
   return {
     ...patient,
+
+    ...balance, // <-- NEW RUNNING BALANCE ADDED HERE
 
     personalInfo: {
       maritalStatus: index % 2 === 0 ? "Married" : "Single",
@@ -481,8 +522,6 @@ const enhancedPatients = basePatients.map((patient, index) => {
 export const useStore = create(
   persist(
     (set, get) => ({
-      /* ========= YOUR ORIGINAL STATE ========= */
-
       darkMode: false,
       isSidebarOpen: true,
       sidebarTheme: "light",
@@ -522,6 +561,7 @@ export const useStore = create(
           patients: state.patients.filter((p) => p.id !== id),
         })),
     }),
-    { name: "cliniva-full-store" }
+   { name: "cliniva-full-store-v2" }
+
   )
 );
