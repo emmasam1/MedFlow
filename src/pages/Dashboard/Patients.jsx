@@ -4,7 +4,7 @@ import DataTable from "../../components/Table";
 import Modal from "../../components/Modal";
 import AddPatients from "../../components/AddPatients";
 import { FiEdit, FiTrash2, FiEye, FiX } from "react-icons/fi";
-import { Link, useNavigate  } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useStore } from "../../store/store";
 
 const Patients = () => {
@@ -69,11 +69,10 @@ const Patients = () => {
         defaultValue={value}
         disabled={disabled}
         className={`w-full px-4 py-3 rounded-2xl border text-sm transition
-        ${
-          disabled
+        ${disabled
             ? "bg-gray-100 border-gray-200 cursor-not-allowed"
             : "border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        }`}
+          }`}
       />
     </div>
   );
@@ -213,18 +212,101 @@ const Patients = () => {
               </div>
 
               {/* Body */}
+
+              {/* Section Divider */}
+              <div className="md:col-span-2 pt-4 mt-4">
+                <h3 className="mx-6 text-md font-semibold text-gray-700">
+                  Personal Information
+                </h3>
+              </div>
+
               <div className="p-6 max-h-[70vh] overflow-y-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {/* Age */}
+                  {/* First Name */}
                   <div>
-                    <label className="text-sm text-gray-600">Age*</label>
+                    <label className="text-sm text-gray-600">First Name*</label>
                     <input
-                      type="number"
+                      type="text"
                       className="w-full border rounded-lg px-3 py-2 mt-1"
-                      defaultValue="30"
                     />
                   </div>
-
+                  {/*Last Name */}
+                  <div>
+                    <label className="text-sm text-gray-600">Last Name*</label>
+                    <input
+                      type="text"
+                      className="w-full border rounded-lg px-3 py-2 mt-1"
+                    />
+                  </div>
+                  {/* Phone Number */}
+                  <div>
+                    <label className="text-sm text-gray-600">Phone Number*</label>
+                    <input
+                      type="tel"
+                      className="w-full border rounded-lg px-3 py-2 mt-1"
+                    />
+                  </div>
+                  {/* Date of Birth */}
+                  <div>
+                    <label className="text-sm text-gray-600">Date of Birth*</label>
+                    <input
+                      type="date"
+                      className="w-full border rounded-lg px-3 py-2 mt-1"
+                    />
+                  </div>
+                  {/* Gender */}
+                  <div>
+                    <label className="text-sm text-gray-600">Gender*</label>
+                    <select className="w-full border rounded-lg px-3 py-2 mt-1">
+                      <option>Select</option>
+                      <option>Male</option>
+                      <option>Female</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+                  {/* Type */}
+                  <div>
+                    <label className="text-sm text-gray-600">Type*</label>
+                    <select className="w-full border rounded-lg px-3 py-2 mt-1">
+                      <option>Single</option>
+                      <option>Family</option>
+                      <option>NHIS</option>
+                    </select>
+                  </div>
+                  {/* Marital Status*/}
+                  <div>
+                    <label className="text-sm text-gray-600">Marital Status*</label>
+                    <select className="w-full border rounded-lg px-3 py-2 mt-1">
+                      <option>Single</option>
+                      <option>Married</option>
+                      <option>Divorced</option>
+                      <option>Widowed</option>
+                    </select>
+                  </div>
+                  {/*Origin State*/}
+                  <div>
+                    <label className="text-sm text-gray-600">Origin State*</label>
+                    <input
+                      type="text"
+                      className="w-full border rounded-lg px-3 py-2 mt-1"
+                    />
+                  </div>
+                  {/*Local Government*/}
+                  <div>
+                    <label className="text-sm text-gray-600">L.G.A*</label>
+                    <input
+                      type="text"
+                      className="w-full border rounded-lg px-3 py-2 mt-1"
+                    />
+                  </div>
+                  {/*Occupation*/}
+                  <div>
+                    <label className="text-sm text-gray-600">Occupation*</label>
+                    <input
+                      type="text"
+                      className="w-full border rounded-lg px-3 py-2 mt-1"
+                    />
+                  </div>
                   {/* Email */}
                   <div>
                     <label className="text-sm text-gray-600">Email*</label>
@@ -288,6 +370,58 @@ const Patients = () => {
                     />
                   </div>
                 </div>
+
+                {/* Section Divider */}
+                <div className="md:col-span-2 pt-4 border-t mt-4">
+                  <h3 className="text-md font-semibold text-gray-700">
+                    Next of Kin
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                  {/* NOK Name */}
+                  <div>
+                    <label className="text-sm text-gray-600">NOK Full Name*</label>
+                    <input
+                      type="text"
+                      className="w-full border rounded-lg px-3 py-2 mt-1"
+                      defaultValue={editPatient?.emergency?.name}
+                    />
+                  </div>
+
+                  {/* Relationship */}
+                  <div>
+                    <label className="text-sm text-gray-600">NOK Relationship*</label>
+                    <input
+                      type="text"
+                      className="w-full border rounded-lg px-3 py-2 mt-1"
+                      defaultValue={editPatient?.emergency?.relation}
+                    />
+                  </div>
+
+                  {/* NOK Phone */}
+                  <div>
+                    <label className="text-sm text-gray-600">NOK Phone*</label>
+                    <input
+                      type="tel"
+                      className="w-full border rounded-lg px-3 py-2 mt-1"
+                      defaultValue={editPatient?.emergency?.phone}
+                    />
+                  </div>
+
+                  {/* Address */}
+                  <div>
+                    <label className="text-sm text-gray-600">NOK Address*</label>
+                    <input
+                      type="text"
+                      className="w-full border rounded-lg px-3 py-2 mt-1"
+                    />
+                  </div>
+
+                </div>
+
+
               </div>
 
               {/* Footer */}
