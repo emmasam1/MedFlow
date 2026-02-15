@@ -109,7 +109,7 @@ const PatientProfile = () => {
           <p className="text-sm font-bold text-black">Running Balance</p>
 
           <h2 className="font-bold m-0! flex items-center gap-3">
-            {balance === 0 ? "₦0.00" : amountDisplay}
+            {balance === 0 ? "₦0.00" : (balance < 0 ? "−" : "") + amountDisplay}
             <span className="text-xs">{statusText}</span>
           </h2>
         </div>
