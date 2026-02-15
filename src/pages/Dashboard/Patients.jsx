@@ -1,18 +1,23 @@
-import React, { useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { useReactToPrint } from "react-to-print";
 import { motion, AnimatePresence } from "framer-motion";
 import DataTable from "../../components/Table";
 import Modal from "../../components/Modal";
 import AddPatients from "../../components/AddPatients";
 import { FiEdit, FiTrash2, FiEye, FiX } from "react-icons/fi";
+import { PiPrinterLight } from "react-icons/pi";
 import { Link, useNavigate } from "react-router-dom";
 import { useStore } from "../../store/store";
+import PatientIDCard from "../../components/PatientIDCard";
 
 const Patients = () => {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [editPatient, setEditPatient] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
-  const { darkMode, patients } = useStore();
+  const { darkMode, patients, deletePatient } = useStore();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [printPatient, setPrintPatient] = useState(null);
+  const printRef = useRef();
 
   const navigate = useNavigate();
 
@@ -41,9 +46,22 @@ const Patients = () => {
   };
 
   const handleDelete = () => {
-    setPatientsData((prev) => prev.filter((p) => p.id !== selectedPatient.id));
+    if (!selectedPatient) return;
+    deletePatient(selectedPatient.id);
     setIsDeleteOpen(false);
+    setSelectedPatient(null);
   };
+
+  useEffect(() => {
+    if (printPatient) {
+      handlePrint();
+    }
+  }, [printPatient]);
+
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: printPatient?.fullName || "Patient ID Card",
+  });
 
   // const handleChange = (e) => {
   //   setSelectedPatient({
@@ -69,10 +87,11 @@ const Patients = () => {
         defaultValue={value}
         disabled={disabled}
         className={`w-full px-4 py-3 rounded-2xl border text-sm transition
-        ${disabled
+        ${
+          disabled
             ? "bg-gray-100 border-gray-200 cursor-not-allowed"
             : "border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          }`}
+        }`}
       />
     </div>
   );
@@ -116,9 +135,20 @@ const Patients = () => {
                 className="text-red-500 cursor-pointer hover:text-red-700"
                 onClick={() => confirmDelete(row)}
               />
+              <PiPrinterLight
+                className="cursor-pointer"
+                onClick={() => {
+                  setPrintPatient(row);
+                  handlePrint();
+                }}
+              />
             </div>
           )}
         />
+      </div>
+
+      <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
+        <PatientIDCard ref={printRef} patient={printPatient} />
       </div>
 
       {/* ================= MODAL ADD PATIENT ================= */}
@@ -240,7 +270,9 @@ const Patients = () => {
                   </div>
                   {/* Phone Number */}
                   <div>
-                    <label className="text-sm text-gray-600">Phone Number*</label>
+                    <label className="text-sm text-gray-600">
+                      Phone Number*
+                    </label>
                     <input
                       type="tel"
                       className="w-full border rounded-lg px-3 py-2 mt-1"
@@ -248,7 +280,9 @@ const Patients = () => {
                   </div>
                   {/* Date of Birth */}
                   <div>
-                    <label className="text-sm text-gray-600">Date of Birth*</label>
+                    <label className="text-sm text-gray-600">
+                      Date of Birth*
+                    </label>
                     <input
                       type="date"
                       className="w-full border rounded-lg px-3 py-2 mt-1"
@@ -275,7 +309,9 @@ const Patients = () => {
                   </div>
                   {/* Marital Status*/}
                   <div>
-                    <label className="text-sm text-gray-600">Marital Status*</label>
+                    <label className="text-sm text-gray-600">
+                      Marital Status*
+                    </label>
                     <select className="w-full border rounded-lg px-3 py-2 mt-1">
                       <option>Single</option>
                       <option>Married</option>
@@ -285,7 +321,9 @@ const Patients = () => {
                   </div>
                   {/*Origin State*/}
                   <div>
-                    <label className="text-sm text-gray-600">Origin State*</label>
+                    <label className="text-sm text-gray-600">
+                      Origin State*
+                    </label>
                     <input
                       type="text"
                       className="w-full border rounded-lg px-3 py-2 mt-1"
@@ -379,10 +417,11 @@ const Patients = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
                   {/* NOK Name */}
                   <div>
-                    <label className="text-sm text-gray-600">NOK Full Name*</label>
+                    <label className="text-sm text-gray-600">
+                      NOK Full Name*
+                    </label>
                     <input
                       type="text"
                       className="w-full border rounded-lg px-3 py-2 mt-1"
@@ -392,7 +431,9 @@ const Patients = () => {
 
                   {/* Relationship */}
                   <div>
-                    <label className="text-sm text-gray-600">NOK Relationship*</label>
+                    <label className="text-sm text-gray-600">
+                      NOK Relationship*
+                    </label>
                     <input
                       type="text"
                       className="w-full border rounded-lg px-3 py-2 mt-1"
@@ -412,16 +453,15 @@ const Patients = () => {
 
                   {/* Address */}
                   <div>
-                    <label className="text-sm text-gray-600">NOK Address*</label>
+                    <label className="text-sm text-gray-600">
+                      NOK Address*
+                    </label>
                     <input
                       type="text"
                       className="w-full border rounded-lg px-3 py-2 mt-1"
                     />
                   </div>
-
                 </div>
-
-
               </div>
 
               {/* Footer */}

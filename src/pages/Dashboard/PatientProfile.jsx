@@ -179,12 +179,13 @@ const PatientProfile = () => {
                 <p className="font-semibold text-gray-700 pt-2">
                   Emergency Contact
                 </p>
-                <Row label="Name" value={patient.emergencyContact.name} />
+                <Row label="Name" value={patient.nextOfKin.name} />
                 <Row
                   label="Relation"
-                  value={patient.emergencyContact.relation}
+                  value={patient.nextOfKin.relationship}
                 />
-                <Row label="Phone" value={patient.emergencyContact.phone} />
+                <Row label="Phone" value={patient.nextOfKin.phone} />
+                <Row label="Address" value={patient.nextOfKin.address} />
               </div>
             </div>
           </Section>
