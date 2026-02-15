@@ -22,7 +22,6 @@ const Row = ({ label, value }) => (
   </div>
 );
 
-
 const Section = ({ loading, children }) => {
   return (
     <motion.div
@@ -41,6 +40,24 @@ const PatientProfile = () => {
 
   const patient = patients.find((p) => String(p.id) === String(id));
 
+  
+  const balance = Number(patient?.runningBalance ?? 0);
+  
+  let statusText = "";
+  let statusColor = "";
+  let amountDisplay = `₦${Math.abs(balance).toLocaleString()}`;
+
+  if (balance > 0) {
+    statusText = "Advance Payment";
+    statusColor = "text-green-600 bg-green-50 border-green-200";
+  } else if (balance < 0) {
+    statusText = "Outstanding Payment";
+    statusColor = "text-red-600 bg-red-50 border-red-200";
+  } else {
+    statusText = "No Outstanding Balance";
+    statusColor = "text-gray-600 bg-gray-50 border-gray-200";
+  }
+
   // Separate loading states for each box
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [loadingPersonal, setLoadingPersonal] = useState(true);
@@ -50,22 +67,19 @@ const PatientProfile = () => {
   const [loadingInsurance, setLoadingInsurance] = useState(true);
   const [loadingVisitHistory, setLoadingVisitHistory] = useState(true);
 
-  
-useEffect(() => {
-  if (!patient) return;
+  useEffect(() => {
+    if (!patient) return;
 
-  const delay = 100; // shorter delay between boxes
+    const delay = 100; // shorter delay between boxes
 
-  setTimeout(() => setLoadingProfile(false), 0);
-  setTimeout(() => setLoadingPersonal(false), delay);
-  setTimeout(() => setLoadingContact(false), delay * 2);
-  setTimeout(() => setLoadingMedical(false), delay * 3);
-  setTimeout(() => setLoadingAdmission(false), delay * 4);
-  setTimeout(() => setLoadingInsurance(false), delay * 5);
-  setTimeout(() => setLoadingVisitHistory(false), delay * 6);
-}, [patient]);
-
-
+    setTimeout(() => setLoadingProfile(false), 0);
+    setTimeout(() => setLoadingPersonal(false), delay);
+    setTimeout(() => setLoadingContact(false), delay * 2);
+    setTimeout(() => setLoadingMedical(false), delay * 3);
+    setTimeout(() => setLoadingAdmission(false), delay * 4);
+    setTimeout(() => setLoadingInsurance(false), delay * 5);
+    setTimeout(() => setLoadingVisitHistory(false), delay * 6);
+  }, [patient]);
 
   if (!patient) {
     return (
@@ -78,17 +92,30 @@ useEffect(() => {
   return (
     <div>
       {/* Breadcrumb */}
-      <div className="flex items-center text-sm text-gray-600 mb-3">
-        <Link to="/dashboard/patients" className="flex gap-2 item-center">
-          <RiUserHeartLine className="w-4 h-4" /> All Patients
-        </Link>
-        <span className="mx-2">›</span>
-        <span className="font-semibold text-gray-800">
-          {patient.fullName} information
-        </span>
+      <div className="flex justify-between items-center mb-4!">
+        <div className="flex items-center text-sm text-gray-600">
+          <Link to="/dashboard/patients" className="flex gap-2 item-center">
+            <RiUserHeartLine className="w-4 h-4" /> All Patients
+          </Link>
+          <span className="mx-2">›</span>
+          <span className="font-semibold text-gray-800">
+            {patient.fullName} information
+          </span>
+        </div>
+
+        <div
+          className={`flex justify-between items-center gap-3 bg-transparent! ${statusColor}`}
+        >
+          <p className="text-sm font-bold text-black">Running Balance</p>
+
+          <h2 className="font-bold m-0! flex items-center gap-3">
+            {balance === 0 ? "₦0.00" : (balance < 0 ? "−" : "") + amountDisplay}
+            <span className="text-xs">{statusText}</span>
+          </h2>
+        </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 mt-3">
+      <div className="flex flex-col md:flex-row gap-4 mt-4!">
         {/* LEFT SIDE */}
         <div className="md:w-1/3 space-y-5">
           {/* PROFILE HEADER */}
@@ -142,7 +169,9 @@ useEffect(() => {
             <div className="bg-white rounded-sm shadow-sm">
               <div className="flex items-center gap-2 px-5 py-4 border-b border-gray-200">
                 <IdentificationIcon className="w-5 h-5 text-gray-600" />
-                <h3 className="font-semibold text-gray-800">Contact & Address</h3>
+                <h3 className="font-semibold text-gray-800">
+                  Contact & Address
+                </h3>
               </div>
               <div className="p-5 space-y-4 text-sm">
                 <Row label="Phone" value={patient.phone} />
@@ -151,7 +180,10 @@ useEffect(() => {
                   Emergency Contact
                 </p>
                 <Row label="Name" value={patient.emergencyContact.name} />
-                <Row label="Relation" value={patient.emergencyContact.relation} />
+                <Row
+                  label="Relation"
+                  value={patient.emergencyContact.relation}
+                />
                 <Row label="Phone" value={patient.emergencyContact.phone} />
               </div>
             </div>
@@ -281,7 +313,10 @@ useEffect(() => {
                   label="Coverage Amount"
                   value={`₦${patient.insuranceDetails.coverageAmount.toLocaleString()}`}
                 />
-                <Row label="Copayment" value={patient.insuranceDetails.copayment} />
+                <Row
+                  label="Copayment"
+                  value={patient.insuranceDetails.copayment}
+                />
               </div>
             </div>
           </Section>
