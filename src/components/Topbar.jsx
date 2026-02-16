@@ -134,7 +134,7 @@ const Topbar = () => {
                 {notifications.length > 0 && (
                   <div className="flex flex-col max-h-[60vh] overflow-y-auto">
                     {notifications.map((notif) => (
-                      <Notification key={notif.id} notif={notif} />
+                      <Notification key={notif.id} notif={notif} onClick={() => setNotifDropdown(false)}/>
                     ))}
                   </div>
                 )}

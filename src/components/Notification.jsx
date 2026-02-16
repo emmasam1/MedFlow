@@ -8,7 +8,7 @@ const notifColors = {
   info: "border-l-4 border-blue-500 bg-blue-50/70",
 };
 
-const Notification = ({ notif }) => {
+const Notification = ({ notif, onClick }) => {
 //   const removeNotification = useStore((state) => state.removeNotification);
   const navigate = useNavigate();
 
@@ -19,7 +19,10 @@ const Notification = ({ notif }) => {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 0 }}
       transition={{ duration: 0.2 }}
-      onClick={() => navigate(`/dashboard/notifications/${notif.id}`)}
+      onClick={() => {
+        navigate(`/dashboard/notifications/${notif.id}`);
+        onClick?.();
+      }}
       className={`flex flex-col gap-1 mb-2 p-4 cursor-pointer rounded-lg hover:bg-gray-100 transition-transform transform ${notifColors[notif.type]}`}
     >
       <h4 className="font-semibold text-gray-800 text-sm">{notif.title}</h4>
