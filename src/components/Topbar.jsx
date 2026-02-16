@@ -83,7 +83,7 @@ const Topbar = () => {
         </button>
 
         <div className="hidden md:block">
-          <h1 className="text-sm font-semibold text-gray-700 tracking-wide">
+          <h1 className="text-sm font-semibold text-black tracking-wide">
             Afternoon Shift
           </h1>
         </div>
