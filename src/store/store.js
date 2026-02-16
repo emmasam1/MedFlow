@@ -483,6 +483,64 @@ export const basePatients = [
   },
 ];
 
+const dummyNotifications = [
+  {
+    id: 1,
+    type: "success",
+    title: "Patient Admitted",
+    message: "Chinedu Okafor has been admitted to Ward W-101 / R-201",
+    duration: 5000,
+  },
+  {
+    id: 2,
+    type: "error",
+    title: "Payment Failed",
+    message: "Payment for Aisha Bello could not be processed",
+    duration: 5000,
+  },
+  {
+    id: 3,
+    type: "info",
+    title: "New Appointment",
+    message: "Ibrahim Musa has a scheduled appointment tomorrow",
+    duration: 5000,
+  },
+  {
+    id: 4,
+    type: "success",
+    title: "Test Result Ready",
+    message: "Fatima Usman's lab results are now available",
+    duration: 5000,
+  },
+  {
+    id: 5,
+    type: "info",
+    title: "Reminder",
+    message: "Samuel Olatunji has an appointment today at 2 PM",
+    duration: 5000,
+  },
+  {
+    id: 6,
+    type: "error",
+    title: "Alert",
+    message: "Payment for Tunde Adeyemi is overdue",
+    duration: 5000,
+  },
+  {
+    id: 7,
+    type: "success",
+    title: "Discharged",
+    message: "Blessing Nwosu has been discharged successfully",
+    duration: 5000,
+  },
+  {
+    id: 8,
+    type: "info",
+    title: "New Patient",
+    message: "Jessica Okon has registered today",
+    duration: 5000,
+  },
+];
 
 /* ===============================
    BALANCE GENERATOR
@@ -634,7 +692,26 @@ export const useStore = create(
         set((state) => ({
           patients: state.patients.filter((p) => p.id !== id),
         })),
+
+      /* ========= NOTIFICATIONS ========= */
+      notifications: dummyNotifications,
+
+      addNotification: (notif) =>
+        set((state) => ({
+          notifications: [...state.notifications, { id: Date.now(), ...notif }],
+        })),
+
+      removeNotification: (id) =>
+        set((state) => ({
+          notifications: state.notifications.filter((n) => n.id !== id),
+        })),
+
+      // ---------- Other actions ----------
+      setDarkMode: (val) => set({ darkMode: val }),
+      toggleSidebar: () =>
+        set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
     }),
+
     { name: "cliniva-full-store-v2.0" },
   ),
 );
