@@ -21,7 +21,7 @@ const Topbar = () => {
     isRTL,
     darkMode,
     notifications,
-    removeAllNotifications,
+    markAsRead,
   } = useStore();
 
   const [profileDropdown, setProfileDropdown] = useState(false);
@@ -53,6 +53,12 @@ const Topbar = () => {
   const handleLogout = () => {
     setProfileDropdown(false);
     navigate("/");
+  };
+
+  const handleNotificationClick = (notif) => {
+    markAsRead(notif.id);
+    setNotifDropdown(false);
+    navigate(`/dashboard/notifications/${notif.id}`);
   };
 
   const isLightTopbar =
@@ -108,9 +114,9 @@ const Topbar = () => {
             aria-label="Notifications"
           >
             <RiNotification3Line size={22} />
-            {notifications.length > 0 && (
+            {notifications.filter((n) => !n.isRead).length > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white font-semibold">
-                {notifications.length}
+                {notifications.filter((n) => !n.isRead).length}
               </span>
             )}
           </button>
@@ -131,10 +137,14 @@ const Topbar = () => {
                 )}
 
                 {/* Wrap notifications with max-h only if needed */}
-                {notifications.length > 0 && (
+                {notifications.filter((n) => !n.isRead).length > 0 && (
                   <div className="flex flex-col max-h-[60vh] overflow-y-auto">
                     {notifications.map((notif) => (
-                      <Notification key={notif.id} notif={notif} onClick={() => setNotifDropdown(false)}/>
+                      <Notification
+                        key={notif.id}
+                        notif={notif}
+                        onClick={() => handleNotificationClick(notif)}
+                      />
                     ))}
                   </div>
                 )}

@@ -490,6 +490,7 @@ const dummyNotifications = [
     title: "Patient Admitted",
     message: "Chinedu Okafor has been admitted to Ward W-101 / R-201",
     duration: 5000,
+    isRead: false,
   },
   {
     id: 2,
@@ -497,6 +498,7 @@ const dummyNotifications = [
     title: "Payment Failed",
     message: "Payment for Aisha Bello could not be processed",
     duration: 5000,
+    isRead: false,
   },
   {
     id: 3,
@@ -504,6 +506,7 @@ const dummyNotifications = [
     title: "New Appointment",
     message: "Ibrahim Musa has a scheduled appointment tomorrow",
     duration: 5000,
+    isRead: false,
   },
   {
     id: 4,
@@ -511,6 +514,7 @@ const dummyNotifications = [
     title: "Test Result Ready",
     message: "Fatima Usman's lab results are now available",
     duration: 5000,
+    isRead: false,
   },
   {
     id: 5,
@@ -518,6 +522,7 @@ const dummyNotifications = [
     title: "Reminder",
     message: "Samuel Olatunji has an appointment today at 2 PM",
     duration: 5000,
+    isRead: false,
   },
   {
     id: 6,
@@ -525,6 +530,7 @@ const dummyNotifications = [
     title: "Alert",
     message: "Payment for Tunde Adeyemi is overdue",
     duration: 5000,
+    isRead: false,
   },
   {
     id: 7,
@@ -532,6 +538,7 @@ const dummyNotifications = [
     title: "Discharged",
     message: "Blessing Nwosu has been discharged successfully",
     duration: 5000,
+    isRead: false,
   },
   {
     id: 8,
@@ -539,6 +546,7 @@ const dummyNotifications = [
     title: "New Patient",
     message: "Jessica Okon has registered today",
     duration: 5000,
+    isRead: false,
   },
 ];
 
@@ -701,9 +709,11 @@ export const useStore = create(
           notifications: [...state.notifications, { id: Date.now(), ...notif }],
         })),
 
-      removeNotification: (id) =>
+      markAsRead: (id) =>
         set((state) => ({
-          notifications: state.notifications.filter((n) => n.id !== id),
+          notifications: state.notifications.map((notif) =>
+            notif.id === id ? { ...notif, isRead: true } : notif,
+          ),
         })),
 
       // ---------- Other actions ----------
