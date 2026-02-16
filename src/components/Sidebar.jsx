@@ -147,7 +147,7 @@ const Sidebar = () => {
             isRTL={isRTL}
           />
 
-          <SidebarItem
+          {/* <SidebarItem
             to="/settings"
             icon={<RiSettings4Line size={22} />}
             label="Settings"
@@ -155,7 +155,7 @@ const Sidebar = () => {
             theme={sidebarTheme}
             onClick={handleLinkClick}
             isRTL={isRTL}
-          />
+          /> */}
         </div>
       </nav>
     </motion.aside>

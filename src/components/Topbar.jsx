@@ -1,4 +1,3 @@
-
 import {
   RiMenuFoldLine,
   RiMenuUnfoldLine,
@@ -9,20 +8,24 @@ import {
   RiLogoutBoxRLine,
 } from "react-icons/ri";
 import { useStore } from "../store/store";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 
 const Topbar = () => {
-  const { isSidebarOpen, toggleSidebar, topbarColor, isRTL, darkMode } = useStore();
+  const { isSidebarOpen, toggleSidebar, topbarColor, isRTL, darkMode } =
+    useStore();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   // --- Fullscreen Logic ---
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch((err) => {
-        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+        console.error(
+          `Error attempting to enable full-screen mode: ${err.message}`,
+        );
       });
     } else {
       if (document.exitFullscreen) {
@@ -31,7 +34,14 @@ const Topbar = () => {
     }
   };
 
-  const isLightTopbar = topbarColor === "bg-white" || topbarColor === "bg-gray-50";
+ const handleLogout = () => {
+  setDropdownOpen(false);
+  navigate("/");
+};
+
+
+  const isLightTopbar =
+    topbarColor === "bg-white" || topbarColor === "bg-gray-50";
   const textColor = isLightTopbar
     ? darkMode
       ? "text-white"
@@ -58,8 +68,8 @@ const Topbar = () => {
               ? "lg:pr-[260px] pr-0"
               : "lg:pr-[80px] pr-0"
             : isSidebarOpen
-            ? "lg:pl-[260px] pl-0"
-            : "lg:pl-[80px] pl-0"
+              ? "lg:pl-[260px] pl-0"
+              : "lg:pl-[80px] pl-0"
         }
         ${topbarColor} ${textColor} shadow-sm`}
     >
@@ -82,7 +92,7 @@ const Topbar = () => {
           size={20}
           onClick={toggleFullscreen}
         />
-        
+
         <div className="relative">
           <RiNotification3Line size={22} />
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">
@@ -118,20 +128,15 @@ const Topbar = () => {
               >
                 <Link
                   to="/user-profile"
+                  onClick={() => setDropdownOpen(false)}
                   className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 transition text-gray-800"
                 >
                   <RiUserLine size={18} />
                   <span>Account</span>
                 </Link>
-                <Link
-                  to="/settings"
-                  className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 transition text-gray-800"
-                >
-                  <RiSettings3Line size={18} />
-                  <span>Settings</span>
-                </Link>
+
                 <button
-                  onClick={() => console.log("Logout clicked")}
+                  onClick={() => handleLogout()}
                   className="w-full text-left flex items-center gap-3 px-4 py-2 hover:bg-blue-50 transition text-gray-800"
                 >
                   <RiLogoutBoxRLine size={18} />
