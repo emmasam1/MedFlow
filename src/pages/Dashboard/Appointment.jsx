@@ -3,6 +3,7 @@ import { Calendar } from "antd";
 import { motion, AnimatePresence } from "framer-motion";
 import dayjs from "dayjs";
 import { HiSearch, HiChevronDown } from "react-icons/hi";
+import { PlusCircleIcon } from "@heroicons/react/24/outline";
 
 const PER_PAGE = 10;
 
@@ -105,9 +106,24 @@ const Appointment = () => {
 
   return (
     <div className="rounded-2xl shadow-sm overflow-hidden">
+      <div className="flex justify-between items-center p-2">
+      <span className="font-semibold text-gray-800">Appointment</span>
+        <motion.button
+          whileHover={{ scale: 1.05, y: -2 }}
+          whileTap={{ scale: 0.97 }}
+          transition={{ type: "spring", stiffness: 300 }}
+          className=" px-2 py-1 rounded-full text-[#005CBB] font-semibold flex items-center justify-end gap-1
+          hover:bg-[#9DCEF8] transition-colors duration-300 text-xs cursor-pointer">
+          <PlusCircleIcon className="w-5 h-5" />
+          Appointment
+        </motion.button>
+      </div>
+       
+      
+
       <div className="hidden lg:flex h-[calc(100vh-140px)]">
         {/* LEFT PANEL */}
-        <div style={{ width: leftWidth }} className="bg-white p-4 ">
+        <div style={{ width: leftWidth }} className="bg-white p-4 overflow-y-auto">
           <Calendar
             fullscreen={false}
             onSelect={handleDateSelect}
@@ -166,8 +182,8 @@ const Appointment = () => {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 bg-white 
-        focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none 
-        transition text-sm"
+                  focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none 
+                  transition text-sm"
                 />
 
                 {/* LEFT SEARCH ICON */}
@@ -180,11 +196,13 @@ const Appointment = () => {
                 <button
                   onClick={() => console.log("Searching:", search)}
                   className="absolute right-2 top-1/2 -translate-y-1/2 
-        p-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+                  p-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
                 >
                   <HiSearch size={14} />
                 </button>
+
               </div>
+
 
               {/* STATUS SELECT */}
               <div className="relative w-full sm:w-56">
@@ -192,8 +210,8 @@ const Appointment = () => {
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                   className="appearance-none w-full py-2.5 px-4 pr-10 rounded-xl 
-        border border-slate-200 bg-white text-sm
-        outline-none transition cursor-pointer"
+                  border border-slate-200 bg-white text-sm
+                  outline-none transition cursor-pointer"
                 >
                   <option value="All">All Status</option>
                   <option value="Confirmed">Confirmed</option>
@@ -209,6 +227,7 @@ const Appointment = () => {
                 />
               </div>
             </div>
+
           </div>
 
           {/* LIST */}
