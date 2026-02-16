@@ -11,6 +11,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 import Notification from "./Notification";
+import Time from "./Time";
 
 const Topbar = () => {
   const {
@@ -68,17 +69,25 @@ const Topbar = () => {
         ${isRTL ? (isSidebarOpen ? "lg:pr-[260px]" : "lg:pr-[80px]") : isSidebarOpen ? "lg:pl-[260px]" : "lg:pl-[80px]"}
         ${topbarColor} ${textColor} shadow-sm`}
     >
-      {/* Sidebar Toggle */}
-      <button
-        onClick={toggleSidebar}
-        className="p-2 hover:bg-black/5 rounded-lg transition-colors"
-      >
-        {isSidebarOpen ? (
-          <RiMenuFoldLine size={22} />
-        ) : (
-          <RiMenuUnfoldLine size={22} />
-        )}
-      </button>
+      <div className="flex items-center gap-5">
+        {/* Sidebar Toggle */}
+        <button
+          onClick={toggleSidebar}
+          className="p-2 hover:bg-black/5 rounded-lg transition-colors"
+        >
+          {isSidebarOpen ? (
+            <RiMenuFoldLine size={22} />
+          ) : (
+            <RiMenuUnfoldLine size={22} />
+          )}
+        </button>
+
+        <div className="hidden md:block">
+          <h1 className="text-sm font-semibold text-gray-700 tracking-wide">
+            Afternoon Shift
+          </h1>
+        </div>
+      </div>
 
       <div className="flex items-center gap-6">
         {/* Fullscreen */}
@@ -87,6 +96,9 @@ const Topbar = () => {
           className="cursor-pointer hidden sm:block hover:opacity-80 transition-opacity"
           onClick={toggleFullscreen}
         />
+
+        {/*Time*/}
+        <Time />
 
         {/* Notifications */}
         <div className="relative" ref={notifRef}>

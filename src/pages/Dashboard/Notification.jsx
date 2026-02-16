@@ -8,7 +8,6 @@ const Notification = () => {
   const navigate = useNavigate();
   const { notifications, removeNotification } = useStore();
 
-  console.log(id)
 
   // Find the notification
   const notif = notifications.find((n) => n.id.toString() === id);
