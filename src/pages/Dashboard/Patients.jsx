@@ -9,6 +9,7 @@ import { PiPrinterLight } from "react-icons/pi";
 import { Link, useNavigate } from "react-router-dom";
 import { useStore } from "../../store/store";
 import PatientIDCard from "../../components/PatientIDCard";
+import EditPatientModal from "../../components/EditPatientModal";
 
 const Patients = () => {
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -120,7 +121,7 @@ const Patients = () => {
           columns={columns}
           data={patients}
           searchableKeys={["fullName", "patientId", "phone"]}
-          onRowClick={(row) => navigate(`/dashboard/patient-profile/${row.id}`)}
+          // onRowClick={(row) => navigate(`/dashboard/patient-profile/${row.id}`)}
           actions={(row) => (
             <div className="flex gap-3" onClick={(e) => e.stopPropagation()}>
               <Link to={`/dashboard/patient-profile/${row.id}`}>
@@ -129,7 +130,9 @@ const Patients = () => {
 
               <FiEdit
                 className="text-blue-500 cursor-pointer hover:text-blue-700"
-                onClick={() => setEditPatient(row)}
+                onClick={() => {
+                  setEditPatient(row);
+                }}
               />
               <FiTrash2
                 className="text-red-500 cursor-pointer hover:text-red-700"
@@ -212,7 +215,6 @@ const Patients = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            {/* Modal Container */}
             <motion.div
               initial={{ y: 40, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -220,262 +222,10 @@ const Patients = () => {
               transition={{ duration: 0.25 }}
               className="bg-white w-full max-w-4xl rounded-xl shadow-xl overflow-hidden"
             >
-              {/* Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b">
-                <div className="flex items-center gap-3">
-                  <img
-                    src="https://i.pravatar.cc/40"
-                    alt="avatar"
-                    className="w-10 h-10 rounded-full"
-                  />
-                  <h2 className="text-lg font-semibold">
-                    Edit {editPatient.name}
-                  </h2>
-                </div>
-
-                <button
-                  onClick={() => setEditPatient(null)}
-                  className="p-2 rounded-full hover:bg-gray-100 transition"
-                >
-                  <FiX size={20} />
-                </button>
-              </div>
-
-              {/* Body */}
-
-              {/* Section Divider */}
-              <div className="md:col-span-2 pt-4 mt-4">
-                <h3 className="mx-6 text-md font-semibold text-gray-700">
-                  Personal Information
-                </h3>
-              </div>
-
-              <div className="p-6 max-h-[70vh] overflow-y-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {/* First Name */}
-                  <div>
-                    <label className="text-sm text-gray-600">First Name*</label>
-                    <input
-                      type="text"
-                      className="w-full border rounded-lg px-3 py-2 mt-1"
-                    />
-                  </div>
-                  {/*Last Name */}
-                  <div>
-                    <label className="text-sm text-gray-600">Last Name*</label>
-                    <input
-                      type="text"
-                      className="w-full border rounded-lg px-3 py-2 mt-1"
-                    />
-                  </div>
-                  {/* Phone Number */}
-                  <div>
-                    <label className="text-sm text-gray-600">
-                      Phone Number*
-                    </label>
-                    <input
-                      type="tel"
-                      className="w-full border rounded-lg px-3 py-2 mt-1"
-                    />
-                  </div>
-                  {/* Date of Birth */}
-                  <div>
-                    <label className="text-sm text-gray-600">
-                      Date of Birth*
-                    </label>
-                    <input
-                      type="date"
-                      className="w-full border rounded-lg px-3 py-2 mt-1"
-                    />
-                  </div>
-                  {/* Gender */}
-                  <div>
-                    <label className="text-sm text-gray-600">Gender*</label>
-                    <select className="w-full border rounded-lg px-3 py-2 mt-1">
-                      <option>Select</option>
-                      <option>Male</option>
-                      <option>Female</option>
-                      <option>Other</option>
-                    </select>
-                  </div>
-                  {/* Type */}
-                  <div>
-                    <label className="text-sm text-gray-600">Type*</label>
-                    <select className="w-full border rounded-lg px-3 py-2 mt-1">
-                      <option>Single</option>
-                      <option>Family</option>
-                      <option>NHIS</option>
-                    </select>
-                  </div>
-                  {/* Marital Status*/}
-                  <div>
-                    <label className="text-sm text-gray-600">
-                      Marital Status*
-                    </label>
-                    <select className="w-full border rounded-lg px-3 py-2 mt-1">
-                      <option>Single</option>
-                      <option>Married</option>
-                      <option>Divorced</option>
-                      <option>Widowed</option>
-                    </select>
-                  </div>
-                  {/*Origin State*/}
-                  <div>
-                    <label className="text-sm text-gray-600">
-                      Origin State*
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full border rounded-lg px-3 py-2 mt-1"
-                    />
-                  </div>
-                  {/*Local Government*/}
-                  <div>
-                    <label className="text-sm text-gray-600">L.G.A*</label>
-                    <input
-                      type="text"
-                      className="w-full border rounded-lg px-3 py-2 mt-1"
-                    />
-                  </div>
-                  {/*Occupation*/}
-                  <div>
-                    <label className="text-sm text-gray-600">Occupation*</label>
-                    <input
-                      type="text"
-                      className="w-full border rounded-lg px-3 py-2 mt-1"
-                    />
-                  </div>
-                  {/* Email */}
-                  <div>
-                    <label className="text-sm text-gray-600">Email*</label>
-                    <input
-                      type="email"
-                      className="w-full border rounded-lg px-3 py-2 mt-1"
-                      defaultValue="ashton.cox@example.com"
-                    />
-                  </div>
-
-                  {/* Admission Date */}
-                  <div>
-                    <label className="text-sm text-gray-600">
-                      Admission Date*
-                    </label>
-                    <input
-                      type="date"
-                      className="w-full border rounded-lg px-3 py-2 mt-1"
-                    />
-                  </div>
-
-                  {/* Discharge Date */}
-                  <div>
-                    <label className="text-sm text-gray-600">
-                      Discharge Date
-                    </label>
-                    <input
-                      type="date"
-                      className="w-full border rounded-lg px-3 py-2 mt-1"
-                    />
-                  </div>
-
-                  {/* Doctor */}
-                  <div>
-                    <label className="text-sm text-gray-600">
-                      Doctor Assigned*
-                    </label>
-                    <input
-                      className="w-full border rounded-lg px-3 py-2 mt-1"
-                      defaultValue="Dr. John Doe"
-                    />
-                  </div>
-
-                  {/* Status */}
-                  <div>
-                    <label className="text-sm text-gray-600">Status*</label>
-                    <select className="w-full border rounded-lg px-3 py-2 mt-1">
-                      <option>Recovered</option>
-                      <option>Under Treatment</option>
-                      <option>Under Observation</option>
-                    </select>
-                  </div>
-
-                  {/* Address (full width) */}
-                  <div className="md:col-span-2">
-                    <label className="text-sm text-gray-600">Address</label>
-                    <textarea
-                      rows="3"
-                      className="w-full border rounded-lg px-3 py-2 mt-1"
-                      defaultValue="11, Shyam Appt., Rajkot"
-                    />
-                  </div>
-                </div>
-
-                {/* Section Divider */}
-                <div className="md:col-span-2 pt-4 border-t mt-4">
-                  <h3 className="text-md font-semibold text-gray-700">
-                    Next of Kin
-                  </h3>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {/* NOK Name */}
-                  <div>
-                    <label className="text-sm text-gray-600">
-                      NOK Full Name*
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full border rounded-lg px-3 py-2 mt-1"
-                      defaultValue={editPatient?.emergency?.name}
-                    />
-                  </div>
-
-                  {/* Relationship */}
-                  <div>
-                    <label className="text-sm text-gray-600">
-                      NOK Relationship*
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full border rounded-lg px-3 py-2 mt-1"
-                      defaultValue={editPatient?.emergency?.relation}
-                    />
-                  </div>
-
-                  {/* NOK Phone */}
-                  <div>
-                    <label className="text-sm text-gray-600">NOK Phone*</label>
-                    <input
-                      type="tel"
-                      className="w-full border rounded-lg px-3 py-2 mt-1"
-                      defaultValue={editPatient?.emergency?.phone}
-                    />
-                  </div>
-
-                  {/* Address */}
-                  <div>
-                    <label className="text-sm text-gray-600">
-                      NOK Address*
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full border rounded-lg px-3 py-2 mt-1"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Footer */}
-              <div className="flex gap-3 px-6 py-4 border-t">
-                <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
-                  Save
-                </button>
-                <button
-                  onClick={() => setEditPatient(null)}
-                  className="bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700"
-                >
-                  Cancel
-                </button>
-              </div>
+              <EditPatientModal
+                patient={editPatient}
+                onClose={() => setEditPatient(null)}
+              />
             </motion.div>
           </motion.div>
         )}
