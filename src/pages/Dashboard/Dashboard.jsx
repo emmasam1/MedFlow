@@ -14,10 +14,12 @@ import NewPatientChart from "../../components/NewPatientChart";
 import { useStore } from "../../store/store";
 import Modal from "../../components/Modal";
 import AddPatients from "../../components/AddPatients";
+import DoctorsAppointment from "../../components/DoctorsAppointment";
 
 const Dashboard = () => {
   const { darkMode } = useStore();
   const [isOpen, setIsOpen] = useState(false);
+  const [isAppointment, setIsAppointment] = useState(false);
   const location = useLocation();
   const pathName =
     location.pathname.split("/").filter(Boolean).pop() || "Dashboard";
@@ -67,6 +69,7 @@ const Dashboard = () => {
             transition={{ type: "spring", stiffness: 300 }}
           >
             <button
+            onClick={() => setIsAppointment(true)}
               className="hover:bg-[#9DCEF8]! px-3 py-2 rounded-full! 
                text-[#005CBB]! font-bold flex items-center gap-2
                transition-colors duration-300 text-sm cursor-pointer"
@@ -108,15 +111,19 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-        <h2 className={`text-xl font-bold mb-6 ${darkMode ? "text-white" : "text-slate-800"}`}>
-          Patient Registration
-        </h2>
+      {/* {Add New Patient Modal} */}
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Add New Patient" size="2xl">
+    
         <AddPatients />
+      </Modal>
+
+      {/* {Appointment Modal} */}
+      <Modal isOpen={isAppointment} onClose={() => setIsAppointment(false)} title="Create Appointment" size="4xl">
+       
+       <DoctorsAppointment />
       </Modal>
     </>
   );
 };
 
 export default React.memo(Dashboard);
-
