@@ -118,7 +118,7 @@ const Dashboard = () => {
       </Modal>
 
       {/* {Appointment Modal} */}
-      <Modal isOpen={isAppointment} onClose={() => setIsAppointment(false)} title="Create Appointment" size="4xl">
+      <Modal isOpen={isAppointment} onClose={() => setIsAppointment(false)} title="Create Appointment" size="3xl">
        
        <DoctorsAppointment />
       </Modal>
