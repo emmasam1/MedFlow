@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
+import BookAppointment from "./BookAppointment";
 
 /* ================== FIXED APPOINTMENTS DATA ================== */
 // Note: Month 1 is February (0-indexed)
