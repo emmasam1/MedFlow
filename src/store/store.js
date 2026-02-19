@@ -681,6 +681,7 @@ export const useStore = create(
       /* ========= PATIENT STATE ========= */
 
       patients: enhancedPatients,
+      doctors:doctors,
 
       getPatientById: (id) => get().patients.find((p) => p.id === Number(id)),
 
