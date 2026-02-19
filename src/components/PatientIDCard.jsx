@@ -4,10 +4,10 @@ import { QRCodeCanvas } from "qrcode.react";
 const PatientIDCard = forwardRef(({ patient }, ref) => {
   if (!patient) return null;
 
-  // ✅ Structured QR Data
+  // ✅ Corrected Structured QR Data
   const qrData = JSON.stringify({
     type: "patient",
-    id: patient.patientId,
+    patientId: patient.patientId, // Change "id" to "patientId"
     name: patient.fullName,
   });
 
@@ -21,9 +21,7 @@ const PatientIDCard = forwardRef(({ patient }, ref) => {
         <h2 className="font-bold text-blue-700 text-lg tracking-wide">
           CLINIVA HOSPITAL
         </h2>
-        <p className="text-[11px] text-gray-500">
-          Patient Identification Card
-        </p>
+        <p className="text-[11px] text-gray-500">Patient Identification Card</p>
       </div>
 
       {/* Body */}
@@ -31,16 +29,13 @@ const PatientIDCard = forwardRef(({ patient }, ref) => {
         {/* Patient Info */}
         <div className="space-y-1 text-sm">
           <p>
-            <span className="font-semibold">Name:</span>{" "}
-            {patient.fullName}
+            <span className="font-semibold">Name:</span> {patient.fullName}
           </p>
           <p>
-            <span className="font-semibold">Age:</span>{" "}
-            {patient.age}
+            <span className="font-semibold">Age:</span> {patient.age}
           </p>
           <p>
-            <span className="font-semibold">Card No:</span>{" "}
-            {patient.patientId}
+            <span className="font-semibold">Card No:</span> {patient.patientId}
           </p>
         </div>
 
@@ -48,7 +43,7 @@ const PatientIDCard = forwardRef(({ patient }, ref) => {
         <div className="flex flex-col items-center">
           <QRCodeCanvas
             value={qrData}
-            size={70}   // 👈 Smaller, better for ID card
+            size={70} // 👈 Smaller, better for ID card
             bgColor="#ffffff"
             fgColor="#111827"
             level="H"
