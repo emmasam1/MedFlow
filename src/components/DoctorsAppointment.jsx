@@ -87,33 +87,42 @@ const DoctorsAppointment = () => {
   const startScanner = async () => {
     if (isScanning) return;
 
+    // Use the ID directly to ensure the element exists
     const html5QrCode = new Html5Qrcode("qr-reader");
     scannerRef.current = html5QrCode;
     setIsScanning(true);
 
     try {
       await html5QrCode.start(
-        { facingMode: "environment" },
+        { facingMode: "user" }, // Changed to "user" for easier PC testing
         {
           fps: 10,
           qrbox: { width: 250, height: 250 },
         },
-        async (decodedText) => {
-          if (scanSuccess) return; // prevent double scan
-
+        (decodedText) => {
+          if (scanSuccess) return;
           const patientId = extractPatientId(decodedText);
           handleScanSuccess(patientId);
         },
       );
     } catch (err) {
       console.error("Camera error:", err);
+      setIsScanning(false); // Reset if it fails to start
     }
   };
 
   const stopScanner = async () => {
-    if (scannerRef.current) {
-      await scannerRef.current.stop();
-      await scannerRef.current.clear();
+    if (scannerRef.current && isScanning) {
+      try {
+        await scannerRef.current.stop();
+        // Ensure the scanner is completely cleared from the DOM
+        scannerRef.current.clear();
+        scannerRef.current = null;
+      } catch (err) {
+        console.warn("Stop error:", err);
+      } finally {
+        setIsScanning(false);
+      }
     }
   };
 
@@ -137,12 +146,23 @@ const DoctorsAppointment = () => {
     }, 1200);
   };
 
+  // This Effect ensures the scanner only runs when the Modal is fully rendered
   useEffect(() => {
+    let timeoutId;
+
     if (isScanOpen) {
-      startScanner();
+      // Small delay ensures the 'qr-reader' div is painted in the DOM
+      timeoutId = setTimeout(() => {
+        startScanner();
+      }, 300);
     } else {
       stopScanner();
     }
+
+    return () => {
+      clearTimeout(timeoutId);
+      stopScanner();
+    };
   }, [isScanOpen]);
 
   /* -------------------- SUBMIT -------------------- */
@@ -391,5 +411,3 @@ const DoctorsAppointment = () => {
 };
 
 export default DoctorsAppointment;
-
-

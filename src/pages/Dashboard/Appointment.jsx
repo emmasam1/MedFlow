@@ -8,6 +8,7 @@ import Modal from "../../components/Modal";
 import SearchPatientTab from "../../components/SearchPatientTab";
 import ScanPatientTab from "../../components/ScanPatientTab";
 import CreateAppointmentStep from "../../components/CreateAppointmentStep";
+import DoctorsAppointment from "../../components/DoctorsAppointment";
 
 const PER_PAGE = 10;
 
@@ -45,10 +46,10 @@ const Appointment = () => {
   const [statusFilter, setStatusFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [leftWidth, setLeftWidth] = useState(380);
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("search");
   const [selectedPatient, setSelectedPatient] = useState(null);
-  const [step, setStep] = useState("search")
+  const [step, setStep] = useState("search");
 
   const isDragging = useRef(false);
 
@@ -108,17 +109,15 @@ const Appointment = () => {
   };
 
   const handleOpenModal = () => {
-    setIsOpen(true)
-    console.log("working")
-
-  }
+    setIsOpen(true);
+    console.log("working");
+  };
   const handleCloseModal = () => {
     setIsOpen(false);
-    setStep("search");        // reset workflow
+    setStep("search"); // reset workflow
     setSelectedPatient(null); // clear patient
-    setActiveTab("search");   // reset tab
+    setActiveTab("search"); // reset tab
   };
-  
 
   const totalForDay = filtered.length;
   const confirmed = filtered.filter((a) => a.status === "Confirmed").length;
@@ -129,86 +128,34 @@ const Appointment = () => {
     <div className="rounded-2xl shadow-sm overflow-hidden">
       <div className="flex justify-between items-center p-2">
         <span className="font-semibold text-gray-800">Appointment</span>
-        <motion.button onClick={handleOpenModal}
+        <motion.button
+          onClick={handleOpenModal}
           whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.97 }}
           transition={{ type: "spring", stiffness: 300 }}
           className=" px-2 py-1 rounded-full text-[#005CBB] font-semibold flex items-center justify-end gap-1
-            hover:bg-[#9DCEF8] transition-colors duration-300 text-xs cursor-pointer">
+            hover:bg-[#9DCEF8] transition-colors duration-300 text-xs cursor-pointer"
+        >
           <PlusCircleIcon className="w-5 h-5" />
           Appointment
         </motion.button>
 
-        <Modal isOpen={isOpen} onClose={handleCloseModal}>
-
-
-          {/* ================= STEP: SEARCH ================= */}
-          {step === "search" && (
-            <div>
-
-              {/* TAB HEADER */}
-              <div className="flex border-b">
-                <button
-                  onClick={() => setActiveTab("search")}
-                  className={`px-4 py-2 text-sm font-medium ${activeTab === "search"
-                      ? "border-b-2 border-blue-600 text-blue-600"
-                      : "text-gray-500"
-                    }`}
-                >
-                  Search Patient
-                </button>
-
-                <button
-                  onClick={() => setActiveTab("scan")}
-                  className={`px-4 py-2 text-sm font-medium ${activeTab === "scan"
-                      ? "border-b-2 border-blue-600 text-blue-600"
-                      : "text-gray-500"
-                    }`}
-                >
-                  Scan Barcode
-                </button>
-              </div>
-
-              {/* TAB BODY */}
-              <div className="p-5">
-                {activeTab === "search" && (
-                  <SearchPatientTab
-                    onSelect={(patient) => {
-                      setSelectedPatient(patient);
-                      setStep("create"); //switch to appointment form
-                    }}
-                  />
-                )}
-
-                {activeTab === "scan" && (
-                  <ScanPatientTab
-                    onSelect={(patient) => {
-                      setSelectedPatient(patient);
-                      setStep("create"); //switch to appointment form
-                    }}
-                  />
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* ================= STEP: CREATE APPOINTMENT ================= */}
-          {step === "create" && selectedPatient && (
-            <CreateAppointmentStep patient={selectedPatient} />
-          )}
-
+        <Modal
+          isOpen={isOpen}
+          onClose={handleCloseModal}
+          title="Add New Patient"
+          size="2xl"
+        >
+          <DoctorsAppointment />
         </Modal>
-
-
       </div>
-
-
-
-
 
       <div className="hidden lg:flex h-[calc(100vh-140px)]">
         {/* LEFT PANEL */}
-        <div style={{ width: leftWidth }} className="bg-white p-4 overflow-y-auto">
+        <div
+          style={{ width: leftWidth }}
+          className="bg-white p-4 overflow-y-auto"
+        >
           <Calendar
             fullscreen={false}
             onSelect={handleDateSelect}
@@ -285,9 +232,7 @@ const Appointment = () => {
                 >
                   <HiSearch size={14} />
                 </button>
-
               </div>
-
 
               {/* STATUS SELECT */}
               <div className="relative w-full sm:w-56">
@@ -312,7 +257,6 @@ const Appointment = () => {
                 />
               </div>
             </div>
-
           </div>
 
           {/* LIST */}
