@@ -143,7 +143,7 @@ const Appointment = () => {
         <Modal
           isOpen={isOpen}
           onClose={handleCloseModal}
-          title="Add New Patient"
+          title="Create Appointment"
           size="2xl"
         >
           <DoctorsAppointment />
