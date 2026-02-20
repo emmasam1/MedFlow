@@ -1,23 +1,20 @@
+
 import { motion } from "framer-motion";
 import { Button, Input, Form, Typography, message } from "antd";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAppStore } from "../../store/useAppStore";
+import { useAppStore } from "../../store/useAppstore";
 
 const { Title, Text } = Typography;
 
 const Login = () => {
-  const [loading, setLoading] = useState(false);
-  const { login } = useAppStore();
+  // Use store loading state instead of local to stay in sync
+  const { login, loading } = useAppStore();
   const navigate = useNavigate();
 
-  const onFinish = async (values) => {
-    setLoading(true);
-
+const onFinish = async (values) => {
     try {
       const user = await login(values.username, values.password);
 
-      // ✅ Save to sessionStorage
       sessionStorage.setItem("user", JSON.stringify(user));
 
       if (user?.role === "record_officer") {
@@ -27,12 +24,10 @@ const Login = () => {
       } else if (user?.role === "lab") {
         navigate("/lab-dashboard");
       } else {
-        message.error("Unauthorized role");
+        message.warning("Role not authorized");
       }
     } catch (err) {
-      message.error(err.message || "Invalid credentials");
-    } finally {
-      setLoading(false);
+      message.error(err.message);
     }
   };
 
@@ -61,10 +56,7 @@ const Login = () => {
             }}
           />
 
-          <Title
-            level={4}
-            className="!m-0 !font-black tracking-tight text-gray-800"
-          >
+          <Title level={4} className="!m-0 !font-black tracking-tight text-gray-800">
             Health Flow
           </Title>
           <Text className="text-[9px] font-extrabold uppercase tracking-[0.25em] text-blue-500/80">
@@ -81,28 +73,20 @@ const Login = () => {
           autoComplete="off"
         >
           <Form.Item
-            label={
-              <span className="text-[10px] font-bold text-gray-400 uppercase ml-1">
-                Staff ID
-              </span>
-            }
+            label={<span className="text-[10px] font-bold text-gray-400 uppercase ml-1">Staff ID</span>}
             name="username"
             className="mb-1"
             rules={[{ required: true, message: "Required" }]}
           >
             <Input
-              placeholder="ID Number/Scan QR Code"
+              placeholder="e.g. jane"
               autoFocus
               className="rounded-xl h-9! border-blue-50 bg-gray-50/50 hover:border-blue-100! focus:border-blue-50! focus:bg-white! transition-all text-sm"
             />
           </Form.Item>
 
           <Form.Item
-            label={
-              <span className="text-[10px] font-bold text-gray-400 uppercase ml-1">
-                Password
-              </span>
-            }
+            label={<span className="text-[10px] font-bold text-gray-400 uppercase ml-1">Password</span>}
             name="password"
             className="mb-3"
             rules={[{ required: true, message: "Required" }]}
@@ -130,11 +114,7 @@ const Login = () => {
         <div className="mt-6 pt-3 border-t border-gray-50 text-center">
           <p className="text-gray-400 text-[10px] leading-tight m-0 italic font-medium">
             Forgot credentials? <br />
-            See{" "}
-            <span className="text-gray-600 font-bold not-italic">
-              IT Admin
-            </span>{" "}
-            physically.
+            See <span className="text-gray-600 font-bold not-italic">IT Admin</span> physically.
           </p>
         </div>
       </motion.div>
