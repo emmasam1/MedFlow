@@ -147,4 +147,109 @@ const StatCard = ({ title, count, color }) => (
   </div>
 );
 
-export default AppointmentManager;
+//login component
+
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { FiLock, FiUser, FiArrowRight } from 'react-icons/fi';
+
+const Login = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  
+  const { login, loading } = useAppStore(); // Pulling from your store
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError(''); // Clear previous errors
+
+    try {
+      const user = await login(username, password);
+      
+      // Navigate based on the role in db.json
+      if (user.role === 'record_officer') {
+        navigate('/record-dashboard');
+      } else if (user.role === 'doctor') {
+        navigate('/doctor-dashboard');
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8"
+      >
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-extrabold text-blue-600 mb-2">Hospital HMS</h1>
+          <p className="text-gray-500">Sign in to manage your department</p>
+        </div>
+
+        <form onSubmit={handleLogin} className="space-y-6">
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100">
+              {error}
+            </div>
+          )}
+
+          {/* Username */}
+          <div className="relative">
+            <FiUser className="absolute left-3 top-3.5 text-gray-400" />
+            <input 
+              type="text"
+              placeholder="Username"
+              className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
+
+          {/* Password */}
+          <div className="relative">
+            <FiLock className="absolute left-3 top-3.5 text-gray-400" />
+            <input 
+              type="password"
+              placeholder="Password"
+              className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          {/* Submit Button */}
+          <button 
+            type="submit"
+            disabled={loading}
+            className={`w-full py-3 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-all shadow-lg ${
+              loading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 active:scale-95 shadow-blue-200'
+            }`}
+          >
+            {loading ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <> Login <FiArrowRight /> </>
+            )}
+          </button>
+        </form>
+
+        <div className="mt-8 text-center text-xs text-gray-400 uppercase tracking-widest">
+          Secured Hospital Portal
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+
+
+export { AppointmentManager, Login };
