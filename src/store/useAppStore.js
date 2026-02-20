@@ -18,14 +18,25 @@ export const useAppStore = create((set, get) => ({
   loading: false,
 
   // --- AUTH ACTIONS ---
-  login: async (username, password) => {
+// --- AUTH ACTIONS IN useAppStore.js ---
+login: async (username, password) => {
+  set({ loading: true }); // Start loading
+  try {
     const res = await api.get(`/users?username=${username}&password=${password}`);
+    
     if (res.data.length > 0) {
-      set({ user: res.data[0] });
-      return res.data[0];
+      const user = res.data[0];
+      set({ user, loading: false }); // Success
+      return user; 
+    } else {
+      set({ loading: false }); // Done loading but failed
+      throw new Error("Invalid username or password");
     }
-    throw new Error("Invalid credentials");
-  },
+  } catch (error) {
+    set({ loading: false }); // Network error or other issues
+    throw error;
+  }
+},
   logout: () => set({ user: null }),
 
   // --- PATIENT ACTIONS ---
