@@ -110,7 +110,6 @@ const Appointment = () => {
 
   const handleOpenModal = () => {
     setIsOpen(true);
-    console.log("working");
   };
   const handleCloseModal = () => {
     setIsOpen(false);
