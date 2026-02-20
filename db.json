@@ -1,0 +1,50 @@
+{
+  "users": [
+    { "id": "1", "username": "admin_doc", "password": "123", "role": "doctor", "name": "Dr. Adeyemi" },
+    { "id": "2", "username": "record_jane", "password": "123", "role": "record_officer", "name": "Jane Doe" },
+    { "id": "3", "username": "lab_tech", "password": "123", "role": "lab", "name": "John Lab" }
+  ],
+  "patients": [
+    {
+      "id": "1",
+      "patientId": "PT-1001",
+      "fullName": "Chinedu Okafor",
+      "gender": "Male",
+      "age": 34,
+      "bloodGroup": "O+",
+      "patientType": "NHIS",
+      "phone": "08031245678",
+      "status": "Active",
+      "medicalInfo": { "allergies": ["None"], "chronicConditions": ["Hypertension"] },
+      "balanceLabel": "₦20,000 CR"
+    },
+    {
+      "id": "2",
+      "patientId": "PT-1002",
+      "fullName": "Aisha Bello",
+      "gender": "Female",
+      "age": 28,
+      "bloodGroup": "A+",
+      "patientType": "Single",
+      "phone": "08056781234",
+      "status": "Admitted",
+      "medicalInfo": { "allergies": ["Penicillin"], "chronicConditions": ["Asthma"] },
+      "balanceLabel": "₦10,000 OS"
+    }
+  ],
+  "appointments": [
+    {
+      "id": "1",
+      "patientId": "1",
+      "patientName": "Chinedu Okafor",
+      "date": "2024-03-25",
+      "time": "09:00 AM",
+      "status": "pending",
+      "assignedDoctor": "Dr. Adeyemi",
+      "reason": "Routine Checkup"
+    }
+  ],
+  "notifications": [
+    { "id": "1", "type": "success", "title": "Patient Admitted", "message": "Chinedu Okafor has been admitted", "isRead": false }
+  ]
+}
