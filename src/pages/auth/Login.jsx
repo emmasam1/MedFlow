@@ -1,17 +1,21 @@
-
-
 import { motion } from "framer-motion";
 import { Button, Input, Form, Typography, message } from "antd";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useAppStore } from "../../store/useAppStore";
 
 const { Title, Text } = Typography;
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
+  const { login } = useAppStore();
   const navigate = useNavigate();
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
+    const { staffId, password } = values;
+
+
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
