@@ -1,8 +1,29 @@
 {
   "users": [
-    { "id": "1", "username": "admin_doc", "password": "123", "role": "doctor", "name": "Dr. Adeyemi" },
-    { "id": "2", "username": "record_jane", "password": "123", "role": "record_officer", "name": "Jane Doe" },
-    { "id": "3", "username": "lab_tech", "password": "123", "role": "lab", "name": "John Lab" }
+    {
+      "id": "1",
+      "username": "admin_doc",
+      "password": "123",
+      "role": "doctor",
+      "name": "Dr. Adeyemi"
+    },
+    {
+      "id": "2",
+      "username": "record_jane",
+      "password": "123",
+      "role": "record_officer",
+      "name": "Jane Doe"
+    },
+    {
+      "id": "3",
+      "username": "lab_tech",
+      "password": "123",
+      "role": "lab",
+      "name": "John Lab"
+    },
+    {
+      "id": "09da"
+    }
   ],
   "patients": [
     {
@@ -15,7 +36,14 @@
       "patientType": "NHIS",
       "phone": "08031245678",
       "status": "Active",
-      "medicalInfo": { "allergies": ["None"], "chronicConditions": ["Hypertension"] },
+      "medicalInfo": {
+        "allergies": [
+          "None"
+        ],
+        "chronicConditions": [
+          "Hypertension"
+        ]
+      },
       "balanceLabel": "₦20,000 CR"
     },
     {
@@ -28,7 +56,14 @@
       "patientType": "Single",
       "phone": "08056781234",
       "status": "Admitted",
-      "medicalInfo": { "allergies": ["Penicillin"], "chronicConditions": ["Asthma"] },
+      "medicalInfo": {
+        "allergies": [
+          "Penicillin"
+        ],
+        "chronicConditions": [
+          "Asthma"
+        ]
+      },
       "balanceLabel": "₦10,000 OS"
     }
   ],
@@ -45,6 +80,12 @@
     }
   ],
   "notifications": [
-    { "id": "1", "type": "success", "title": "Patient Admitted", "message": "Chinedu Okafor has been admitted", "isRead": false }
+    {
+      "id": "1",
+      "type": "success",
+      "title": "Patient Admitted",
+      "message": "Chinedu Okafor has been admitted",
+      "isRead": false
+    }
   ]
 }
