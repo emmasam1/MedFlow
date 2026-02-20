@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Modal, Form, Input, Select, TimePicker, Button } from "antd";
+import { motion } from "framer-motion";
+import { Calendar } from "antd";
+import DoctorsAppointment from "./DoctorsAppointment";
+import Modal from "./Modal";
 
 const BookAppointment = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -9,10 +11,9 @@ const BookAppointment = () => {
   const handleDateSelect = (date) => {
     setSelectedDate(date);
     setIsModalOpen(true);
-    setShowHint(false); // hide hint once user clicks a day
   };
 
-  const handleClose = () => {
+  const handleCloseModal = () => {
     setIsModalOpen(false);
   };
 
@@ -28,17 +29,13 @@ const BookAppointment = () => {
           Appointment Calendar
         </h2>
 
-        {/* Hint for the user */}
-        <AnimatePresence>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="text-xs text-gray-500 mb-2 italic"
-          >
-            Click on a day to book an appointment
-          </motion.div>
-        </AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-xs text-gray-500 mb-2 italic"
+        >
+          Click on a day to book an appointment
+        </motion.div>
 
         <Calendar
           fullscreen={false}
@@ -47,79 +44,13 @@ const BookAppointment = () => {
         />
       </motion.div>
 
-      {/* Appointment Modal */}
       <Modal
-        open={isModalOpen}
-        onCancel={handleClose}
-        footer={null}
-        centered
-        width={420}
-        modalRender={(modal) => (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
-          >
-            {modal}
-          </motion.div>
-        )}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        title="Create Appointment"
+        size="2xl"
       >
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold text-gray-800">
-            Create Appointment
-          </h2>
-          <p className="text-sm text-gray-500">
-            Schedule a visit with a doctor
-          </p>
-        </div>
-
-        <Form layout="vertical">
-          <Form.Item label="Date">
-            <Input
-              value={selectedDate?.format("MMMM DD, YYYY")}
-              disabled
-              className="rounded-md"
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Patient Name"
-            name="patientName"
-            rules={[{ required: true, message: "Please enter patient name" }]}
-          >
-            <Input placeholder="John Doe" />
-          </Form.Item>
-
-          <Form.Item
-            label="Doctor"
-            name="doctor"
-            rules={[{ required: true, message: "Please select a doctor" }]}
-          >
-            <Select placeholder="Select doctor">
-              <Select.Option value="Dr. Ella John">Dr. Ella John</Select.Option>
-              <Select.Option value="Dr. Alex Brown">
-                Dr. Alex Brown
-              </Select.Option>
-              <Select.Option value="Dr. Michael Stone">
-                Dr. Michael Stone
-              </Select.Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item
-            label="Time"
-            name="time"
-            rules={[{ required: true, message: "Please select time" }]}
-          >
-            <TimePicker use12Hours format="h:mm A" className="w-full" />
-          </Form.Item>
-
-          <div className="flex justify-end gap-2 mt-6">
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button type="primary">Create Appointment</Button>
-          </div>
-        </Form>
+        <DoctorsAppointment selectedDate={selectedDate} />
       </Modal>
     </div>
   );

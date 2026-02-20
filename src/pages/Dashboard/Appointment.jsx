@@ -110,7 +110,6 @@ const Appointment = () => {
 
   const handleOpenModal = () => {
     setIsOpen(true);
-    console.log("working");
   };
   const handleCloseModal = () => {
     setIsOpen(false);
@@ -143,7 +142,7 @@ const Appointment = () => {
         <Modal
           isOpen={isOpen}
           onClose={handleCloseModal}
-          title="Add New Patient"
+          title="Create Appointment"
           size="2xl"
         >
           <DoctorsAppointment />

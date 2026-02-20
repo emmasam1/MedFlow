@@ -1,23 +1,30 @@
 
-
 import { motion } from "framer-motion";
 import { Button, Input, Form, Typography, message } from "antd";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAppStore } from "../../store/useAppstore";
 
 const { Title, Text } = Typography;
 
 const Login = () => {
-  const [loading, setLoading] = useState(false);
+  // Use store loading state instead of local to stay in sync
+  const { login, loading } = useAppStore();
   const navigate = useNavigate();
 
-  const onFinish = (values) => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      message.success(`Welcome back!`);
-      navigate("/dashboard");
-    }, 1000);
+const onFinish = async (values) => {
+    try {
+      const user = await login(values.username, values.password);
+
+      if (user?.role === "record_officer") {
+        navigate("/dashboard");
+      } else if (user?.role === "doctor") {
+        navigate("/doctor-dashboard");
+      } else {
+        message.warning("Role not authorized");
+      }
+    } catch (err) {
+      message.error(err.message);
+    }
   };
 
   return (
@@ -28,22 +35,23 @@ const Login = () => {
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="relative z-10 w-full max-w-[340px] bg-white rounded-[1rem] shadow-md p-4 md:p-7 border border-blue-50"
       >
+        {/* Header */}
         <div className="text-center mb-5">
-          <motion.img 
-            src="/logo.png" 
-            alt="Logo" 
+          <motion.img
+            src="/logo.png"
+            alt="Logo"
             className="mx-auto h-16 w-16 rounded-full mb-3 object-cover shadow-md border-2 border-blue-50"
-            animate={{ 
+            animate={{
               scale: [1, 1.1, 1],
-              rotate: [0, 15, -15, 0]
+              rotate: [0, 15, -15, 0],
             }}
-            transition={{ 
-              duration: 3, 
-              repeat: Infinity, 
-              ease: "easeInOut" 
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut",
             }}
           />
-          
+
           <Title level={4} className="!m-0 !font-black tracking-tight text-gray-800">
             Health Flow
           </Title>
@@ -52,23 +60,24 @@ const Login = () => {
           </Text>
         </div>
 
-        <Form 
-          layout="vertical" 
-          size="middle" 
-          onFinish={onFinish} 
+        {/* Form */}
+        <Form
+          layout="vertical"
+          size="middle"
+          onFinish={onFinish}
           requiredMark={false}
           autoComplete="off"
         >
           <Form.Item
             label={<span className="text-[10px] font-bold text-gray-400 uppercase ml-1">Staff ID</span>}
-            name="staffId"
+            name="username"
             className="mb-1"
             rules={[{ required: true, message: "Required" }]}
           >
-            <Input 
-              placeholder="ID Number/Scan QR Code" 
-              autoFocus 
-              className="rounded-xl h-9! border-blue-50 bg-gray-50/50 hover:border-blue-100! focus:border-blue-50! focus:bg-white! transition-all text-sm" 
+            <Input
+              placeholder="e.g. jane"
+              autoFocus
+              className="rounded-xl h-9! border-blue-50 bg-gray-50/50 hover:border-blue-100! focus:border-blue-50! focus:bg-white! transition-all text-sm"
             />
           </Form.Item>
 
@@ -78,9 +87,9 @@ const Login = () => {
             className="mb-3"
             rules={[{ required: true, message: "Required" }]}
           >
-            <Input.Password 
-              placeholder="••••••••"  
-              className="rounded-xl h-9! border-blue-50 bg-gray-50/50 hover:border-blue-100! focus:border-blue-50! focus:bg-white! transition-all text-sm" 
+            <Input.Password
+              placeholder="••••••••"
+              className="rounded-xl h-9! border-blue-50 bg-gray-50/50 hover:border-blue-100! focus:border-blue-50! focus:bg-white! transition-all text-sm"
             />
           </Form.Item>
 
@@ -97,6 +106,7 @@ const Login = () => {
           </Form.Item>
         </Form>
 
+        {/* Footer */}
         <div className="mt-6 pt-3 border-t border-gray-50 text-center">
           <p className="text-gray-400 text-[10px] leading-tight m-0 italic font-medium">
             Forgot credentials? <br />
