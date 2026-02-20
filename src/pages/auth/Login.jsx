@@ -15,10 +15,14 @@ const onFinish = async (values) => {
     try {
       const user = await login(values.username, values.password);
 
+      sessionStorage.setItem("user", JSON.stringify(user));
+
       if (user?.role === "record_officer") {
         navigate("/dashboard");
       } else if (user?.role === "doctor") {
         navigate("/doctor-dashboard");
+      } else if (user?.role === "lab") {
+        navigate("/lab-dashboard");
       } else {
         message.warning("Role not authorized");
       }
