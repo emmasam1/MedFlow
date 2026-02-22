@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { Line } from "react-chartjs-2";
@@ -11,43 +11,83 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { useAppStore } from "../store/useAppStore";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Legend,
+);
 
 const monthNames = [
-  "January","February","March","April","May","June",
-  "July","August","September","October","November","December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
 
-const generateRandomPatients = (daysInMonth) =>
-  Array.from({ length: daysInMonth }, () => Math.floor(Math.random() * 10) + 1);
-
 const NewPatientChart = () => {
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 1, 10));
-  const [selectedDay, setSelectedDay] = useState(10);
-  const [startIndex, setStartIndex] = useState(7);
-  const [chartData, setChartData] = useState(generateRandomPatients(31));
+  const { patients } = useAppStore(); // get patients
+  const today = new Date();
+  const [currentDate, setCurrentDate] = useState(today);
+  const [selectedDay, setSelectedDay] = useState(today.getDate()); // use numeric day
+  const [startIndex, setStartIndex] = useState(Math.max(today.getDate() - 3, 0)); 
+  const [chartData, setChartData] = useState([]);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const daysInMonth = getDaysInMonth(year, month);
 
   const days = Array.from({ length: daysInMonth }, (_, i) => ({
-    weekday: new Date(year, month, i + 1).toLocaleDateString("en-US", { weekday: "short" }),
+    weekday: new Date(year, month, i + 1).toLocaleDateString("en-US", {
+      weekday: "short",
+    }),
     date: i + 1,
   }));
 
   const VISIBLE_DAYS = 5;
 
+  // Compute patients per hour for selected day
+  const computeChartData = (day) => {
+    // Filter patients for selected day
+    const dayStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    const patientsOfDay = patients.filter((p) => p.regDate === dayStr);
+
+    // For simplicity, assign patients randomly across 24 hours
+    const hourly = Array(24).fill(0);
+    patientsOfDay.forEach(() => {
+      const hour = Math.floor(Math.random() * 24);
+      hourly[hour] += 1;
+    });
+
+    setChartData(hourly);
+  };
+
+  useEffect(() => {
+    computeChartData(selectedDay);
+  }, [patients, selectedDay]);
+
   const selectDay = (day) => {
+    if (day < 1 || day > daysInMonth) return;
     setSelectedDay(day);
-    const newData = Array.from({ length: 24 }, () => Math.floor(Math.random() * 5) + 1);
-    setChartData(newData);
 
     if (day >= startIndex + VISIBLE_DAYS) {
-      setStartIndex(Math.min(day - VISIBLE_DAYS + 1, days.length - VISIBLE_DAYS));
+      setStartIndex(
+        Math.min(day - VISIBLE_DAYS + 1, days.length - VISIBLE_DAYS),
+      );
     }
     if (day <= startIndex) {
       setStartIndex(Math.max(day - 1, 0));
@@ -59,7 +99,6 @@ const NewPatientChart = () => {
     setCurrentDate(newDate);
     setSelectedDay(1);
     setStartIndex(0);
-    setChartData(generateRandomPatients(getDaysInMonth(newDate.getFullYear(), newDate.getMonth())));
   };
 
   const lineData = {
@@ -101,13 +140,19 @@ const NewPatientChart = () => {
       <div className="flex items-center justify-between mb-4 flex-shrink-0">
         <h2 className="font-bold text-sm text-gray-900">New Patients</h2>
         <div className="flex items-center gap-3 px-3 py-1 rounded-full">
-          <button onClick={() => changeMonth(-1)} className="hover:text-blue-600 transition cursor-pointer">
+          <button
+            onClick={() => changeMonth(-1)}
+            className="hover:text-blue-600 transition cursor-pointer"
+          >
             <FiChevronLeft size={18} />
           </button>
           <span className="text-sm font-medium text-gray-700 text-center">
             {monthNames[month]} {year}
           </span>
-          <button onClick={() => changeMonth(1)} className="hover:text-blue-600 transition cursor-pointer">
+          <button
+            onClick={() => changeMonth(1)}
+            className="hover:text-blue-600 transition cursor-pointer"
+          >
             <FiChevronRight size={18} />
           </button>
         </div>
@@ -115,7 +160,10 @@ const NewPatientChart = () => {
 
       {/* Days navigation */}
       <div className="flex items-center gap-2 mb-4 flex-shrink-0">
-        <button onClick={() => selectDay(selectedDay - 1)} disabled={selectedDay <= 1}>
+        <button
+          onClick={() => selectDay(selectedDay - 1)}
+          disabled={selectedDay <= 1}
+        >
           <FiChevronLeft className="text-gray-400 disabled:opacity-20" />
         </button>
         <div className="flex flex-1 justify-between">
@@ -126,7 +174,9 @@ const NewPatientChart = () => {
               className={`relative flex flex-col items-center min-w-[50px] py-2 rounded-xl transition-all duration-300
               ${selectedDay === d.date ? "text-blue-600" : "text-gray-400 hover:bg-gray-50"}`}
             >
-              <span className="text-[10px] uppercase tracking-wider font-bold">{d.weekday}</span>
+              <span className="text-[10px] uppercase tracking-wider font-bold">
+                {d.weekday}
+              </span>
               <span className="text-lg font-semibold">{d.date}</span>
               {selectedDay === d.date && (
                 <motion.div
@@ -137,7 +187,10 @@ const NewPatientChart = () => {
             </button>
           ))}
         </div>
-        <button onClick={() => selectDay(selectedDay + 1)} disabled={selectedDay >= daysInMonth}>
+        <button
+          onClick={() => selectDay(selectedDay + 1)}
+          disabled={selectedDay >= daysInMonth}
+        >
           <FiChevronRight className="text-gray-400 disabled:opacity-20" />
         </button>
       </div>

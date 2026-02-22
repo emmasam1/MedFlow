@@ -1,4 +1,3 @@
-
 // import { create } from "zustand";
 // import axios from "axios";
 
@@ -24,7 +23,7 @@
 
 //     // Fetch all users to bypass query string issues
 //     const res = await api.get(`/users`);
-    
+
 //     // Log to see what the server is actually sending back
 //     console.log("Server data received:", res.data);
 
@@ -75,7 +74,8 @@ export const useAppStore = create((set, get) => ({
   darkMode: false,
   isSidebarOpen: true,
   setDarkMode: (val) => set({ darkMode: val }),
-  toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
+  toggleSidebar: () =>
+    set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
 
   // --- DATA STATE ---
   user: null,
@@ -93,9 +93,9 @@ export const useAppStore = create((set, get) => ({
 
       // Fetch all users to bypass query string issues
       const res = await api.get(`/users`);
-      
+
       const foundUser = res.data.find(
-        (user) => user.username === u && user.password === p
+        (user) => user.username === u && user.password === p,
       );
 
       if (foundUser) {
@@ -129,8 +129,8 @@ export const useAppStore = create((set, get) => ({
       set((state) => ({ patients: [...state.patients, res.data] }));
       return res.data;
     } catch (error) {
-      console.error("Error adding patient:", error);
-      throw error;
+      console.error("SERVER ERROR:", error.response?.data);
+      alert("Failed to register patient");
     }
   },
 
@@ -138,7 +138,9 @@ export const useAppStore = create((set, get) => ({
   fetchAppointments: async (dateFilter = "") => {
     set({ loading: true });
     try {
-      const url = dateFilter ? `/appointments?date=${dateFilter}` : "/appointments";
+      const url = dateFilter
+        ? `/appointments?date=${dateFilter}`
+        : "/appointments";
       const res = await api.get(url);
       set({ appointments: res.data, loading: false });
     } catch (error) {
@@ -150,7 +152,10 @@ export const useAppStore = create((set, get) => ({
   createAppointment: async (appt) => {
     try {
       // Automatically sets status to pending on creation
-      const res = await api.post("/appointments", { ...appt, status: "pending" });
+      const res = await api.post("/appointments", {
+        ...appt,
+        status: "pending",
+      });
       set((state) => ({ appointments: [...state.appointments, res.data] }));
       return res.data;
     } catch (error) {
@@ -163,7 +168,7 @@ export const useAppStore = create((set, get) => ({
     try {
       await api.patch(`/appointments/${id}`, { status });
       // Refresh the list to reflect the updated status
-      get().fetchAppointments(); 
+      get().fetchAppointments();
     } catch (error) {
       console.error("Error updating status:", error);
     }

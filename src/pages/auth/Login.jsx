@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { Button, Input, Form, Typography, message } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useAppStore } from "../../store/useAppstore";
+import { useAppStore } from "../../store/useAppStore";
 
 const { Title, Text } = Typography;
 

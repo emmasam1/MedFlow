@@ -1,9 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import PatientChart from "../../components/PatientChart";
 import StatCard from "../../components/StatCard";
-import DoctorStatus from "../../components/DoctorStatus";
-import { Link } from "react-router-dom";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import { useLocation } from "react-router-dom";
 
@@ -15,6 +13,7 @@ import { useStore } from "../../store/store";
 import Modal from "../../components/Modal";
 import AddPatients from "../../components/AddPatients";
 import DoctorsAppointment from "../../components/DoctorsAppointment";
+import { useAppStore } from "../../store/useAppStore";
 
 const Dashboard = () => {
   const { darkMode } = useStore();
@@ -23,6 +22,31 @@ const Dashboard = () => {
   const location = useLocation();
   const pathName =
     location.pathname.split("/").filter(Boolean).pop() || "Dashboard";
+
+  const { patients, appointments, fetchPatients, fetchAppointments } =
+    useAppStore();
+
+  useEffect(() => {
+    fetchPatients();
+    fetchAppointments();
+  }, []);
+
+  // 📊 Compute stats properly
+  const totalAppointments = appointments.length;
+
+  const cancelledAppointments = appointments.filter(
+  (appt) => appt.status?.toLowerCase() === "cancelled"
+).length;
+
+  const totalPatients = patients.length;
+
+
+const today = new Date().toISOString().split("T")[0]; // "2026-02-22"
+
+const newPatients = patients.filter(
+  (p) => p.regDate === today
+).length;
+
   return (
     <>
       <div className="flex flex-col sm:flex-row justify-between items-center text-center sm:text-left mb-8 gap-4 px-4">
@@ -69,7 +93,7 @@ const Dashboard = () => {
             transition={{ type: "spring", stiffness: 300 }}
           >
             <button
-            onClick={() => setIsAppointment(true)}
+              onClick={() => setIsAppointment(true)}
               className="hover:bg-[#9DCEF8]! px-3 py-2 rounded-full! 
                text-[#005CBB]! font-bold flex items-center gap-2
                transition-colors duration-300 text-sm cursor-pointer"
@@ -88,12 +112,23 @@ const Dashboard = () => {
       >
         {/* Top Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <StatCard title="Appointments" value="650" color="purple" />
-          <StatCard title="Cancelled Appointments" value="54" color="orange" />
-          <StatCard title="Total Patients" value="20125" color="blue" />
-          <StatCard title="New Patients" value="129" color="green" />
-        </div>
+          <StatCard
+            title="Appointments"
+            value={totalAppointments}
+            color="purple"
+          />
 
+          <StatCard
+            title="Cancelled Appointments"
+            value={cancelledAppointments}
+            color="orange"
+          />
+
+          <StatCard title="Total Patients" value={totalPatients} color="blue" />
+
+          <StatCard title="New Patients" value={newPatients} color="green" />
+        </div>
+        
         {/* Middle Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 ">
           <PatientChart />
@@ -112,15 +147,23 @@ const Dashboard = () => {
       </div>
 
       {/* {Add New Patient Modal} */}
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Add New Patient" size="2xl">
-    
-        <AddPatients />
+      <Modal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        title="Add New Patient"
+        size="2xl"
+      >
+        <AddPatients onSuccess={() => setIsOpen(false)} />
       </Modal>
 
       {/* {Appointment Modal} */}
-      <Modal isOpen={isAppointment} onClose={() => setIsAppointment(false)} title="Create Appointment" size="3xl">
-       
-       <DoctorsAppointment />
+      <Modal
+        isOpen={isAppointment}
+        onClose={() => setIsAppointment(false)}
+        title="Create Appointment"
+        size="3xl"
+      >
+        <DoctorsAppointment onSuccess={() => setIsAppointment(false)} />
       </Modal>
     </>
   );

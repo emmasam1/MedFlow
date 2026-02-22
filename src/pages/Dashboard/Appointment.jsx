@@ -5,10 +5,8 @@ import dayjs from "dayjs";
 import { HiSearch, HiChevronDown } from "react-icons/hi";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import Modal from "../../components/Modal";
-import SearchPatientTab from "../../components/SearchPatientTab";
-import ScanPatientTab from "../../components/ScanPatientTab";
-import CreateAppointmentStep from "../../components/CreateAppointmentStep";
 import DoctorsAppointment from "../../components/DoctorsAppointment";
+import { useAppStore } from "../../store/useAppStore";
 
 const PER_PAGE = 10;
 
@@ -40,8 +38,9 @@ const statusStyles = {
 };
 
 const Appointment = () => {
-  const [appointments, setAppointments] = useState(generateAppointments());
-  const [selectedDate, setSelectedDate] = useState("2026-02-10");
+  const { appointments, fetchAppointments, updateApptStatus } = useAppStore();
+  const today = dayjs();
+  const [selectedDate, setSelectedDate] = useState(today.format("YYYY-MM-DD"));
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
@@ -52,6 +51,10 @@ const Appointment = () => {
   const [step, setStep] = useState("search");
 
   const isDragging = useRef(false);
+
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
 
   const handleMouseDown = () => {
     if (window.innerWidth < 1024) return;
@@ -77,22 +80,26 @@ const Appointment = () => {
   }, []);
 
   const handleDateSelect = (value) => {
-    setSelectedDate(value.format("YYYY-MM-DD"));
-    setCurrentPage(1);
-  };
+  setSelectedDate(value.format("YYYY-MM-DD")); // keep the same format
+  setCurrentPage(1);
+};
 
-  const updateStatus = (id, newStatus) => {
-    setAppointments((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a)),
-    );
+  const updateStatus = async (id, newStatus) => {
+    await updateApptStatus(id, newStatus);
   };
 
   const filtered = useMemo(() => {
     return appointments
       .filter((a) => a.date === selectedDate)
-      .filter((a) => a.patient.toLowerCase().includes(search.toLowerCase()))
       .filter((a) =>
-        statusFilter === "All" ? true : a.status === statusFilter,
+        (a.patient || a.patientName || "")
+          .toLowerCase()
+          .includes(search.toLowerCase()),
+      )
+      .filter((a) =>
+        statusFilter === "All"
+          ? true
+          : a.status?.toLowerCase() === statusFilter.toLowerCase(),
       );
   }, [appointments, selectedDate, search, statusFilter]);
 
@@ -119,9 +126,17 @@ const Appointment = () => {
   };
 
   const totalForDay = filtered.length;
-  const confirmed = filtered.filter((a) => a.status === "Confirmed").length;
-  const pending = filtered.filter((a) => a.status === "Pending").length;
-  const cancelled = filtered.filter((a) => a.status === "Cancelled").length;
+  const confirmed = filtered.filter(
+    (a) => a.status?.toLowerCase() === "confirmed",
+  ).length;
+
+  const pending = filtered.filter(
+    (a) => a.status?.toLowerCase() === "pending",
+  ).length;
+
+  const cancelled = filtered.filter(
+    (a) => a.status?.toLowerCase() === "cancelled",
+  ).length;
 
   return (
     <div className="rounded-2xl shadow-sm overflow-hidden">
@@ -142,6 +157,7 @@ const Appointment = () => {
         <Modal
           isOpen={isOpen}
           onClose={handleCloseModal}
+          onSuccess={() => setIsOpen(false)}
           title="Create Appointment"
           size="2xl"
         >
@@ -270,9 +286,9 @@ const Appointment = () => {
                   className="bg-slate-50 p-4 rounded-xl flex justify-between items-center"
                 >
                   <div>
-                    <p className="font-medium">{appt.patient}</p>
+                    <p className="font-medium">{appt.patientName}</p>
                     <p className="text-sm text-slate-500">
-                      {appt.doctor} • {appt.time}
+                      {appt.assignedDoctor} • {appt.time}
                     </p>
                   </div>
 
@@ -296,7 +312,7 @@ const Appointment = () => {
                       appt.status !== "Completed" && (
                         <button
                           onClick={() => updateStatus(appt.id, "Cancelled")}
-                          className="text-xs px-3 py-1 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
+                          className="text-xs px-3 py-1 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 cursor-pointer"
                         >
                           Cancel
                         </button>

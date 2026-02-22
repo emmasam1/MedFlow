@@ -40,16 +40,14 @@ const StatCard = ({ title, value, color }) => {
     <motion.div
       whileHover={{ y: -4 }}
       transition={{ type: "spring", stiffness: 300 }}
-      className={`${theme.card} rounded-2xl p-5 py-7  flex justify-between items-center`}
+      className={`${theme.card} rounded-2xl p-5 py-7 flex justify-between items-center`}
     >
-      {/* ICON */}
       <div
         className={`w-11 h-11 rounded-xl flex items-center justify-center ${theme.icon}`}
       >
         <Icon size={22} strokeWidth={2} />
       </div>
 
-      {/* TEXT */}
       <div className="text-right">
         <p className="text-sm text-black font-semibold">{title}</p>
         <p className="text-xl font-bold text-gray-900">{value}</p>
