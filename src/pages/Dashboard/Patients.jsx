@@ -29,13 +29,42 @@ const Patients = () => {
     fetchPatients();
   }, [fetchPatients]);
 
-
-
   const columns = [
-    { title: "Card No", key: "patientId", sortable: true },
-    { title: "Full Name", key: "fullName", sortable: true },
-    { title: "Patient type", key: "patientType", sortable: true },
-    { title: "Gender", key: "gender" },
+    { title: "Card No", key: "cardNumber", sortable: true },
+    {
+      title: "Full Name",
+      key: "fullName",
+      render: (value) => <span className="capitalize">{value}</span>,
+    },
+    { title: "Patient type", key: "patientType", render: (value) => <span className="capitalize">{value}</span> },
+    {
+      title: "Gender",
+      key: "gender",
+      render: (value) => {
+        if (!value) return "—";
+
+        const gender = value.toLowerCase();
+
+        if (gender === "male") {
+          return (
+            <div className="flex justify-center items-center">
+              <div className="flex justify-center items-center w-8 h-8 rounded-full bg-blue-100 text-blue-600">
+                <span className="m-auto">M</span>
+              </div>
+            </div>
+          );
+        }
+
+        return (
+          <div className="flex justify-center items-center">
+              <div className="flex justify-center items-center w-8 h-8 rounded-full bg-pink-100 text-pink-600">
+                <span className="m-auto">F</span>
+              </div>
+            </div>
+          
+        );
+      },
+    },
     { title: "Age", key: "age", sortable: true },
     { title: "Phone", key: "phone" },
     {

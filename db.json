@@ -197,6 +197,32 @@
         "address": "Airport runway"
       },
       "regDate": "2026-02-23"
+    },
+    {
+      "id": "6a48",
+      "pid": 1771844339295,
+      "patientId": "PT-5636",
+      "fullName": "Blessing Nwosu",
+      "gender": "female",
+      "dob": "1991-02-22",
+      "phone": "08024567891",
+      "address": "23 Independence Layout, Enugu",
+      "bloodGroup": "N/A",
+      "patientType": "kachma",
+      "cardNumber": "KCH-412225",
+      "status": "Active",
+      "photo": "",
+      "maritalStatus": "married",
+      "stateOfOrigin": "Enugu",
+      "lga": "Enugu",
+      "occupation": "Treader",
+      "nextOfKin": {
+        "name": "Ngozi Nwosu",
+        "relationship": "mother",
+        "phone": "08027654321",
+        "address": "23 Independence Layout, Enugu"
+      },
+      "regDate": "2026-02-23"
     }
   ],
   "appointments": [

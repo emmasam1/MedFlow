@@ -4,11 +4,24 @@ import { FiX } from "react-icons/fi";
 const EditPatientModal = ({ patient, onClose, onSave }) => {
   const [formData, setFormData] = useState(null);
 
+  console.log(patient);
+
   useEffect(() => {
     if (patient) {
-      setFormData(patient);
+      setFormData({
+        ...patient,
+        patientType: capitalizeFirstLetter(patient.patientType),
+        gender: capitalizeFirstLetter(patient.gender),
+        nextOfKin: {
+          ...patient.nextOfKin,
+          relationship: capitalizeFirstLetter(patient.nextOfKin?.relationship),
+        },
+      });
     }
   }, [patient]);
+
+  const capitalizeFirstLetter = (str) =>
+    str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "";
 
   if (!formData) return null;
 
@@ -40,8 +53,7 @@ const EditPatientModal = ({ patient, onClose, onSave }) => {
   const patientTypes = ["Single", "Family", "NHIS", "KACHMA"];
 
   const relationshipTypes = [
-    "Wife",
-    "Husband",
+    "Spouse",
     "Father",
     "Mother",
     "Brother",
@@ -51,19 +63,22 @@ const EditPatientModal = ({ patient, onClose, onSave }) => {
     "Guardian",
   ];
 
+  const getNormalizedRelationship = (rel) => {
+    if (!rel) return "";
+    if (rel.toLowerCase() === "wife" || rel.toLowerCase() === "husband")
+      return "Spouse";
+    return rel;
+  };
+
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div className="bg-white w-full max-w-3xl rounded-2xl shadow-xl flex flex-col max-h-[90vh]">
-
         {/* ================= HEADER (FIXED) ================= */}
         <div className="flex items-center justify-between px-6 py-4 ">
           <div className="flex">
-            <h2 className="text-lg font-semibold">
-              Edit Patient
-            </h2> &nbsp; -  &nbsp;
-            <p className="text-lg font-bold">
-              {formData.fullName}
-            </p>
+            <h2 className="text-lg font-semibold">Edit Patient</h2> &nbsp; -
+            &nbsp;
+            <p className="text-lg font-bold">{formData.fullName}</p>
           </div>
 
           <button
@@ -76,21 +91,20 @@ const EditPatientModal = ({ patient, onClose, onSave }) => {
 
         {/* ================= SCROLLABLE BODY ================= */}
         <div className="overflow-y-auto px-6 py-6 space-y-6">
-
           {/* Patient Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium">Patient ID</label>
+              <label className="text-sm font-medium">Card Number</label>
               <input
                 type="text"
-                value={formData.patientId}
+                value={formData.cardNumber}
                 disabled
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100"
               />
             </div>
 
             <div>
-              <label className="text-sm font-medium">Full Name</label>
+              <label className="text-sm font-medium capitalize">Full Name</label>
               <input
                 type="text"
                 name="fullName"
@@ -140,12 +154,12 @@ const EditPatientModal = ({ patient, onClose, onSave }) => {
               <label className="text-sm font-medium">Patient Type</label>
               <select
                 name="patientType"
-                value={formData.patientType}
+                value={formData.patientType.toLowerCase()}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               >
                 {patientTypes.map((type) => (
-                  <option key={type} value={type}>
+                  <option key={type} value={type.toLowerCase()}>
                     {type}
                   </option>
                 ))}
@@ -175,13 +189,13 @@ const EditPatientModal = ({ patient, onClose, onSave }) => {
             </div>
 
             <div className="md:col-span-2">
-              <label className="text-sm font-medium">Address</label>
+              <label className="text-sm font-medium capitalize">Address</label>
               <textarea
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none"
+                className="w-full capitalize px-3 py-2 border border-gray-300 rounded-lg resize-none"
               />
             </div>
           </div>
@@ -199,18 +213,18 @@ const EditPatientModal = ({ patient, onClose, onSave }) => {
                 value={formData.nextOfKin?.name}
                 onChange={handleChange}
                 placeholder="Full Name"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg capitalize"
               />
 
               <select
                 name="nextOfKin.relationship"
-                value={formData.nextOfKin?.relationship}
+                value={formData.nextOfKin?.relationship.toLowerCase()}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               >
                 <option value="">Select Relationship</option>
                 {relationshipTypes.map((rel) => (
-                  <option key={rel} value={rel}>
+                  <option key={rel} value={rel.toLowerCase()}>
                     {rel}
                   </option>
                 ))}
@@ -232,7 +246,7 @@ const EditPatientModal = ({ patient, onClose, onSave }) => {
               onChange={handleChange}
               placeholder="Address"
               rows={2}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none mt-4"
+              className="w-full capitalize px-3 py-2 border border-gray-300 rounded-lg resize-none mt-4"
             />
           </div>
         </div>

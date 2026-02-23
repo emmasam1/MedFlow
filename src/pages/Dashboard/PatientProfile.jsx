@@ -14,6 +14,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useStore } from "../../store/store";
 import { RiUserHeartLine } from "react-icons/ri";
+import { useAppStore } from "../../store/useAppStore";
 
 const Row = ({ label, value }) => (
   <div className="grid grid-cols-2 items-center">
@@ -35,17 +36,17 @@ const Section = ({ loading, children }) => {
 };
 
 const PatientProfile = () => {
+  const { patient, loading, fetchSinglePatient } = useAppStore();
   const { id } = useParams();
-  const patients = useStore((state) => state.patients);
 
-  console.log(id)
-  
-  const patient = patients.find((p) => String(p.id) === String(id));
-  console.log(patient)
+  useEffect(() => {
+    if (id) {
+      fetchSinglePatient(id);
+    }
+  }, [id, fetchSinglePatient]);
 
-  
   const balance = Number(patient?.runningBalance ?? 0);
-  
+
   let statusText = "";
   let statusColor = "";
   let amountDisplay = `₦${Math.abs(balance).toLocaleString()}`;
@@ -73,7 +74,7 @@ const PatientProfile = () => {
   useEffect(() => {
     if (!patient) return;
 
-    const delay = 100; // shorter delay between boxes
+    const delay = 100;
 
     setTimeout(() => setLoadingProfile(false), 0);
     setTimeout(() => setLoadingPersonal(false), delay);
@@ -84,13 +85,36 @@ const PatientProfile = () => {
     setTimeout(() => setLoadingVisitHistory(false), delay * 6);
   }, [patient]);
 
+  if (loading) {
+    return <div className="p-6">Loading patient...</div>;
+  }
+
   if (!patient) {
     return (
       <div className="p-6 text-gray-500">
-        Patient not found or data not loaded.
+        Patient not found or does not exist.
       </div>
     );
   }
+
+  const calculateAge = (dob) => {
+    const birthDate = new Date(dob);
+    const today = new Date();
+
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
+  };
+
+  // console.log(patient)
 
   return (
     <div>
@@ -101,7 +125,7 @@ const PatientProfile = () => {
             <RiUserHeartLine className="w-4 h-4" /> All Patients
           </Link>
           <span className="mx-2">›</span>
-          <span className="font-semibold text-gray-800">
+          <span className="font-semibold text-gray-800 capitalize">
             {patient.fullName} information
           </span>
         </div>
@@ -129,11 +153,11 @@ const PatientProfile = () => {
                 alt="patient"
                 className="w-28 h-28 mx-auto rounded-full border-4 border-blue-400 object-cover"
               />
-              <h2 className="mt-4 text-xl font-semibold text-gray-800">
+              <h2 className="mt-4 text-xl font-semibold text-gray-800 capitalize">
                 {patient.fullName}
               </h2>
               <p className="text-sm text-gray-500">
-                Patient ID: {patient.patientId}
+                Card Number: {patient.cardNumber}
               </p>
               <button className="mt-3 px-4 py-1.5 rounded-md text-sm font-medium border border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 transition-all duration-200">
                 {patient.status}
@@ -150,18 +174,18 @@ const PatientProfile = () => {
                   Personal Information
                 </h3>
               </div>
-              <div className="p-5 space-y-4 text-sm">
+              <div className="p-5 space-y-4 text-sm capitalize">
                 <Row label="Full Name" value={patient.fullName} />
                 <Row label="Gender" value={patient.gender} />
-                <Row label="Age" value={`${patient.age} years`} />
+                <Row label="Age" value={`${calculateAge(patient.dob)} years`} />
                 <Row label="Date of Birth" value={patient.dob} />
                 <Row
                   label="Marital Status"
-                  value={patient.personalInfo.maritalStatus}
+                  value={patient.maritalStatus || "—"}
                 />
                 <Row
                   label="National ID"
-                  value={patient.personalInfo.nationalId}
+                  value={patient.personalInfo?.nationalId || "—"}
                 />
               </div>
             </div>
@@ -176,19 +200,22 @@ const PatientProfile = () => {
                   Contact & Address
                 </h3>
               </div>
-              <div className="p-5 space-y-4 text-sm">
+              <div className="p-5 space-y-4 text-sm capitalize">
                 <Row label="Phone" value={patient.phone} />
                 <Row label="Address" value={patient.address} />
                 <p className="font-semibold text-gray-700 pt-2">
                   Emergency Contact
                 </p>
-                <Row label="Name" value={patient.nextOfKin.name} />
+                <Row label="Name" value={patient.nextOfKin?.name || "—"} />
                 <Row
                   label="Relation"
-                  value={patient.nextOfKin.relationship}
+                  value={patient.nextOfKin?.relationship || "—"}
                 />
-                <Row label="Phone" value={patient.nextOfKin.phone} />
-                <Row label="Address" value={patient.nextOfKin.address} />
+                <Row label="Phone" value={patient.nextOfKin?.phone || "—"} />
+                <Row
+                  label="Address"
+                  value={patient.nextOfKin?.address || "—"}
+                />
               </div>
             </div>
           </Section>
@@ -209,7 +236,7 @@ const PatientProfile = () => {
                   label="Allergies"
                   value={
                     <div className="flex gap-2">
-                      {patient.medicalInfo.allergies.map((a, i) => (
+                      {patient.medicalInfo?.allergies.map((a, i) => (
                         <span
                           key={i}
                           className="px-3 py-1 border rounded-md text-xs"
@@ -224,7 +251,7 @@ const PatientProfile = () => {
                   label="Chronic Conditions"
                   value={
                     <div className="flex gap-2">
-                      {patient.medicalInfo.chronicConditions.map((c, i) => (
+                      {patient.medicalInfo?.chronicConditions.map((c, i) => (
                         <span
                           key={i}
                           className="px-3 py-1 border rounded-md text-xs"
@@ -239,7 +266,7 @@ const PatientProfile = () => {
                   label="Current Medications"
                   value={
                     <div className="space-y-1">
-                      {patient.medicalInfo.currentMedications.map((m, i) => (
+                      {patient.medicalInfo?.currentMedications.map((m, i) => (
                         <div key={i} className="flex items-center gap-2">
                           <PlusCircleIcon className="w-4 h-4 text-blue-500" />
                           <span>{m}</span>
@@ -250,7 +277,7 @@ const PatientProfile = () => {
                 />
                 <Row
                   label="Past Medical History"
-                  value={patient.medicalInfo.pastMedicalHistory}
+                  value={patient.medicalInfo?.pastMedicalHistory}
                 />
               </div>
             </div>
@@ -266,24 +293,27 @@ const PatientProfile = () => {
               <div className="p-5 space-y-3 text-sm">
                 <Row
                   label="Admission Date"
-                  value={patient.admissionDetails.admissionDate}
+                  value={patient.admissionDetails?.admissionDate || "—"}
                 />
                 <Row
                   label="Discharge Date"
-                  value={patient.admissionDetails.dischargeDate || "—"}
+                  value={patient.admissionDetails?.dischargeDate || "—"}
                 />
                 <Row
                   label="Doctor Assigned"
-                  value={patient.admissionDetails.doctorAssigned}
+                  value={patient.admissionDetails?.doctorAssigned || "—"}
                 />
-                <Row label="Ward/Room" value={patient.admissionDetails.ward} />
+                <Row
+                  label="Ward/Room"
+                  value={patient.admissionDetails?.ward || "—"}
+                />
                 <Row
                   label="Reason for Admission"
-                  value={patient.admissionDetails.reason}
+                  value={patient.admissionDetails?.reason || "—"}
                 />
                 <Row
                   label="Treatment"
-                  value={patient.admissionDetails.treatment}
+                  value={patient.admissionDetails?.treatment || "—"}
                 />
               </div>
             </div>
@@ -299,27 +329,27 @@ const PatientProfile = () => {
               <div className="p-5 space-y-3 text-sm">
                 <Row
                   label="Insurance Provider"
-                  value={patient.insuranceDetails.provider}
+                  value={patient.insuranceDetails?.provider || "—"}
                 />
                 <Row
                   label="Policy Number"
-                  value={patient.insuranceDetails.policyNumber}
+                  value={patient.insuranceDetails?.policyNumber || "—"}
                 />
                 <Row
                   label="Policy Type"
-                  value={patient.insuranceDetails.policyType}
+                  value={patient.insuranceDetails?.policyType || "—"}
                 />
                 <Row
                   label="Coverage Period"
-                  value={patient.insuranceDetails.coveragePeriod}
+                  value={patient.insuranceDetails?.coveragePeriod || "—"}
                 />
                 <Row
                   label="Coverage Amount"
-                  value={`₦${patient.insuranceDetails.coverageAmount.toLocaleString()}`}
+                  value={`₦${patient.insuranceDetails?.coverageAmount.toLocaleString() || "—"}`}
                 />
                 <Row
                   label="Copayment"
-                  value={patient.insuranceDetails.copayment}
+                  value={patient.insuranceDetails?.copayment || "—"}
                 />
               </div>
             </div>
@@ -346,7 +376,7 @@ const PatientProfile = () => {
                   </thead>
 
                   <tbody>
-                    {patient.visitHistory.map((visit, i) => (
+                    {patient.visitHistory?.map((visit, i) => (
                       <tr
                         key={i}
                         className="border-t border-gray-200 hover:bg-gray-50 text-xs"

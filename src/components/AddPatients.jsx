@@ -11,7 +11,16 @@ import { useAppStore } from "../store/useAppStore";
 import { ToastContainer, toast, Slide } from "react-toastify";
 
 const generateCardNumber = (type) => {
-  const prefix = type === "nhis" ? "NHIS" : type === "family" ? "FAM" : "SGL";
+  const prefixes = {
+    single: "SGL",
+    family: "FAM",
+    nhis: "NHIS",
+    kachma: "KCH",
+  };
+
+
+  const prefix = prefixes[type] || "GEN";
+
   return `${prefix}-${Math.floor(100000 + Math.random() * 900000)}`;
 };
 
@@ -109,6 +118,18 @@ const AddPatients = ({ onSuccess }) => {
     "Guardian",
   ];
 
+  const getStatus = (type) => {
+  const statuses = {
+    single: "Private",
+    family: "Regular",
+    nhis: "Insurance",
+    kachma: "Insurance",
+  };
+
+  return statuses[type] || "Regular";
+};
+
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "type") {
@@ -116,7 +137,7 @@ const AddPatients = ({ onSuccess }) => {
         ...prev,
         type: value,
         cardNumber: generateCardNumber(value),
-        status: value === "single" ? "Private" : "Regular",
+        status: getStatus(value),
       }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
@@ -371,9 +392,11 @@ const AddPatients = ({ onSuccess }) => {
                     className={inputClass}
                   >
                     <option>Select</option>
-                    <option value="single">Single</option>
-                    <option value="family">Family</option>
-                    <option value="nhis">NHIS</option>
+                    {patientTypes.map((type) => (
+                      <option key={type} value={type.toLowerCase()}>
+                        {type}
+                      </option>
+                    ))}
                   </select>
                 </div>
 

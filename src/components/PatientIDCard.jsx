@@ -7,7 +7,7 @@ const PatientIDCard = forwardRef(({ patient }, ref) => {
   // ✅ Corrected Structured QR Data
   const qrData = JSON.stringify({
     type: "patient",
-    patientId: patient.patientId, // Change "id" to "patientId"
+    cardNumber: patient.cardNumber,
     name: patient.fullName,
   });
 
@@ -29,13 +29,13 @@ const PatientIDCard = forwardRef(({ patient }, ref) => {
         {/* Patient Info */}
         <div className="space-y-1 text-sm">
           <p>
-            <span className="font-semibold">Name:</span> {patient.fullName}
+            <span className="font-semibold capitalize">Name:</span> {patient.fullName}
           </p>
-          <p>
+          {/* <p>
             <span className="font-semibold">Age:</span> {patient.age}
-          </p>
+          </p> */}
           <p>
-            <span className="font-semibold">Card No:</span> {patient.patientId}
+            <span className="font-semibold">Card No:</span> {patient.cardNumber}
           </p>
         </div>
 

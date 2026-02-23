@@ -35,7 +35,7 @@ const DoctorsAppointment = ({ onSuccess }) => {
   const extractPatientId = (decodedText) => {
     try {
       const parsed = JSON.parse(decodedText);
-      return parsed.patientId || null;
+      return parsed.cardNumber || null;
     } catch {
       return decodedText; // plain string QR
     }
@@ -43,7 +43,7 @@ const DoctorsAppointment = ({ onSuccess }) => {
 
   const [formData, setFormData] = useState({
     fullName: "",
-    patientId: "",
+    cardNumber: "",
     doctor: "",
     department: "",
     date: "",
@@ -64,7 +64,7 @@ const DoctorsAppointment = ({ onSuccess }) => {
     setFormData((prev) => ({
       ...prev,
       fullName: patient.fullName,
-      patientId: patient.patientId,
+      cardNumber: patient.cardNumber,
     }));
 
     setSearch(patient.fullName); // show inside input
@@ -75,7 +75,7 @@ const DoctorsAppointment = ({ onSuccess }) => {
     setSearch("");
     setFormData({
       fullName: "",
-      patientId: "",
+      cardNumber: "",
       doctor: "",
       department: "",
       date: "",
@@ -103,8 +103,8 @@ const DoctorsAppointment = ({ onSuccess }) => {
         },
         (decodedText) => {
           if (scanSuccess) return;
-          const patientId = extractPatientId(decodedText);
-          handleScanSuccess(patientId);
+          const cardNumber = extractPatientId(decodedText);
+          handleScanSuccess(cardNumber);
         },
       );
     } catch (err) {
@@ -128,8 +128,8 @@ const DoctorsAppointment = ({ onSuccess }) => {
     }
   };
 
-  const handleScanSuccess = async (patientIdFromQR) => {
-    const found = patients.find((p) => p.patientId === patientIdFromQR);
+  const handleScanSuccess = async (cardNumberFromQR) => {
+    const found = patients.find((p) => p.cardNumber === cardNumberFromQR);
 
     if (!found) {
       alert("Patient not found in system");
@@ -180,7 +180,7 @@ const DoctorsAppointment = ({ onSuccess }) => {
 
     try {
       const newAppointment = {
-        patientId: formData.patientId,
+        cardNumber: formData.cardNumber,
         patientName: formData.fullName,
         assignedDoctor: formData.doctor,
         department: formData.department,
@@ -242,7 +242,7 @@ const DoctorsAppointment = ({ onSuccess }) => {
             value={search}
             disabled={selectedPatient}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-gray-100 sentence-case"
+            className="w-full capitalize px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-gray-100 sentence-case"
           />
 
           {selectedPatient && (
@@ -267,7 +267,7 @@ const DoctorsAppointment = ({ onSuccess }) => {
                 >
                   <p className="font-medium capitalize">{patient.fullName}</p>
                   <p className="text-sm text-gray-500">
-                    {patient.patientId} • {patient.phone}
+                    {patient.cardNumber} • {patient.phone}
                   </p>
                 </div>
               ))
@@ -284,10 +284,10 @@ const DoctorsAppointment = ({ onSuccess }) => {
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
       >
         <div>
-          <label className="block text-sm font-medium mb-1">Patient ID</label>
+          <label className="block text-sm font-medium mb-1">Card Number</label>
           <input
             type="text"
-            value={formData.patientId}
+            value={formData.cardNumber}
             readOnly
             className="w-full px-3 py-2 border border-gray-300 rounded-lg"
           />
