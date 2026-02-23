@@ -14,7 +14,7 @@ import Modal from "../../components/Modal";
 import AddPatients from "../../components/AddPatients";
 import DoctorsAppointment from "../../components/DoctorsAppointment";
 import { useAppStore } from "../../store/useAppStore";
-
+import locationsNg from "locations-ng"
 
 const Dashboard = () => {
   const { darkMode } = useStore();
@@ -24,8 +24,19 @@ const Dashboard = () => {
   const pathName =
     location.pathname.split("/").filter(Boolean).pop() || "Dashboard";
 
-  const { patients, appointments, fetchPatients, fetchAppointments } =
-    useAppStore();
+  const { patients, appointments, fetchPatients, fetchAppointments } = useAppStore();
+
+// all states
+locationsNg.state.all()
+
+// LGAs in a state
+const data = locationsNg.lga.lgas("Kogi")
+
+// localities for a given LGA
+locationsNg.lga.localities("Abia", "Aba North")
+
+console.log(data)
+
 
   useEffect(() => {
     fetchPatients();
