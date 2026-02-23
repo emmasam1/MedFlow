@@ -12,10 +12,12 @@ const Sidebar = () => {
   const { isSidebarOpen, toggleSidebar, sidebarTheme, isRTL, darkMode } =
     useStore();
 
+  const user = JSON.parse(sessionStorage.getItem("user"));
+  
+
   const bgColor = sidebarTheme === "dark" ? "bg-slate-900" : "bg-white";
   const borderColor = darkMode ? "border-gray-200" : "border-gray-100";
-  const titleColor =
-    sidebarTheme === "dark" ? "text-white" : "text-slate-800";
+  const titleColor = sidebarTheme === "dark" ? "text-white" : "text-slate-800";
   const nameColor =
     sidebarTheme === "dark" ? "text-gray-200" : "text-slate-700";
 
@@ -29,11 +31,7 @@ const Sidebar = () => {
       animate={{
         width: isSidebarOpen ? 260 : window.innerWidth >= 1024 ? 80 : 260,
         x:
-          window.innerWidth < 1024 && !isSidebarOpen
-            ? isRTL
-              ? 260
-              : -260
-            : 0,
+          window.innerWidth < 1024 && !isSidebarOpen ? (isRTL ? 260 : -260) : 0,
       }}
       transition={{ type: "spring", damping: 25, stiffness: 200 }}
       className={`fixed top-0 h-screen z-50 overflow-hidden ${bgColor} ${borderColor} shadow-sm flex flex-col ${
@@ -72,9 +70,7 @@ const Sidebar = () => {
             width: isSidebarOpen || window.innerWidth < 1024 ? 85 : 50,
             height: isSidebarOpen || window.innerWidth < 1024 ? 85 : 50,
             borderRadius:
-              isSidebarOpen || window.innerWidth < 1024
-                ? "1.25rem"
-                : "0.75rem",
+              isSidebarOpen || window.innerWidth < 1024 ? "1.25rem" : "0.75rem",
           }}
           className="overflow-hidden border-4 border-slate-50 dark:border-gray-800 shadow-xl mb-4"
         >
@@ -92,10 +88,14 @@ const Sidebar = () => {
             className="text-center"
           >
             <h4 className={`font-bold text-base ${nameColor}`}>
-              Zara Judge
+              {user?.name || "User"}
             </h4>
             <p className="text-[11px] uppercase font-bold text-[#6777ef] tracking-widest mt-1">
-              Admin
+              {user?.role === "record_officer"
+                ? "Record Officer"
+                : user?.role === "doctor"
+                  ? "Doctor"
+                  : "User"}
             </p>
           </motion.div>
         )}
@@ -105,20 +105,16 @@ const Sidebar = () => {
       <nav className="flex-1 px-4 overflow-y-auto no-scrollbar">
         <p
           className={`text-[10px] font-bold uppercase mb-4 px-2 tracking-widest ${
-            sidebarTheme === "dark"
-              ? "text-gray-500"
-              : "text-gray-400"
+            sidebarTheme === "dark" ? "text-gray-500" : "text-gray-400"
           }`}
         >
-          {isSidebarOpen || window.innerWidth < 1024
-            ? "Main Menu"
-            : "•••"}
+          {isSidebarOpen || window.innerWidth < 1024 ? "Main Menu" : "•••"}
         </p>
 
         <div className="space-y-2">
           <SidebarItem
             to="/dashboard"
-            end  
+            end
             icon={<RiDashboardLine size={22} />}
             label="Dashboard"
             isOpen={isSidebarOpen}
@@ -182,7 +178,7 @@ const SidebarItem = ({
   return (
     <NavLink
       to={to}
-      end={end} 
+      end={end}
       onClick={onClick}
       className={({ isActive }) =>
         `flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 group

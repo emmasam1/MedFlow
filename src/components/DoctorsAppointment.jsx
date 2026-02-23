@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useStore } from "../store/store";
+import { useAppStore } from "../store/useAppStore";
 import Modal from "./Modal";
 import { Html5Qrcode } from "html5-qrcode";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaCheckCircle } from "react-icons/fa";
+import { ToastContainer, toast, Slide } from "react-toastify";
 
 const doctors = [
   { id: 1, name: "Dr. John Smith", department: "Cardiology" },
@@ -11,13 +12,14 @@ const doctors = [
   { id: 3, name: "Dr. Michael Brown", department: "Pediatrics" },
 ];
 
-const DoctorsAppointment = () => {
-  const { patients } = useStore();
+const DoctorsAppointment = ({ onSuccess }) => {
+  const { patients, createAppointment } = useAppStore();
   const today = new Date().toISOString().split("T")[0];
 
   const [search, setSearch] = useState("");
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [isScanOpen, setIsScanOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const scannerRef = useRef(null);
   const [scanSuccess, setScanSuccess] = useState(false);
@@ -166,8 +168,7 @@ const DoctorsAppointment = () => {
   }, [isScanOpen]);
 
   /* -------------------- SUBMIT -------------------- */
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!selectedPatient) {
@@ -175,12 +176,38 @@ const DoctorsAppointment = () => {
       return;
     }
 
-    console.log("Appointment:", formData);
-    alert("Appointment created successfully!");
-  };
+    setIsSubmitting(true);
 
+    try {
+      const newAppointment = {
+        patientId: formData.patientId,
+        patientName: formData.fullName,
+        assignedDoctor: formData.doctor,
+        department: formData.department,
+        date: formData.date,
+        time: formData.time,
+        priority: formData.priority,
+        reason: formData.reason,
+        notes: formData.notes || "",
+        status: "scheduled",
+      };
+
+      await createAppointment(newAppointment);
+
+      toast.success("Appointment created successfully!");
+      clearPatient();
+
+      onSuccess?.();
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to create appointment");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return (
     <div className="space-y-6">
+      <ToastContainer transition={Slide} autoClose={5000} />
       <div className="flex justify-end">
         {!selectedPatient ? (
           /* ---------------- SHOW SCAN AREA ---------------- */
@@ -215,7 +242,7 @@ const DoctorsAppointment = () => {
             value={search}
             disabled={selectedPatient}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-gray-100"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-gray-100 sentence-case"
           />
 
           {selectedPatient && (
@@ -238,7 +265,7 @@ const DoctorsAppointment = () => {
                   onClick={() => handleSelectPatient(patient)}
                   className="px-4 py-3 hover:bg-blue-50 cursor-pointer"
                 >
-                  <p className="font-medium">{patient.fullName}</p>
+                  <p className="font-medium capitalize">{patient.fullName}</p>
                   <p className="text-sm text-gray-500">
                     {patient.patientId} • {patient.phone}
                   </p>
@@ -382,9 +409,34 @@ const DoctorsAppointment = () => {
         <div className="md:col-span-2 mt-4">
           <button
             type="submit"
-            className="bg-blue-600 text-white py-2 px-3 cursor-pointer rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg"
+            disabled={isSubmitting}
+            className={`bg-blue-600 text-white py-2 px-3 cursor-pointer rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg flex items-center justify-center gap-2 ${
+              isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+            }`}
           >
-            Create Appointment
+            {isSubmitting && (
+              <svg
+                className="animate-spin h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8H4z"
+                ></path>
+              </svg>
+            )}
+            {isSubmitting ? "Creating..." : "Create Appointment"}
           </button>
         </div>
       </form>

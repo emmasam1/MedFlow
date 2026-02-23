@@ -30,6 +30,9 @@ const Topbar = () => {
   const notifRef = useRef(null);
   const navigate = useNavigate();
 
+  const user = JSON.parse(sessionStorage.getItem("user"));
+
+
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -170,7 +173,7 @@ const Topbar = () => {
             onClick={() => setProfileDropdown((prev) => !prev)}
             className="flex items-center gap-3 cursor-pointer py-1 px-3 rounded-full"
           >
-            <p className="text-sm font-bold hidden md:block">Zara Judge</p>
+            <p className="text-sm font-bold hidden md:block">{user?.name || "User"}</p>
             <img
               src="https://i.pravatar.cc/150?u=ella"
               alt="profile"
