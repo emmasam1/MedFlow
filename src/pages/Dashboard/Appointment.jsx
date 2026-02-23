@@ -286,7 +286,7 @@ const Appointment = () => {
                   className="bg-slate-50 p-4 rounded-xl flex justify-between items-center"
                 >
                   <div>
-                    <p className="font-medium">{appt.patientName}</p>
+                    <p className="font-medium capitalize">{appt.patientName}</p>
                     <p className="text-sm text-slate-500">
                       {appt.assignedDoctor} • {appt.time}
                     </p>
