@@ -99,8 +99,7 @@ const AddPatients = ({ onSuccess }) => {
   const patientTypes = ["Single", "Family", "NHIS", "KACHMA"];
 
   const relationshipTypes = [
-    "Wife",
-    "Husband",
+    "Spouse",
     "Father",
     "Mother",
     "Brother",
@@ -525,12 +524,19 @@ const AddPatients = ({ onSuccess }) => {
               </div>
               <div>
                 <label className={labelClass}>Relationship</label>
-                <input
+                <select
                   name="nokRelationship"
                   value={formData.nokRelationship}
                   onChange={handleChange}
                   className={inputClass}
-                />
+                >
+                  <option value="">Select Relationship</option>
+                  {relationshipTypes.map((rel) => (
+                    <option key={rel} value={rel.toLowerCase()}>
+                      {rel}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className={labelClass}>Phone</label>
