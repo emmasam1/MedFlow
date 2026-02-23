@@ -378,6 +378,32 @@
       "reason": "Follow Up",
       "notes": "",
       "status": "pending"
+    },
+    {
+      "id": "729d",
+      "cardNumber": "FAM-522264",
+      "patientName": "Ibrahim  Musa",
+      "assignedDoctor": "Dr. Michael Brown",
+      "department": "Pediatrics",
+      "date": "2026-02-23",
+      "time": "19:47",
+      "priority": "Normal",
+      "reason": "Follow up",
+      "notes": "",
+      "status": "pending"
+    },
+    {
+      "id": "598f",
+      "cardNumber": "KCH-412225",
+      "patientName": "Blessing Nwosu",
+      "assignedDoctor": "Dr. John Smith",
+      "department": "Cardiology",
+      "date": "2026-02-23",
+      "time": "17:01",
+      "priority": "Urgent",
+      "reason": "Bleeding",
+      "notes": "",
+      "status": "pending"
     }
   ],
   "notifications": [

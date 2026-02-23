@@ -207,7 +207,7 @@ const DoctorsAppointment = ({ onSuccess }) => {
   };
   return (
     <div className="space-y-6">
-      <ToastContainer transition={Slide} autoClose={5000} />
+      <ToastContainer transition={Slide}  />
       <div className="flex justify-end">
         {!selectedPatient ? (
           /* ---------------- SHOW SCAN AREA ---------------- */

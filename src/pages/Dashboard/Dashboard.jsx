@@ -15,6 +15,7 @@ import AddPatients from "../../components/AddPatients";
 import DoctorsAppointment from "../../components/DoctorsAppointment";
 // import locationsNg from "locations-ng"
 import { useAppStore } from "../../store/useAppStore";
+import { ToastContainer } from "react-toastify";
 
 const Dashboard = () => {
   const { darkMode } = useStore();
@@ -58,6 +59,7 @@ const Dashboard = () => {
 
   return (
     <>
+    <ToastContainer />
       <div className="flex flex-col sm:flex-row justify-between items-center text-center sm:text-left mb-8 gap-4 px-4">
         <div>
           <h2

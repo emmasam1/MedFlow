@@ -7,6 +7,7 @@ import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import Modal from "../../components/Modal";
 import DoctorsAppointment from "../../components/DoctorsAppointment";
 import { useAppStore } from "../../store/useAppStore";
+import { ToastContainer } from "react-toastify";
 
 const PER_PAGE = 10;
 
@@ -140,6 +141,7 @@ const Appointment = () => {
 
   return (
     <div className="rounded-2xl shadow-sm overflow-hidden">
+      <ToastContainer/>
       <div className="flex justify-between items-center p-2">
         <span className="font-semibold text-gray-800">Appointment</span>
         <motion.button
@@ -157,11 +159,10 @@ const Appointment = () => {
         <Modal
           isOpen={isOpen}
           onClose={handleCloseModal}
-          onSuccess={() => setIsOpen(false)}
           title="Create Appointment"
           size="2xl"
         >
-          <DoctorsAppointment />
+          <DoctorsAppointment onSuccess={() => setIsOpen(false)}/>
         </Modal>
       </div>
 
