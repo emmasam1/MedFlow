@@ -100,11 +100,25 @@ export const useAppStore = create((set, get) => ({
   },
 
   fetchSinglePatient: async (id) => {
+     set({ loading: true });
     try {
       const res = await api.get(`/patients/${id}`);
-      return res.data;
+       set({ patient: res.data, loading: false });
     } catch (error) {
+      set({ loading: false });
       console.error("Error fetching patient:", error);
+      throw error;
+    }
+  },
+
+  fetchSingleAppointment: async (id) => {
+    set({ loading: true });
+    try {
+      const res = await api.get(`/appointments/${id}`); 
+      set({ singleAppointment: res.data, loading: false });
+    } catch (error) {
+       set({ loading: false });
+      console.error("Error fetching appointment:", error);
       throw error;
     }
   },
