@@ -15,6 +15,7 @@ import AddPatients from "../../components/AddPatients";
 import DoctorsAppointment from "../../components/DoctorsAppointment";
 import { useAppStore } from "../../store/useAppStore";
 
+
 const Dashboard = () => {
   const { darkMode } = useStore();
   const [isOpen, setIsOpen] = useState(false);
@@ -35,17 +36,14 @@ const Dashboard = () => {
   const totalAppointments = appointments.length;
 
   const cancelledAppointments = appointments.filter(
-  (appt) => appt.status?.toLowerCase() === "cancelled"
-).length;
+    (appt) => appt.status?.toLowerCase() === "cancelled",
+  ).length;
 
   const totalPatients = patients.length;
 
+  const today = new Date().toISOString().split("T")[0]; // "2026-02-22"
 
-const today = new Date().toISOString().split("T")[0]; // "2026-02-22"
-
-const newPatients = patients.filter(
-  (p) => p.regDate === today
-).length;
+  const newPatients = patients.filter((p) => p.regDate === today).length;
 
   return (
     <>
@@ -128,7 +126,7 @@ const newPatients = patients.filter(
 
           <StatCard title="New Patients" value={newPatients} color="green" />
         </div>
-        
+
         {/* Middle Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 ">
           <PatientChart />
