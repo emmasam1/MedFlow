@@ -34,10 +34,13 @@ const DoctorsAppointment = ({ onSuccess }) => {
 
   const extractPatientId = (decodedText) => {
     try {
+      // If JSON QR
       const parsed = JSON.parse(decodedText);
-      return parsed.cardNumber || null;
+      return parsed.cardNumber?.trim() || null;
     } catch {
-      return decodedText; // plain string QR
+      // If plain format: cardNumber|name
+      const [cardNumber] = decodedText.split("|");
+      return cardNumber?.trim();
     }
   };
 
@@ -96,11 +99,8 @@ const DoctorsAppointment = ({ onSuccess }) => {
 
     try {
       await html5QrCode.start(
-        { facingMode: "user" }, // Changed to "user" for easier PC testing
-        {
-          fps: 10,
-          qrbox: { width: 250, height: 250 },
-        },
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 150, height: 150 } },
         (decodedText) => {
           if (scanSuccess) return;
           const cardNumber = extractPatientId(decodedText);
@@ -129,16 +129,19 @@ const DoctorsAppointment = ({ onSuccess }) => {
   };
 
   const handleScanSuccess = async (cardNumberFromQR) => {
-    const found = patients.find((p) => p.cardNumber === cardNumberFromQR);
+    const normalizedQR = (cardNumberFromQR || "").trim().toLowerCase();
+
+    const found = patients.find(
+      (p) => (p.cardNumber || "").trim().toLowerCase() === normalizedQR,
+    );
 
     if (!found) {
       alert("Patient not found in system");
       return;
     }
 
-    playBeep(); // 🔊 sound
-    setScanSuccess(true); // show animation
-
+    playBeep();
+    setScanSuccess(true);
     handleSelectPatient(found);
 
     setTimeout(async () => {
@@ -147,6 +150,26 @@ const DoctorsAppointment = ({ onSuccess }) => {
       setScanSuccess(false);
     }, 1200);
   };
+
+  // const handleScanSuccess = async (cardNumberFromQR) => {
+  //   const found = patients.find((p) => p.cardNumber === cardNumberFromQR);
+
+  //   if (!found) {
+  //     alert("Patient not found in system");
+  //     return;
+  //   }
+
+  //   playBeep(); // 🔊 sound
+  //   setScanSuccess(true); // show animation
+
+  //   handleSelectPatient(found);
+
+  //   setTimeout(async () => {
+  //     await stopScanner();
+  //     setIsScanOpen(false);
+  //     setScanSuccess(false);
+  //   }, 1200);
+  // };
 
   // This Effect ensures the scanner only runs when the Modal is fully rendered
   useEffect(() => {
@@ -207,7 +230,7 @@ const DoctorsAppointment = ({ onSuccess }) => {
   };
   return (
     <div className="space-y-6">
-      <ToastContainer transition={Slide}  />
+      <ToastContainer transition={Slide} />
       <div className="flex justify-end">
         {!selectedPatient ? (
           /* ---------------- SHOW SCAN AREA ---------------- */

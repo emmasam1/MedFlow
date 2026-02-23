@@ -23,7 +23,6 @@ const Patients = () => {
 
   const { fetchPatients, patients } = useAppStore();
 
-  console.log(patients);
 
   useEffect(() => {
     fetchPatients();
