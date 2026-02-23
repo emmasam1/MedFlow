@@ -23,13 +23,13 @@ const Patients = () => {
 
   const { fetchPatients, patients } = useAppStore();
 
-  console.log(patients)
+  console.log(patients);
 
   useEffect(() => {
     fetchPatients();
   }, [fetchPatients]);
 
-  const navigate = useNavigate();
+
 
   const columns = [
     { title: "Card No", key: "patientId", sortable: true },
@@ -73,38 +73,43 @@ const Patients = () => {
     documentTitle: printPatient?.fullName || "Patient ID Card",
   });
 
-  // const handleChange = (e) => {
-  //   setSelectedPatient({
-  //     ...selectedPatient,
-  //     [e.target.name]: e.target.value,
-  //   });
-  // };
+  const calculateAge = (dob) => {
+    if (!dob) return "";
 
-  // const savePatient = () => {
-  //   setPatientsData((prev) =>
-  //     prev.map((p) => (p.id === selectedPatient.id ? selectedPatient : p)),
-  //   );
-  //   setSelectedPatient(null);
-  // };
+    const birthDate = new Date(dob);
+    const today = new Date();
 
-  const Input = ({ label, value, type = "text", disabled }) => (
-    <div>
-      <label className="text-xs font-medium text-gray-500 mb-2 block">
-        {label}
-      </label>
-      <input
-        type={type}
-        defaultValue={value}
-        disabled={disabled}
-        className={`w-full px-4 py-3 rounded-2xl border text-sm transition
-        ${
-          disabled
-            ? "bg-gray-100 border-gray-200 cursor-not-allowed"
-            : "border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        }`}
-      />
-    </div>
-  );
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
+  };
+
+  // const Input = ({ label, value, type = "text", disabled }) => (
+  //   <div>
+  //     <label className="text-xs font-medium text-gray-500 mb-2 block">
+  //       {label}
+  //     </label>
+  //     <input
+  //       type={type}
+  //       defaultValue={value}
+  //       disabled={disabled}
+  //       className={`w-full px-4 py-3 rounded-2xl border text-sm transition
+  //       ${
+  //         disabled
+  //           ? "bg-gray-100 border-gray-200 cursor-not-allowed"
+  //           : "border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+  //       }`}
+  //     />
+  //   </div>
+  // );
 
   const Select = ({ label, value, options }) => (
     <div>
@@ -128,9 +133,11 @@ const Patients = () => {
       <div className=" overflow-hidden">
         <DataTable
           columns={columns}
-          data={patients}
+          data={patients.map((patient) => ({
+            ...patient,
+            age: calculateAge(patient.dob),
+          }))}
           searchableKeys={["fullName", "patientId", "phone"]}
-          // onRowClick={(row) => navigate(`/dashboard/patient-profile/${row.id}`)}
           actions={(row) => (
             <div className="flex gap-3" onClick={(e) => e.stopPropagation()}>
               <Link to={`/dashboard/patient-profile/${row.id}`}>
@@ -139,9 +146,7 @@ const Patients = () => {
 
               <FiEdit
                 className="text-blue-500 cursor-pointer hover:text-blue-700"
-                onClick={() => {
-                  setEditPatient(row);
-                }}
+                onClick={() => setEditPatient(row)}
               />
               <FiTrash2
                 className="text-red-500 cursor-pointer hover:text-red-700"
