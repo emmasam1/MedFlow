@@ -10,15 +10,24 @@ import { Link, useNavigate } from "react-router-dom";
 import { useStore } from "../../store/store";
 import PatientIDCard from "../../components/PatientIDCard";
 import EditPatientModal from "../../components/EditPatientModal";
+import { useAppStore } from "../../store/useAppStore";
 
 const Patients = () => {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [editPatient, setEditPatient] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
-  const { darkMode, patients, deletePatient } = useStore();
+  const { darkMode, deletePatient } = useStore();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [printPatient, setPrintPatient] = useState(null);
   const printRef = useRef();
+
+  const { fetchPatients, patients } = useAppStore();
+
+  console.log(patients)
+
+  useEffect(() => {
+    fetchPatients();
+  }, [fetchPatients]);
 
   const navigate = useNavigate();
 
