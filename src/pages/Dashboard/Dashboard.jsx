@@ -13,8 +13,8 @@ import { useStore } from "../../store/store";
 import Modal from "../../components/Modal";
 import AddPatients from "../../components/AddPatients";
 import DoctorsAppointment from "../../components/DoctorsAppointment";
-import { useAppStore } from "../../store/useAppStore";
 import locationsNg from "locations-ng"
+import { useAppStore } from "../../store/useAppStore";
 
 const Dashboard = () => {
   const { darkMode } = useStore();
