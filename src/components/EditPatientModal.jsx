@@ -118,6 +118,7 @@ const EditPatientModal = ({ patient, onClose, onSave }) => {
               <input
                 type="number"
                 name="age"
+                readOnly
                 value={formData.age}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"

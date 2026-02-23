@@ -13,7 +13,7 @@ import { useStore } from "../../store/store";
 import Modal from "../../components/Modal";
 import AddPatients from "../../components/AddPatients";
 import DoctorsAppointment from "../../components/DoctorsAppointment";
-import locationsNg from "locations-ng"
+// import locationsNg from "locations-ng"
 import { useAppStore } from "../../store/useAppStore";
 
 const Dashboard = () => {
@@ -27,15 +27,15 @@ const Dashboard = () => {
   const { patients, appointments, fetchPatients, fetchAppointments } = useAppStore();
 
 // all states
-locationsNg.state.all()
+// locationsNg.state.all()
 
 // LGAs in a state
-const data = locationsNg.lga.lgas("Kogi")
+// const data = locationsNg.lga.lgas("Kogi")
 
 // localities for a given LGA
-locationsNg.lga.localities("Abia", "Aba North")
+// locationsNg.lga.localities("Abia", "Aba North")
 
-console.log(data)
+// console.log(data)
 
 
   useEffect(() => {

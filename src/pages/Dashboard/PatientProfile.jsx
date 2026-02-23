@@ -38,7 +38,10 @@ const PatientProfile = () => {
   const { id } = useParams();
   const patients = useStore((state) => state.patients);
 
+  console.log(id)
+  
   const patient = patients.find((p) => String(p.id) === String(id));
+  console.log(patient)
 
   
   const balance = Number(patient?.runningBalance ?? 0);

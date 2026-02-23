@@ -17,46 +17,6 @@
   ],
   "patients": [
     {
-      "id": "1",
-      "patientId": "PT-1001",
-      "fullName": "Chinedu Okafor",
-      "gender": "Male",
-      "dob": "1992-11-19",
-      "bloodGroup": "O+",
-      "patientType": "NHIS",
-      "phone": "08031245678",
-      "status": "Active",
-      "medicalInfo": {
-        "allergies": [
-          "None"
-        ],
-        "chronicConditions": [
-          "Hypertension"
-        ]
-      },
-      "balanceLabel": "₦20,000 CR"
-    },
-    {
-      "id": "2",
-      "patientId": "PT-1002",
-      "fullName": "Aisha Bello",
-      "gender": "Female",
-      "dob": "1992-11-19",
-      "bloodGroup": "A+",
-      "patientType": "Single",
-      "phone": "08056781234",
-      "status": "Admitted",
-      "medicalInfo": {
-        "allergies": [
-          "Penicillin"
-        ],
-        "chronicConditions": [
-          "Asthma"
-        ]
-      },
-      "balanceLabel": "₦10,000 OS"
-    },
-    {
       "id": "690d",
       "pid": 1771751060308,
       "patientId": "PT-6409",

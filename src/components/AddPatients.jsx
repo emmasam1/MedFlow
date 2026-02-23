@@ -96,6 +96,20 @@ const AddPatients = ({ onSuccess }) => {
     }
   };
 
+  const patientTypes = ["Single", "Family", "NHIS", "KACHMA"];
+
+  const relationshipTypes = [
+    "Wife",
+    "Husband",
+    "Father",
+    "Mother",
+    "Brother",
+    "Sister",
+    "Son",
+    "Daughter",
+    "Guardian",
+  ];
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "type") {
