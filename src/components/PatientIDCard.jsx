@@ -6,13 +6,15 @@ const PatientIDCard = forwardRef(({ patient }, ref) => {
 
   if (!patient) return null;
 
-  const qrData = patient.cardNumber;
+  const qrData = JSON.stringify({
+    cardNumber: patient.cardNumber,
+    id: patient.id,
+  });
 
   return (
     <div className="flex flex-col items-center gap-3">
       {/* PRINT CONTAINER */}
       <div ref={ref} className="print:block">
-
         {/* ================= FRONT ================= */}
         <div
           className={`relative w-[340px] h-[200px] rounded-2xl shadow-xl overflow-hidden
@@ -64,28 +66,25 @@ const PatientIDCard = forwardRef(({ patient }, ref) => {
             </h2>
           </div>
 
-         <div className="flex justify-between items-center">
-           <div className="flex justify-center mb-3">
-            <QRCodeCanvas
-              value={qrData}
-              size={100}
-              level="M"
-              includeMargin={true}
-            />
-          </div>
+          <div className="flex justify-between items-center">
+            <div className="flex justify-center mb-3">
+              <QRCodeCanvas
+                value={qrData}
+                size={100}
+                level="M"
+                includeMargin={true}
+              />
+            </div>
 
-          <div className="text-[11px] text-left text-gray-600 space-y-1">
-            <p className="font-semibold">
-              If found, please return to:
-            </p>
-            <p>Cliniva Hospital</p>
-            <p>123 Medical Avenue, Lagos</p>
-            <p>+234 800 000 0000</p>
-            <p>www.medFlow.com</p>
+            <div className="text-[11px] text-left text-gray-600 space-y-1">
+              <p className="font-semibold">If found, please return to:</p>
+              <p>Cliniva Hospital</p>
+              <p>123 Medical Avenue, Lagos</p>
+              <p>+234 800 000 0000</p>
+              <p>www.medFlow.com</p>
+            </div>
           </div>
-         </div>
         </div>
-
       </div>
 
       {/* Toggle (hidden in print) */}
