@@ -49,8 +49,8 @@ const PatientIDCard = forwardRef(({ patient }, ref) => {
               </div>
             </div>
 
-            <div className="absolute bottom-3 left-4 text-[10px] opacity-90">
-              Emergency Contact: {patient.emergencyContact || "N/A"}
+            <div className="absolute bottom-3 left-4 text-[12px]">
+              <p>Emergency Contact: {patient?.nextOfKin?.phone || "N/A"}</p>
             </div>
           </div>
         </div>
@@ -76,13 +76,15 @@ const PatientIDCard = forwardRef(({ patient }, ref) => {
               />
             </div>
 
-            <div className="text-[11px] text-left text-gray-600 space-y-1">
+            <div className="text-[11px] text-left  space-y-1">
               <p className="font-semibold">If found, please return to:</p>
               <p>Cliniva Hospital</p>
               <p>123 Medical Avenue, Lagos</p>
               <p>+234 800 000 0000</p>
-              <p>www.medFlow.com</p>
             </div>
+          </div>
+          <div className="flex justify-center text-gray-600 text-[11px]">
+            <p>Powered by - www.medFlow.com</p>
           </div>
         </div>
       </div>
