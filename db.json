@@ -378,6 +378,32 @@
       "reason": "Follow Up",
       "notes": "",
       "status": "pending"
+    },
+    {
+      "id": "b2dd",
+      "cardNumber": "SGL-623631",
+      "patientName": "eric sam",
+      "assignedDoctor": "Dr. John Smith",
+      "department": "Cardiology",
+      "date": "2026-02-23",
+      "time": "16:42",
+      "priority": "Urgent",
+      "reason": "gg",
+      "notes": "",
+      "status": "pending"
+    },
+    {
+      "id": "15f8",
+      "cardNumber": "FAM-522264",
+      "patientName": "Ibrahim  Musa",
+      "assignedDoctor": "Dr. John Smith",
+      "department": "Cardiology",
+      "date": "2026-02-23",
+      "time": "17:45",
+      "priority": "Normal",
+      "reason": "gggg",
+      "notes": "",
+      "status": "pending"
     }
   ],
   "notifications": [
