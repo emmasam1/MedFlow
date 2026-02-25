@@ -37,7 +37,7 @@ const Modal = ({
         <>
           {/* Overlay */}
           <motion.div
-            className="fixed inset-0 bg-black/80 z-[1000] backdrop-blur-[2px]"
+            className="fixed inset-0 bg-black/80 z-[1000] backdrop-blur-[2px] h-screen"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

@@ -232,7 +232,7 @@ const AddPatients = ({ onSuccess }) => {
 
   return (
     <div className="w-full max-h-[85vh]">
-      <ToastContainer transition={Slide} autoClose={5000} />
+      <ToastContainer transition={Slide} />
       {/* Progress Bar - More Compact */}
       <div className="flex items-center justify-between mb-4 max-w-xs mx-auto">
         {[1, 2, 3].map((step) => (

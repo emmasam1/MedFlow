@@ -12,6 +12,7 @@ import PatientIDCard from "../../components/PatientIDCard";
 import EditPatientModal from "../../components/EditPatientModal";
 import { useAppStore } from "../../store/useAppStore";
 
+
 const Patients = () => {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [editPatient, setEditPatient] = useState(null);
@@ -23,7 +24,6 @@ const Patients = () => {
 
   const { fetchPatients, patients } = useAppStore();
 
-  console.log(patients);
 
   useEffect(() => {
     fetchPatients();

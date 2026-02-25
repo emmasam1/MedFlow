@@ -1,16 +1,20 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { FiChevronUp, FiChevronDown, FiSearch } from "react-icons/fi";
 import {
-  MagnifyingGlassIcon,
   PlusCircleIcon,
   ArrowPathIcon,
   ArrowDownTrayIcon,
   HomeIcon,
 } from "@heroicons/react/24/outline";
+import { BsQrCodeScan } from "react-icons/bs";
 import { LiaFilterSolid } from "react-icons/lia";
 import AddPatients from "../components/AddPatients";
 import Modal from "../components/Modal";
 import { useStore } from "../store/store";
+import { Html5Qrcode } from "html5-qrcode";
+import { useNavigate } from "react-router-dom";
+import { useAppStore } from "../store/useAppStore";
+import { Tooltip } from "antd";
 
 const Table = ({
   columns,
@@ -26,7 +30,108 @@ const Table = ({
   const [showColumnFilter, setShowColumnFilter] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-   const { darkMode } = useStore();
+  const { darkMode } = useStore();
+  const { patients } = useAppStore();
+  const navigate = useNavigate();
+
+  const scannerRef = useRef(null);
+  const [scanSuccess, setScanSuccess] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+  const [isScanOpen, setIsScanOpen] = useState(false);
+
+  const playBeep = () => {
+    const audio = new Audio(
+      "https://actions.google.com/sounds/v1/alarms/beep_short.ogg",
+    );
+    audio.play();
+  };
+
+  const extractPatientId = (decodedText) => {
+    try {
+      const parsed = JSON.parse(decodedText);
+      return parsed.id?.trim() || null; // ✅ Only return ID
+    } catch {
+      return null; // Not JSON
+    }
+  };
+
+  /* -------------------- QR SCANNER -------------------- */
+  const startScanner = async () => {
+    if (isScanning) return;
+
+    // Use the ID directly to ensure the element exists
+    const html5QrCode = new Html5Qrcode("qr-reader");
+    scannerRef.current = html5QrCode;
+    setIsScanning(true);
+
+    try {
+      await html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 150, height: 150 } },
+        (decodedText) => {
+          if (scanSuccess) return;
+          const cardNumber = extractPatientId(decodedText);
+          handleScanSuccess(cardNumber);
+        },
+      );
+    } catch (err) {
+      console.error("Camera error:", err);
+      setIsScanning(false); // Reset if it fails to start
+    }
+  };
+
+  const stopScanner = async () => {
+    if (scannerRef.current && isScanning) {
+      try {
+        await scannerRef.current.stop();
+        await scannerRef.current.clear();
+      } catch (err) {
+        console.warn("Stop error:", err);
+      } finally {
+        scannerRef.current = null;
+        setIsScanning(false);
+      }
+    }
+  };
+
+  const scanBlockedRef = useRef(false); // 🚨 Blocks multiple scans
+
+  const handleScanSuccess = async (patientId) => {
+    if (!patientId || scanBlockedRef.current) return; // block duplicates
+
+    scanBlockedRef.current = true; // immediately block further scans
+
+    // Stop the scanner before doing anything else
+    if (scannerRef.current) {
+      try {
+        await scannerRef.current.stop();
+        await scannerRef.current.clear();
+      } catch (err) {
+        console.warn("Scanner stop error:", err);
+      }
+      scannerRef.current = null;
+      setIsScanning(false);
+    }
+
+    // Now play beep and navigate
+    playBeep();
+    setIsScanOpen(false); // close modal
+
+    // Give a tiny delay to ensure modal closes before navigating
+    setTimeout(() => {
+      navigate(`/dashboard/patient-profile/${patientId}`);
+    }, 100);
+  };
+
+  // Reset scan block whenever a new scan session starts
+  useEffect(() => {
+    if (isScanOpen) {
+      scanBlockedRef.current = false;
+      startScanner();
+    } else {
+      stopScanner();
+    }
+  }, [isScanOpen]);
 
   // store visible column keys
   const [visibleColumns, setVisibleColumns] = useState(
@@ -101,20 +206,20 @@ const Table = ({
     <div className="space-y-6">
       {/* Search */}
       {/* <div className="flex justify-between items-center">
-        <div className="relative w-80">
-          <FiSearch className="absolute left-3 top-3 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search patients..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-          />
-        </div>
-      </div> */}
+          <div className="relative w-80">
+            <FiSearch className="absolute left-3 top-3 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search patients..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+            />
+          </div>
+        </div> */}
 
       {/* ================= TOP BAR ================= */}
       <div className="mb-6">
@@ -155,10 +260,12 @@ const Table = ({
           <div className="flex items-center gap-5">
             {/* Column Filter */}
             <div className="relative" ref={filterRef}>
-              <LiaFilterSolid
-                onClick={() => setShowColumnFilter((prev) => !prev)}
-                className="w-6 h-6 text-gray-600 cursor-pointer hover:text-blue-600 hover:scale-110 transition"
-              />
+              <Tooltip title="Show / Hide Columns">
+                <LiaFilterSolid
+                  onClick={() => setShowColumnFilter((prev) => !prev)}
+                  className="w-6 h-6 text-gray-600 cursor-pointer hover:text-blue-600 hover:scale-110 transition"
+                />
+              </Tooltip>
 
               {showColumnFilter && (
                 <div className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50 animate-fadeIn">
@@ -186,11 +293,19 @@ const Table = ({
               )}
             </div>
 
-            <PlusCircleIcon
-              onClick={() => setIsOpen(true)}
-              className="w-6 h-6 text-green-600 cursor-pointer hover:scale-110 transition"
-            />
+            <Tooltip title="Add New Patient">
+              <PlusCircleIcon
+                onClick={() => setIsOpen(true)}
+                className="w-6 h-6 text-green-600 cursor-pointer hover:scale-110 transition"
+              />
+            </Tooltip>
 
+            <Tooltip title="Scan Patient QR Code">
+              <BsQrCodeScan
+                onClick={() => setIsScanOpen(true)}
+                className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-600 transition"
+              />
+            </Tooltip>
             <ArrowPathIcon className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-600 transition" />
 
             <ArrowDownTrayIcon className="w-5 h-5 text-blue-600 cursor-pointer hover:text-blue-800 transition" />
@@ -292,15 +407,33 @@ const Table = ({
         </div>
       </div>
 
-        {/* ================= MODAL ADD PATIENT ================= */}
-            <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-              <h2
-                className={`text-xl font-bold mb-6 ${darkMode ? "text-white" : "text-slate-800"}`}
-              >
-                Patient Registration
-              </h2>
-              <AddPatients />
-            </Modal>
+      {/* ================= MODAL ADD PATIENT ================= */}
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
+        <h2
+          className={`text-xl font-bold mb-6 ${darkMode ? "text-white" : "text-slate-800"}`}
+        >
+          Patient Registration
+        </h2>
+        <AddPatients />
+      </Modal>
+
+      {/* ---------------- QR MODAL ---------------- */}
+      <Modal
+        isOpen={isScanOpen}
+        onClose={() => setIsScanOpen(false)}
+        title="Scan Patient QR Code"
+        size="md"
+      >
+        <div className="relative">
+          <div id="qr-reader" className="w-full rounded-lg overflow-hidden" />
+
+          {scanSuccess && (
+            <div className="absolute inset-0 bg-green-500/80 flex items-center justify-center animate-pulse">
+              <FaCheckCircle size={80} className="text-white" />
+            </div>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 };
