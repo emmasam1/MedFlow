@@ -30,6 +30,7 @@ const Table = ({
   const [showColumnFilter, setShowColumnFilter] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
+
   const { darkMode } = useStore();
   const navigate = useNavigate();
 
@@ -38,6 +39,8 @@ const Table = ({
   const [isScanning, setIsScanning] = useState(false);
   const [isScanOpen, setIsScanOpen] = useState(false);
   const scanBlockedRef = useRef(false);
+
+  const [refreshKey, setRefreshKey] = useState(0)
 
   const playBeep = () =>
     new Audio(
@@ -156,6 +159,10 @@ const Table = ({
     setSortConfig({ key, direction });
   };
 
+  const handleRefresh = () => {
+    setRefreshKey((prev)=>prev + 1)
+  }
+
   return (
     <div
       className={`${darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"} space-y-6 p-4 rounded-lg`}
@@ -238,14 +245,21 @@ const Table = ({
               className="w-5 h-5 cursor-pointer hover:text-blue-500 transition"
             />
           </Tooltip>
-
-          <ArrowPathIcon className="w-5 h-5 cursor-pointer hover:text-blue-500 transition" />
+          
+          <Tooltip title="Refresh">
+            <ArrowPathIcon 
+              onClick={()=>{
+                handleRefresh()
+              }}
+              className="w-5 h-5 cursor-pointer hover:text-blue-500 transition" 
+            />
+          </Tooltip>
           <ArrowDownTrayIcon className="w-5 h-5 text-blue-500 cursor-pointer hover:text-blue-600 transition" />
         </div>
       </div>
 
       {/* Table */}
-      <div
+      <div key={refreshKey}
         className={`${darkMode ? "border-gray-700" : "border-gray-100"} border overflow-x-auto rounded-lg`}
       >
         <table className="min-w-full text-sm">
