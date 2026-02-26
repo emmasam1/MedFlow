@@ -29,7 +29,7 @@ const Patients = () => {
 
   const columns = [
     { title: "Card No", key: "cardNumber", sortable: true },
-    { title: "Full Name", key: "fullName", render: (v) => <span className="capitalize">{v}</span> },
+    { title: "Full Name", key: "fullName", render: (v) => <span className="capitalize!">{v}</span> },
     { title: "Patient type", key: "patientType", render: (v) => <span className="capitalize">{v}</span> },
     {
       title: "Gender",

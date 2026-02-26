@@ -21,13 +21,10 @@ const PatientIDCard = forwardRef(({ patient }, ref) => {
           ${isBack ? "hidden print:block" : ""}`}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4">
-            <div className="flex justify-between items-center mb-3">
-              <h2 className="font-bold text-lg tracking-wide">
+            <div className="flex justify-center items-center mb-3">
+              <h2 className="font-bold text-sm tracking-wide">
                 MANAAL SPECIALIST HOSPITAL LTD
               </h2>
-              <span className="text-xs bg-white text-blue-700 px-2 py-1 rounded-full font-semibold">
-                PATIENT ID
-              </span>
             </div>
 
             <div className="flex items-center gap-4">
@@ -61,7 +58,7 @@ const PatientIDCard = forwardRef(({ patient }, ref) => {
           ${!isBack ? "hidden print:block" : ""}`}
         >
           <div className="text-center mb-2">
-            <h2 className="font-bold text-blue-700 text-lg tracking-wide">
+            <h2 className="font-bold text-blue-700 text-sm tracking-wide">
               MANAAL SPECIALIST HOSPITAL LTD
             </h2>
           </div>
@@ -76,14 +73,14 @@ const PatientIDCard = forwardRef(({ patient }, ref) => {
               />
             </div>
 
-            <div className="text-[11px] text-left  space-y-1">
+            <div className="text-[10px] text-left  space-y-1">
               <p className="font-semibold">If found, please return to:</p>
               <p>Manaal Specialist Hospital Ltd</p>
               <p>No. C5 Zangon Aya Road, Kawo, Kaduna</p>
               <p>+234 803 551 6227</p>
             </div>
           </div>
-          <div className="flex justify-center text-gray-600 text-[11px]">
+          <div className="flex justify-center mb-6 text-gray-600 text-[11px]">
             <p>Powered by - www.medFlow.com</p>
           </div>
         </div>
