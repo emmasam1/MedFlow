@@ -16,7 +16,7 @@ const Sidebar = () => {
   
 
   const bgColor = sidebarTheme === "dark" ? "bg-slate-900" : "bg-white";
-  const borderColor = darkMode ? "border-gray-200" : "border-gray-100";
+  const borderColor = darkMode ? "border-gray-800" : "border-gray-100";
   const titleColor = sidebarTheme === "dark" ? "text-white" : "text-slate-800";
   const nameColor =
     sidebarTheme === "dark" ? "text-gray-200" : "text-slate-700";
@@ -34,7 +34,7 @@ const Sidebar = () => {
           window.innerWidth < 1024 && !isSidebarOpen ? (isRTL ? 260 : -260) : 0,
       }}
       transition={{ type: "spring", damping: 25, stiffness: 200 }}
-      className={`fixed top-0 h-screen z-50 overflow-hidden ${bgColor} ${borderColor} shadow-sm flex flex-col ${
+      className={`fixed top-0 h-screen z-50 overflow-hidden ${bgColor} ${borderColor} shadow-sm flex flex-col border-r ${
         isRTL ? "right-0" : "left-0"
       }`}
     >
