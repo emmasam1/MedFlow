@@ -23,7 +23,7 @@ const PatientIDCard = forwardRef(({ patient }, ref) => {
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4">
             <div className="flex justify-between items-center mb-3">
               <h2 className="font-bold text-lg tracking-wide">
-                CLINIVA HOSPITAL
+                MANAAL SPECIALIST HOSPITAL LTD
               </h2>
               <span className="text-xs bg-white text-blue-700 px-2 py-1 rounded-full font-semibold">
                 PATIENT ID
@@ -62,7 +62,7 @@ const PatientIDCard = forwardRef(({ patient }, ref) => {
         >
           <div className="text-center mb-2">
             <h2 className="font-bold text-blue-700 text-lg tracking-wide">
-              CLINIVA HOSPITAL
+              MANAAL SPECIALIST HOSPITAL LTD
             </h2>
           </div>
 
@@ -78,9 +78,9 @@ const PatientIDCard = forwardRef(({ patient }, ref) => {
 
             <div className="text-[11px] text-left  space-y-1">
               <p className="font-semibold">If found, please return to:</p>
-              <p>Cliniva Hospital</p>
-              <p>123 Medical Avenue, Lagos</p>
-              <p>+234 800 000 0000</p>
+              <p>Manaal Specialist Hospital Ltd</p>
+              <p>No. C5 Zangon Aya Road, Kawo, Kaduna</p>
+              <p>+234 803 551 6227</p>
             </div>
           </div>
           <div className="flex justify-center text-gray-600 text-[11px]">
