@@ -4,14 +4,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import DataTable from "../../components/Table";
 import Modal from "../../components/Modal";
 import AddPatients from "../../components/AddPatients";
-import { FiEdit, FiTrash2, FiEye, FiX } from "react-icons/fi";
+import { FiEdit, FiTrash2, FiEye } from "react-icons/fi";
 import { PiPrinterLight } from "react-icons/pi";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useStore } from "../../store/store";
 import PatientIDCard from "../../components/PatientIDCard";
 import EditPatientModal from "../../components/EditPatientModal";
 import { useAppStore } from "../../store/useAppStore";
-
 
 const Patients = () => {
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -24,44 +23,28 @@ const Patients = () => {
 
   const { fetchPatients, patients } = useAppStore();
 
-
   useEffect(() => {
     fetchPatients();
   }, [fetchPatients]);
 
   const columns = [
     { title: "Card No", key: "cardNumber", sortable: true },
-    {
-      title: "Full Name",
-      key: "fullName",
-      render: (value) => <span className="capitalize">{value}</span>,
-    },
-    { title: "Patient type", key: "patientType", render: (value) => <span className="capitalize">{value}</span> },
+    { title: "Full Name", key: "fullName", render: (v) => <span className="capitalize">{v}</span> },
+    { title: "Patient type", key: "patientType", render: (v) => <span className="capitalize">{v}</span> },
     {
       title: "Gender",
       key: "gender",
-      render: (value) => {
-        if (!value) return "—";
-
-        const gender = value.toLowerCase();
-
-        if (gender === "male") {
-          return (
-            <div className="flex justify-center items-center">
-              <div className="flex justify-center items-center w-8 h-8 rounded-full bg-blue-100 text-blue-600">
-                <span className="m-auto">M</span>
-              </div>
-            </div>
-          );
-        }
-
+      render: (v) => {
+        if (!v) return "—";
+        const gender = v.toLowerCase();
+        const bgColor = gender === "male" ? "bg-blue-100 text-blue-600" : "bg-pink-100 text-pink-600";
+        const label = gender === "male" ? "M" : "F";
         return (
           <div className="flex justify-center items-center">
-              <div className="flex justify-center items-center w-8 h-8 rounded-full bg-pink-100 text-pink-600">
-                <span className="m-auto">F</span>
-              </div>
+            <div className={`flex justify-center items-center w-8 h-8 rounded-full ${bgColor}`}>
+              <span className="m-auto">{label}</span>
             </div>
-          
+          </div>
         );
       },
     },
@@ -70,15 +53,12 @@ const Patients = () => {
     {
       title: "Status",
       key: "status",
-      render: (value) => (
-        <span className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-600">
-          {value}
-        </span>
+      render: (v) => (
+        <span className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-600">{v}</span>
       ),
     },
   ];
 
-  // ------------------ DELETE ------------------
   const confirmDelete = (patient) => {
     setSelectedPatient(patient);
     setIsDeleteOpen(true);
@@ -92,97 +72,47 @@ const Patients = () => {
   };
 
   useEffect(() => {
-    if (printPatient) {
-      handlePrint();
-    }
+    if (printPatient) handlePrint();
   }, [printPatient]);
 
   const handlePrint = useReactToPrint({
-    contentRef: printRef,
+    content: () => printRef.current,
     documentTitle: printPatient?.fullName || "Patient ID Card",
   });
 
   const calculateAge = (dob) => {
     if (!dob) return "";
-
-    const birthDate = new Date(dob);
+    const birth = new Date(dob);
     const today = new Date();
-
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birthDate.getDate())
-    ) {
-      age--;
-    }
-
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
     return age;
   };
 
-  // const Input = ({ label, value, type = "text", disabled }) => (
-  //   <div>
-  //     <label className="text-xs font-medium text-gray-500 mb-2 block">
-  //       {label}
-  //     </label>
-  //     <input
-  //       type={type}
-  //       defaultValue={value}
-  //       disabled={disabled}
-  //       className={`w-full px-4 py-3 rounded-2xl border text-sm transition
-  //       ${
-  //         disabled
-  //           ? "bg-gray-100 border-gray-200 cursor-not-allowed"
-  //           : "border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-  //       }`}
-  //     />
-  //   </div>
-  // );
-
-  const Select = ({ label, value, options }) => (
-    <div>
-      <label className="text-xs font-medium text-gray-500 mb-2 block">
-        {label}
-      </label>
-      <select
-        defaultValue={value}
-        className="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        {options.map((opt) => (
-          <option key={opt}>{opt}</option>
-        ))}
-      </select>
-    </div>
-  );
-
   return (
-    <div className="p-4 bg-white min-h-screen">
+    <div className={`${darkMode ? "bg-gray-900 text-gray-100" : "bg-white text-gray-900"} p-4 min-h-screen`}>
       {/* Table */}
-      <div className=" overflow-hidden">
+      <div className="overflow-hidden">
         <DataTable
           columns={columns}
-          data={patients.map((patient) => ({
-            ...patient,
-            age: calculateAge(patient.dob),
-          }))}
+          data={patients.map((p) => ({ ...p, age: calculateAge(p.dob) }))}
           searchableKeys={["fullName", "patientId", "phone"]}
           actions={(row) => (
             <div className="flex gap-3" onClick={(e) => e.stopPropagation()}>
               <Link to={`/dashboard/patient-profile/${row.id}`}>
-                <FiEye className="text-gray-500 cursor-pointer hover:text-black" />
+                <FiEye className={`cursor-pointer ${darkMode ? "text-gray-200 hover:text-white" : "text-gray-500 hover:text-black"}`} />
               </Link>
-
               <FiEdit
-                className="text-blue-500 cursor-pointer hover:text-blue-700"
+                className={`cursor-pointer ${darkMode ? "text-blue-400 hover:text-blue-200" : "text-blue-500 hover:text-blue-700"}`}
                 onClick={() => setEditPatient(row)}
               />
               <FiTrash2
-                className="text-red-500 cursor-pointer hover:text-red-700"
+                className={`cursor-pointer ${darkMode ? "text-red-400 hover:text-red-200" : "text-red-500 hover:text-red-700"}`}
                 onClick={() => confirmDelete(row)}
               />
               <PiPrinterLight
-                className="cursor-pointer"
+                className={`cursor-pointer ${darkMode ? "text-gray-200 hover:text-white" : "text-gray-700 hover:text-black"}`}
                 onClick={() => {
                   setPrintPatient(row);
                   handlePrint();
@@ -197,17 +127,13 @@ const Patients = () => {
         <PatientIDCard ref={printRef} patient={printPatient} />
       </div>
 
-      {/* ================= MODAL ADD PATIENT ================= */}
+      {/* Add Patient Modal */}
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-        <h2
-          className={`text-xl font-bold mb-6 ${darkMode ? "text-white" : "text-slate-800"}`}
-        >
-          Patient Registration
-        </h2>
+        <h2 className={`text-xl font-bold mb-6 ${darkMode ? "text-white" : "text-slate-800"}`}>Patient Registration</h2>
         <AddPatients />
       </Modal>
 
-      {/* ================= DELETE CONFIRM MODAL ================= */}
+      {/* Delete Modal */}
       <AnimatePresence>
         {isDeleteOpen && (
           <motion.div
@@ -221,19 +147,16 @@ const Patients = () => {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 30, opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="bg-white w-[400px] rounded-2xl shadow-2xl p-6"
+              className={`${darkMode ? "bg-gray-800 text-gray-100" : "bg-white text-gray-900"} w-[400px] rounded-2xl shadow-2xl p-6`}
             >
               <h3 className="text-lg font-semibold mb-2">Delete Patient?</h3>
               <p className="text-sm text-gray-500 mb-6">
-                Are you sure you want to delete{" "}
-                <span className="font-medium">{selectedPatient?.fullName}</span>
-                ? This action cannot be undone.
+                Are you sure you want to delete <span className="font-medium">{selectedPatient?.fullName}</span>? This action cannot be undone.
               </p>
-
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setIsDeleteOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200"
+                  className={`${darkMode ? "bg-gray-700 hover:bg-gray-600 text-gray-100" : "bg-gray-100 hover:bg-gray-200 text-gray-900"} px-4 py-2 rounded-xl`}
                 >
                   Cancel
                 </button>
@@ -249,7 +172,7 @@ const Patients = () => {
         )}
       </AnimatePresence>
 
-      {/* ================== EDIT PATIENTS ========================*/}
+      {/* Edit Patient Modal */}
       <AnimatePresence>
         {editPatient && (
           <motion.div
@@ -263,12 +186,9 @@ const Patients = () => {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 40, opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="bg-white w-full max-w-4xl rounded-xl shadow-xl overflow-hidden"
+              className={`${darkMode ? "bg-gray-800 text-gray-100" : "bg-white text-gray-900"} w-full max-w-4xl rounded-xl shadow-xl overflow-hidden`}
             >
-              <EditPatientModal
-                patient={editPatient}
-                onClose={() => setEditPatient(null)}
-              />
+              <EditPatientModal patient={editPatient} onClose={() => setEditPatient(null)} />
             </motion.div>
           </motion.div>
         )}

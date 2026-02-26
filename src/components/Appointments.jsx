@@ -2,23 +2,34 @@ import React, { useState, useEffect } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAppStore } from "../store/useAppStore";
+import { useStore } from "../store/store";
 
 const monthNames = [
-  "January","February","March","April","May","June",
-  "July","August","September","October","November","December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
-const getDaysInMonth = (year, month) =>
-  new Date(year, month + 1, 0).getDate();
+const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
 
 const Appointments = () => {
   const { fetchAppointments, appointments } = useAppStore();
+  const { darkMode } = useStore();
 
   const today = new Date();
   const [currentDate, setCurrentDate] = useState(today);
   const [selectedDay, setSelectedDay] = useState(today.getDate());
   const [startIndex, setStartIndex] = useState(
-    Math.max(today.getDate() - 2, 0)
+    Math.max(today.getDate() - 2, 0),
   );
 
   useEffect(() => {
@@ -45,7 +56,7 @@ const Appointments = () => {
 
     if (day >= startIndex + VISIBLE_DAYS) {
       setStartIndex(
-        Math.min(day - VISIBLE_DAYS + 1, days.length - VISIBLE_DAYS)
+        Math.min(day - VISIBLE_DAYS + 1, days.length - VISIBLE_DAYS),
       );
     }
 
@@ -61,10 +72,8 @@ const Appointments = () => {
     setStartIndex(0);
   };
 
-  /* ✅ CORRECT FILTERING USING REAL STORE DATA */
   const todaysAppointments = appointments.filter((appt) => {
     if (!appt.date) return false;
-
     const apptDate = new Date(appt.date);
 
     return (
@@ -74,28 +83,48 @@ const Appointments = () => {
     );
   });
 
+  /* 🎨 THEME VARIABLES */
+  const containerBg = darkMode
+    ? "bg-[#1a202c] border-gray-700"
+    : "bg-white border-gray-100";
+
+  const textPrimary = darkMode ? "text-white" : "text-gray-900";
+  const textSecondary = darkMode ? "text-gray-300" : "text-gray-700";
+  const textMuted = darkMode ? "text-gray-400" : "text-gray-400";
+
+  const hoverBg = darkMode ? "hover:bg-gray-800" : "hover:bg-gray-50";
+
+  const cardBg = darkMode
+    ? "bg-gray-800 border-gray-700 hover:bg-gray-750"
+    : "bg-white border-gray-100 hover:shadow-md hover:border-blue-100";
+
+  const badgeBg = darkMode
+    ? "bg-gray-700 text-gray-200"
+    : "bg-gray-50 text-gray-600";
+
   return (
-    <div className="bg-white rounded-xl shadow-lg p-4 border border-gray-100 flex flex-col h-[400px]">
-      
+    <div
+      className={`${containerBg} rounded-xl shadow-lg p-4 border flex flex-col h-[400px] transition-colors duration-300`}
+    >
       {/* HEADER */}
       <div className="flex items-center justify-between mb-4 flex-shrink-0">
-        <h2 className="font-bold text-sm text-gray-900">Appointments</h2>
+        <h2 className={`font-bold text-sm ${textPrimary}`}>Appointments</h2>
 
         <div className="flex items-center gap-3 px-3 py-1 rounded-full">
           <button
             onClick={() => changeMonth(-1)}
-            className="hover:text-blue-600 transition cursor-pointer"
+            className={`${hoverBg} ${darkMode ? "text-white" : "text-gray-700"} p-1 rounded-full transition-colors duration-300 cursor-pointer`}
           >
             <FiChevronLeft size={18} />
           </button>
 
-          <span className="text-sm font-medium text-gray-700 text-center">
+          <span className={`text-sm font-medium ${textSecondary}`}>
             {monthNames[month]} {year}
           </span>
 
           <button
             onClick={() => changeMonth(1)}
-            className="hover:text-blue-600 transition cursor-pointer"
+            className={`${hoverBg} ${darkMode ? "text-white" : "text-gray-700"} p-1 rounded-full transition-colors duration-300 cursor-pointer`}
           >
             <FiChevronRight size={18} />
           </button>
@@ -119,8 +148,8 @@ const Appointments = () => {
               className={`relative flex flex-col items-center min-w-[50px] py-2 rounded-xl transition-all duration-300
               ${
                 selectedDay === d.date
-                  ? "text-blue-600"
-                  : "text-gray-400 hover:bg-gray-50"
+                  ? "text-blue-500"
+                  : `${textMuted} ${hoverBg}`
               }`}
             >
               <span className="text-[10px] uppercase tracking-wider font-bold">
@@ -131,7 +160,11 @@ const Appointments = () => {
               {selectedDay === d.date && (
                 <motion.div
                   layoutId="activeDay"
-                  className="absolute inset-0 bg-blue-50 border border-blue-200 rounded-xl -z-10"
+                  className={`absolute inset-0 rounded-xl -z-10 ${
+                    darkMode
+                      ? "bg-blue-900/30 border border-blue-700"
+                      : "bg-blue-50 border border-blue-200"
+                  }`}
                 />
               )}
             </button>
@@ -154,12 +187,12 @@ const Appointments = () => {
         className="text-sm font-medium text-orange-500 mb-4 flex-shrink-0"
       >
         {todaysAppointments.length} appointment
-        {todaysAppointments.length !== 1 && "s"} on{" "}
-        {monthNames[month]} {selectedDay}
+        {todaysAppointments.length !== 1 && "s"} on {monthNames[month]}{" "}
+        {selectedDay}
       </motion.p>
 
-      {/* APPOINTMENT LIST - EXACT SAME DESIGN */}
-      <div className="flex-1 overflow-y-auto space-y-3 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+      {/* APPOINTMENT LIST */}
+      <div className="flex-1 overflow-y-auto space-y-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
         <AnimatePresence mode="popLayout">
           {todaysAppointments.length === 0 ? (
             <motion.div
@@ -168,9 +201,7 @@ const Appointments = () => {
               exit={{ opacity: 0 }}
               className="text-center py-10"
             >
-              <p className="text-gray-400 italic">
-                No schedules for today
-              </p>
+              <p className={`${textMuted} italic`}>No schedules for today</p>
             </motion.div>
           ) : (
             todaysAppointments.map((appt) => (
@@ -181,13 +212,13 @@ const Appointments = () => {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.2 }}
-                className="group flex items-center justify-between border border-gray-100 rounded-2xl p-4 hover:shadow-md hover:border-blue-100 transition-all bg-white"
+                className={`group flex items-center justify-between border rounded-2xl p-4 transition-all ${cardBg}`}
               >
                 <div className="flex gap-4">
                   <div className="w-[3px] rounded-full bg-blue-500" />
 
                   <div>
-                    <p className="font-bold text-gray-800 capitalize">
+                    <p className={`font-bold capitalize ${textPrimary}`}>
                       {appt.patientName}
                     </p>
 
@@ -195,17 +226,18 @@ const Appointments = () => {
                       {appt.department}
                     </p>
 
-                    <p className="text-[11px] text-gray-400 flex items-center gap-1">
-                      <span className="grayscale group-hover:grayscale-0 transition">
-                        🩺
-                      </span>
-                      {appt.assignedDoctor}
+                    <p
+                      className={`text-[11px] flex items-center gap-1 ${textMuted}`}
+                    >
+                      🩺 {appt.assignedDoctor}
                     </p>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <span className="text-xs font-bold text-gray-600 bg-gray-50 px-2 py-1 rounded-md">
+                  <span
+                    className={`text-xs font-bold px-2 py-1 rounded-md ${badgeBg}`}
+                  >
                     {appt.time}
                   </span>
                 </div>
