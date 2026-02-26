@@ -72,11 +72,13 @@ const Patients = () => {
   };
 
   useEffect(() => {
-    if (printPatient) handlePrint();
+    if (printPatient) {
+      handlePrint();
+    }
   }, [printPatient]);
 
   const handlePrint = useReactToPrint({
-    content: () => printRef.current,
+    contentRef: printRef,
     documentTitle: printPatient?.fullName || "Patient ID Card",
   });
 
