@@ -1,4 +1,3 @@
-
 import { create } from "zustand";
 import axios from "axios";
 
@@ -100,10 +99,10 @@ export const useAppStore = create((set, get) => ({
   },
 
   fetchSinglePatient: async (id) => {
-     set({ loading: true });
+    set({ loading: true });
     try {
       const res = await api.get(`/patients/${id}`);
-       set({ patient: res.data, loading: false });
+      set({ patient: res.data, loading: false });
     } catch (error) {
       set({ loading: false });
       console.error("Error fetching patient:", error);
@@ -114,10 +113,10 @@ export const useAppStore = create((set, get) => ({
   fetchSingleAppointment: async (id) => {
     set({ loading: true });
     try {
-      const res = await api.get(`/appointments/${id}`); 
+      const res = await api.get(`/appointments/${id}`);
       set({ singleAppointment: res.data, loading: false });
     } catch (error) {
-       set({ loading: false });
+      set({ loading: false });
       console.error("Error fetching appointment:", error);
       throw error;
     }
@@ -130,6 +129,26 @@ export const useAppStore = create((set, get) => ({
       get().fetchAppointments();
     } catch (error) {
       console.error("Error updating status:", error);
+    }
+  },
+
+  updatePatient: async (id, updatedData) => {
+    try {
+      // Send PATCH request to backend
+      const res = await api.patch(`/patients/${id}`, updatedData);
+
+      // Update the patients array in store
+      set((state) => ({
+        patients: state.patients.map((p) => (p.id === id ? res.data : p)),
+      }));
+
+      // Optional: return updated patient
+      return res.data;
+    } catch (error) {
+      console.error("Error updating patient:", error);
+      throw new Error(
+        error.response?.data?.message || "Failed to update patient",
+      );
     }
   },
 }));

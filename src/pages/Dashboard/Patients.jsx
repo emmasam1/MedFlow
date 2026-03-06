@@ -21,7 +21,7 @@ const Patients = () => {
   const [printPatient, setPrintPatient] = useState(null);
   const printRef = useRef();
 
-  const { fetchPatients, patients } = useAppStore();
+  const { fetchPatients, patients, updatePatient } = useAppStore();
 
   useEffect(() => {
     fetchPatients();
@@ -29,19 +29,32 @@ const Patients = () => {
 
   const columns = [
     { title: "Card No", key: "cardNumber", sortable: true },
-    { title: "Full Name", key: "fullName", render: (v) => <span className="capitalize!">{v}</span> },
-    { title: "Patient type", key: "patientType", render: (v) => <span className="capitalize">{v}</span> },
+    {
+      title: "Full Name",
+      key: "fullName",
+      render: (v) => <span className="capitalize!">{v}</span>,
+    },
+    {
+      title: "Patient type",
+      key: "patientType",
+      render: (v) => <span className="capitalize">{v}</span>,
+    },
     {
       title: "Gender",
       key: "gender",
       render: (v) => {
         if (!v) return "—";
         const gender = v.toLowerCase();
-        const bgColor = gender === "male" ? "bg-blue-100 text-blue-600" : "bg-pink-100 text-pink-600";
+        const bgColor =
+          gender === "male"
+            ? "bg-blue-100 text-blue-600"
+            : "bg-pink-100 text-pink-600";
         const label = gender === "male" ? "M" : "F";
         return (
           <div className="flex justify-center items-center">
-            <div className={`flex justify-center items-center w-8 h-8 rounded-full ${bgColor}`}>
+            <div
+              className={`flex justify-center items-center w-8 h-8 rounded-full ${bgColor}`}
+            >
               <span className="m-auto">{label}</span>
             </div>
           </div>
@@ -54,7 +67,9 @@ const Patients = () => {
       title: "Status",
       key: "status",
       render: (v) => (
-        <span className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-600">{v}</span>
+        <span className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-600">
+          {v}
+        </span>
       ),
     },
   ];
@@ -88,12 +103,15 @@ const Patients = () => {
     const today = new Date();
     let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate()))
+      age--;
     return age;
   };
 
   return (
-    <div className={`${darkMode ? "bg-gray-900 text-gray-100" : "bg-white text-gray-900"} p-4 min-h-screen`}>
+    <div
+      className={`${darkMode ? "bg-gray-900 text-gray-100" : "bg-white text-gray-900"} p-4 min-h-screen`}
+    >
       {/* Table */}
       <div className="overflow-hidden">
         <DataTable
@@ -103,7 +121,9 @@ const Patients = () => {
           actions={(row) => (
             <div className="flex gap-3" onClick={(e) => e.stopPropagation()}>
               <Link to={`/dashboard/patient-profile/${row.id}`}>
-                <FiEye className={`cursor-pointer ${darkMode ? "text-gray-200 hover:text-white" : "text-gray-500 hover:text-black"}`} />
+                <FiEye
+                  className={`cursor-pointer ${darkMode ? "text-gray-200 hover:text-white" : "text-gray-500 hover:text-black"}`}
+                />
               </Link>
               <FiEdit
                 className={`cursor-pointer ${darkMode ? "text-blue-400 hover:text-blue-200" : "text-blue-500 hover:text-blue-700"}`}
@@ -131,7 +151,11 @@ const Patients = () => {
 
       {/* Add Patient Modal */}
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-        <h2 className={`text-xl font-bold mb-6 ${darkMode ? "text-white" : "text-slate-800"}`}>Patient Registration</h2>
+        <h2
+          className={`text-xl font-bold mb-6 ${darkMode ? "text-white" : "text-slate-800"}`}
+        >
+          Patient Registration
+        </h2>
         <AddPatients />
       </Modal>
 
@@ -153,7 +177,9 @@ const Patients = () => {
             >
               <h3 className="text-lg font-semibold mb-2">Delete Patient?</h3>
               <p className="text-sm text-gray-500 mb-6">
-                Are you sure you want to delete <span className="font-medium">{selectedPatient?.fullName}</span>? This action cannot be undone.
+                Are you sure you want to delete{" "}
+                <span className="font-medium">{selectedPatient?.fullName}</span>
+                ? This action cannot be undone.
               </p>
               <div className="flex justify-end gap-3">
                 <button
@@ -190,7 +216,20 @@ const Patients = () => {
               transition={{ duration: 0.25 }}
               className={`${darkMode ? "bg-gray-800 text-gray-100" : "bg-white text-gray-900"} w-full max-w-4xl rounded-xl shadow-xl overflow-hidden`}
             >
-              <EditPatientModal patient={editPatient} onClose={() => setEditPatient(null)} />
+              <EditPatientModal
+                patient={editPatient}
+                onClose={() => setEditPatient(null)}
+                onSave={async (updatedData) => {
+                  try {
+                    await updatePatient(updatedData.id, updatedData); // updatePatient from useAppStore
+                    fetchPatients(); // refresh list
+                    setEditPatient(null); // close modal
+                    alert("Patient updated successfully");
+                  } catch (err) {
+                    alert(err.message);
+                  }
+                }}
+              />
             </motion.div>
           </motion.div>
         )}
