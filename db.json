@@ -70,7 +70,12 @@
       },
       "regDate": "2026-02-22",
       "age": 45,
-      "familyMembers": []
+      "familyMembers": [
+        {
+          "name": "Tanko Musa",
+          "relationship": "Son"
+        }
+      ]
     },
     {
       "id": "cdae",

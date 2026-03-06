@@ -12,14 +12,21 @@ import {
   UserCircleIcon,
   IdentificationIcon,
 } from "@heroicons/react/24/outline";
+import { MdFamilyRestroom } from "react-icons/md";
 import { useStore } from "../../store/store";
 import { RiUserHeartLine } from "react-icons/ri";
 import { useAppStore } from "../../store/useAppStore";
 
 const Row = ({ label, value, darkMode }) => (
   <div className="grid grid-cols-2 items-center">
-    <span className={darkMode ? "text-gray-400" : "text-gray-500"}>{label}</span>
-    <span className={darkMode ? "text-gray-100 font-medium" : "text-gray-800 font-medium"}>
+    <span className={darkMode ? "text-gray-400" : "text-gray-500"}>
+      {label}
+    </span>
+    <span
+      className={
+        darkMode ? "text-gray-100 font-medium" : "text-gray-800 font-medium"
+      }
+    >
       {value}
     </span>
   </div>
@@ -85,14 +92,23 @@ const PatientProfile = () => {
   }, [patient]);
 
   if (loading) return <div className="p-6">Loading patient...</div>;
-  if (!patient) return <div className="p-6 text-gray-500">Patient not found or does not exist.</div>;
+  if (!patient)
+    return (
+      <div className="p-6 text-gray-500">
+        Patient not found or does not exist.
+      </div>
+    );
 
   const calculateAge = (dob) => {
     const birthDate = new Date(dob);
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) age--;
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    )
+      age--;
     return age;
   };
 
@@ -101,18 +117,34 @@ const PatientProfile = () => {
   const textClass = darkMode ? "text-gray-100" : "text-gray-800";
 
   return (
-    <div className={darkMode ? "bg-gray-900 text-gray-100 min-h-screen" : "bg-gray-50 text-gray-900 min-h-screen"}>
+    <div
+      className={
+        darkMode
+          ? "bg-gray-900 text-gray-100 min-h-screen"
+          : "bg-gray-50 text-gray-900 min-h-screen"
+      }
+    >
       {/* Breadcrumb */}
       <div className="flex justify-between items-center mb-4">
-        <div className={`flex items-center text-sm ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
+        <div
+          className={`flex items-center text-sm ${darkMode ? "text-gray-300" : "text-gray-600"}`}
+        >
           <Link to="/dashboard/patients" className="flex gap-2 items-center">
             <RiUserHeartLine className="w-4 h-4" /> All Patients
           </Link>
           <span className="mx-2">›</span>
-          <span className="font-semibold capitalize">{patient.fullName} information</span>
+          <span className="font-semibold capitalize">
+            {patient.fullName} information
+          </span>
         </div>
-        <div className={`flex justify-between items-center gap-3 bg-transparent ${statusColor}`}>
-          <p className={`text-sm font-bold ${darkMode ? "text-gray-200" : "text-black"}`}>Running Balance</p>
+        <div
+          className={`flex justify-between items-center gap-3 bg-transparent ${statusColor}`}
+        >
+          <p
+            className={`text-sm font-bold ${darkMode ? "text-gray-200" : "text-black"}`}
+          >
+            Running Balance
+          </p>
           <h2 className="font-bold flex items-center gap-3">
             {balance === 0 ? "₦0.00" : (balance < 0 ? "−" : "") + amountDisplay}
             <span className="text-xs">{statusText}</span>
@@ -131,11 +163,17 @@ const PatientProfile = () => {
                 alt="patient"
                 className="w-28 h-28 mx-auto rounded-full border-4 border-blue-400 object-cover"
               />
-              <h2 className="mt-4 text-xl font-semibold capitalize">{patient.fullName}</h2>
-              <p className={`${darkMode ? "text-gray-400" : "text-gray-500"} text-sm`}>
+              <h2 className="mt-4 text-xl font-semibold capitalize">
+                {patient.fullName}
+              </h2>
+              <p
+                className={`${darkMode ? "text-gray-400" : "text-gray-500"} text-sm`}
+              >
                 Card Number: {patient.cardNumber}
               </p>
-              <button className={`mt-3 px-4 py-1.5 rounded-md text-sm font-medium border ${darkMode ? "border-gray-600 text-gray-100 hover:bg-gray-700 hover:border-gray-500" : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"}`}>
+              <button
+                className={`mt-3 px-4 py-1.5 rounded-md text-sm font-medium border ${darkMode ? "border-gray-600 text-gray-100 hover:bg-gray-700 hover:border-gray-500" : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400"}`}
+              >
                 {patient.status}
               </button>
             </div>
@@ -149,13 +187,65 @@ const PatientProfile = () => {
                 Personal Information
               </div>
               <div className="p-5 space-y-4 text-sm capitalize">
-                <Row label="Full Name" value={patient.fullName} darkMode={darkMode} />
-                <Row label="Gender" value={patient.gender} darkMode={darkMode} />
-                <Row label="Age" value={`${calculateAge(patient.dob)} years`} darkMode={darkMode} />
-                <Row label="Date of Birth" value={patient.dob} darkMode={darkMode} />
-                <Row label="Marital Status" value={patient.maritalStatus || "—"} darkMode={darkMode} />
-                <Row label="National ID" value={patient.personalInfo?.nationalId || "—"} darkMode={darkMode} />
+                <Row
+                  label="Full Name"
+                  value={patient.fullName}
+                  darkMode={darkMode}
+                />
+                <Row
+                  label="Gender"
+                  value={patient.gender}
+                  darkMode={darkMode}
+                />
+                <Row
+                  label="Age"
+                  value={`${calculateAge(patient.dob)} years`}
+                  darkMode={darkMode}
+                />
+                <Row
+                  label="Date of Birth"
+                  value={patient.dob}
+                  darkMode={darkMode}
+                />
+                <Row
+                  label="Marital Status"
+                  value={patient.maritalStatus || "—"}
+                  darkMode={darkMode}
+                />
+                <Row
+                  label="National ID"
+                  value={patient.personalInfo?.nationalId || "—"}
+                  darkMode={darkMode}
+                />
               </div>
+
+              {patient.familyMembers && patient.familyMembers.length > 0 && (
+                <div className="mt-6">
+                  {/* Header */}
+                  <div
+                    className={`flex items-center gap-2 px-5 py-4 border-t ${darkMode ? "border-gray-50!" : "border-gray-100"} font-semibold`}
+                    style={{ borderTop: "1px solid gray" }}
+                  >
+                    <MdFamilyRestroom className="w-5 h-5 text-gray-400" />
+                    Family Members
+                  </div>
+
+                  {/* Family Members Grid */}
+                  <div >
+                    {patient.familyMembers.map((member, i) => (
+                      <div className="flex justify-between items-center mt-4 px-5 pb-4" key={i}>
+                     
+                        <h3 className={`font-medium capitalize ${darkMode ? "text-gray-100" : "text-gray-900"}`}>
+                          {member.name || "N/A"}
+                        </h3>
+                         <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+                          {member.relationship || "Relationship not specified"}
+                        </p>
+                       </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </Section>
 
@@ -168,12 +258,36 @@ const PatientProfile = () => {
               </div>
               <div className="p-5 space-y-4 text-sm capitalize">
                 <Row label="Phone" value={patient.phone} darkMode={darkMode} />
-                <Row label="Address" value={patient.address} darkMode={darkMode} />
-                <p className={`font-semibold pt-2 ${darkMode ? "text-gray-200" : "text-gray-700"}`}>Emergency Contact</p>
-                <Row label="Name" value={patient.nextOfKin?.name || "—"} darkMode={darkMode} />
-                <Row label="Relation" value={patient.nextOfKin?.relationship || "—"} darkMode={darkMode} />
-                <Row label="Phone" value={patient.nextOfKin?.phone || "—"} darkMode={darkMode} />
-                <Row label="Address" value={patient.nextOfKin?.address || "—"} darkMode={darkMode} />
+                <Row
+                  label="Address"
+                  value={patient.address}
+                  darkMode={darkMode}
+                />
+                <p
+                  className={`font-semibold pt-2 ${darkMode ? "text-gray-200" : "text-gray-700"}`}
+                >
+                  Emergency Contact
+                </p>
+                <Row
+                  label="Name"
+                  value={patient.nextOfKin?.name || "—"}
+                  darkMode={darkMode}
+                />
+                <Row
+                  label="Relation"
+                  value={patient.nextOfKin?.relationship || "—"}
+                  darkMode={darkMode}
+                />
+                <Row
+                  label="Phone"
+                  value={patient.nextOfKin?.phone || "—"}
+                  darkMode={darkMode}
+                />
+                <Row
+                  label="Address"
+                  value={patient.nextOfKin?.address || "—"}
+                  darkMode={darkMode}
+                />
               </div>
             </div>
           </Section>
@@ -189,13 +303,22 @@ const PatientProfile = () => {
                 Medical Information
               </div>
               <div className="p-5 space-y-4 text-sm">
-                <Row label="Blood Group" value={patient.bloodGroup} darkMode={darkMode} />
+                <Row
+                  label="Blood Group"
+                  value={patient.bloodGroup}
+                  darkMode={darkMode}
+                />
                 <Row
                   label="Allergies"
                   value={
                     <div className="flex gap-2">
                       {patient.medicalInfo?.allergies.map((a, i) => (
-                        <span key={i} className="px-3 py-1 border rounded-md text-xs">{a}</span>
+                        <span
+                          key={i}
+                          className="px-3 py-1 border rounded-md text-xs"
+                        >
+                          {a}
+                        </span>
                       ))}
                     </div>
                   }
@@ -205,7 +328,12 @@ const PatientProfile = () => {
                   value={
                     <div className="flex gap-2">
                       {patient.medicalInfo?.chronicConditions.map((c, i) => (
-                        <span key={i} className="px-3 py-1 border rounded-md text-xs">{c}</span>
+                        <span
+                          key={i}
+                          className="px-3 py-1 border rounded-md text-xs"
+                        >
+                          {c}
+                        </span>
                       ))}
                     </div>
                   }
@@ -223,7 +351,11 @@ const PatientProfile = () => {
                     </div>
                   }
                 />
-                <Row label="Past Medical History" value={patient.medicalInfo?.pastMedicalHistory} darkMode={darkMode} />
+                <Row
+                  label="Past Medical History"
+                  value={patient.medicalInfo?.pastMedicalHistory}
+                  darkMode={darkMode}
+                />
               </div>
             </div>
           </Section>
@@ -236,12 +368,36 @@ const PatientProfile = () => {
                 Admission Details
               </div>
               <div className="p-5 space-y-3 text-sm">
-                <Row label="Admission Date" value={patient.admissionDetails?.admissionDate || "—"} darkMode={darkMode} />
-                <Row label="Discharge Date" value={patient.admissionDetails?.dischargeDate || "—"} darkMode={darkMode} />
-                <Row label="Doctor Assigned" value={patient.admissionDetails?.doctorAssigned || "—"} darkMode={darkMode} />
-                <Row label="Ward/Room" value={patient.admissionDetails?.ward || "—"} darkMode={darkMode} />
-                <Row label="Reason for Admission" value={patient.admissionDetails?.reason || "—"} darkMode={darkMode} />
-                <Row label="Treatment" value={patient.admissionDetails?.treatment || "—"} darkMode={darkMode} />
+                <Row
+                  label="Admission Date"
+                  value={patient.admissionDetails?.admissionDate || "—"}
+                  darkMode={darkMode}
+                />
+                <Row
+                  label="Discharge Date"
+                  value={patient.admissionDetails?.dischargeDate || "—"}
+                  darkMode={darkMode}
+                />
+                <Row
+                  label="Doctor Assigned"
+                  value={patient.admissionDetails?.doctorAssigned || "—"}
+                  darkMode={darkMode}
+                />
+                <Row
+                  label="Ward/Room"
+                  value={patient.admissionDetails?.ward || "—"}
+                  darkMode={darkMode}
+                />
+                <Row
+                  label="Reason for Admission"
+                  value={patient.admissionDetails?.reason || "—"}
+                  darkMode={darkMode}
+                />
+                <Row
+                  label="Treatment"
+                  value={patient.admissionDetails?.treatment || "—"}
+                  darkMode={darkMode}
+                />
               </div>
             </div>
           </Section>
@@ -254,12 +410,36 @@ const PatientProfile = () => {
                 Insurance Details
               </div>
               <div className="p-5 space-y-3 text-sm">
-                <Row label="Insurance Provider" value={patient.insuranceDetails?.provider || "—"} darkMode={darkMode} />
-                <Row label="Policy Number" value={patient.insuranceDetails?.policyNumber || "—"} darkMode={darkMode} />
-                <Row label="Policy Type" value={patient.insuranceDetails?.policyType || "—"} darkMode={darkMode} />
-                <Row label="Coverage Period" value={patient.insuranceDetails?.coveragePeriod || "—"} darkMode={darkMode} />
-                <Row label="Coverage Amount" value={`₦${patient.insuranceDetails?.coverageAmount.toLocaleString() || "—"}`} darkMode={darkMode} />
-                <Row label="Copayment" value={patient.insuranceDetails?.copayment || "—"} darkMode={darkMode} />
+                <Row
+                  label="Insurance Provider"
+                  value={patient.insuranceDetails?.provider || "—"}
+                  darkMode={darkMode}
+                />
+                <Row
+                  label="Policy Number"
+                  value={patient.insuranceDetails?.policyNumber || "—"}
+                  darkMode={darkMode}
+                />
+                <Row
+                  label="Policy Type"
+                  value={patient.insuranceDetails?.policyType || "—"}
+                  darkMode={darkMode}
+                />
+                <Row
+                  label="Coverage Period"
+                  value={patient.insuranceDetails?.coveragePeriod || "—"}
+                  darkMode={darkMode}
+                />
+                <Row
+                  label="Coverage Amount"
+                  value={`₦${patient.insuranceDetails?.coverageAmount.toLocaleString() || "—"}`}
+                  darkMode={darkMode}
+                />
+                <Row
+                  label="Copayment"
+                  value={patient.insuranceDetails?.copayment || "—"}
+                  darkMode={darkMode}
+                />
               </div>
             </div>
           </Section>
@@ -273,7 +453,9 @@ const PatientProfile = () => {
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className={`${darkMode ? "bg-gray-700 text-gray-100" : "bg-gray-50 text-gray-600"}`}>
+                  <thead
+                    className={`${darkMode ? "bg-gray-700 text-gray-100" : "bg-gray-50 text-gray-600"}`}
+                  >
                     <tr>
                       <th className="text-left px-5 py-3">Date</th>
                       <th className="text-left px-5 py-3">Doctor</th>
@@ -285,7 +467,10 @@ const PatientProfile = () => {
                   </thead>
                   <tbody>
                     {patient.visitHistory?.map((visit, i) => (
-                      <tr key={i} className={`${darkMode ? "border-gray-600 hover:bg-gray-600" : "border-t border-gray-200 hover:bg-gray-50"} text-xs`}>
+                      <tr
+                        key={i}
+                        className={`${darkMode ? "border-gray-600 hover:bg-gray-600" : "border-t border-gray-200 hover:bg-gray-50"} text-xs`}
+                      >
                         <td className="px-5 py-3">{visit.date}</td>
                         <td className="px-5 py-3">{visit.doctor}</td>
                         <td className="px-5 py-3">{visit.treatment}</td>
