@@ -119,27 +119,57 @@ const Patients = () => {
           data={patients.map((p) => ({ ...p, age: calculateAge(p.dob) }))}
           searchableKeys={["fullName", "patientId", "phone"]}
           actions={(row) => (
-            <div className="flex gap-3" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="flex mt-2"
+              onClick={(e) => e.stopPropagation()}
+            >
               <Link to={`/dashboard/patient-profile/${row.id}`}>
-                <FiEye
-                  className={`cursor-pointer ${darkMode ? "text-gray-200 hover:text-white" : "text-gray-500 hover:text-black"}`}
-                />
+                <div
+                  className={`p-2 rounded-full cursor-pointer transition ${
+                    darkMode
+                      ? "hover:bg-gray-700 text-gray-200 hover:text-white"
+                      : "hover:bg-gray-200 text-gray-500 hover:text-black"
+                  }`}
+                >
+                  <FiEye  />
+                </div>
               </Link>
-              <FiEdit
-                className={`cursor-pointer ${darkMode ? "text-blue-400 hover:text-blue-200" : "text-blue-500 hover:text-blue-700"}`}
+
+              <div
+                className={`p-2 rounded-full cursor-pointer transition ${
+                  darkMode
+                    ? "hover:bg-blue-900 text-blue-400 hover:text-blue-200"
+                    : "hover:bg-blue-100 text-blue-500 hover:text-blue-700"
+                }`}
                 onClick={() => setEditPatient(row)}
-              />
-              <FiTrash2
-                className={`cursor-pointer ${darkMode ? "text-red-400 hover:text-red-200" : "text-red-500 hover:text-red-700"}`}
+              >
+                <FiEdit  />
+              </div>
+
+              <div
+                className={`p-2 rounded-full cursor-pointer transition ${
+                  darkMode
+                    ? "hover:bg-red-900 text-red-400 hover:text-red-200"
+                    : "hover:bg-red-100 text-red-500 hover:text-red-700"
+                }`}
                 onClick={() => confirmDelete(row)}
-              />
-              <PiPrinterLight
-                className={`cursor-pointer ${darkMode ? "text-gray-200 hover:text-white" : "text-gray-700 hover:text-black"}`}
+              >
+                <FiTrash2  />
+              </div>
+
+              <div
+                className={`p-2 rounded-full cursor-pointer transition ${
+                  darkMode
+                    ? "hover:bg-gray-700 text-gray-200 hover:text-white"
+                    : "hover:bg-gray-200 text-gray-700 hover:text-black"
+                }`}
                 onClick={() => {
                   setPrintPatient(row);
                   handlePrint();
                 }}
-              />
+              >
+                <PiPrinterLight />
+              </div>
             </div>
           )}
         />

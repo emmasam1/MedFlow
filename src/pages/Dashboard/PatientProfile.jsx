@@ -220,11 +220,11 @@ const PatientProfile = () => {
               </div>
 
               {patient.familyMembers && patient.familyMembers.length > 0 && (
-                <div className="mt-6">
+                <div className="">
                   {/* Header */}
                   <div
-                    className={`flex items-center gap-2 px-5 py-4 border-t ${darkMode ? "border-gray-50!" : "border-gray-100"} font-semibold`}
-                    style={{ borderTop: "1px solid gray" }}
+                    className={`flex items-center gap-2 px-5 py-4 border-t ${darkMode ? "border-gray-600" : "border-gray-200"} border-b ${darkMode ? "border-gray-600" : "border-gray-200"}  font-semibold`}
+                    // style={{ borderTop: "1px solid gray" }}
                   >
                     <MdFamilyRestroom className="w-5 h-5 text-gray-400" />
                     Family Members
