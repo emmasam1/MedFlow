@@ -2,17 +2,17 @@
   "users": [
     {
       "id": "1",
-      "username": "admin_doc",
+      "username": "Ibrahim",
       "password": "123",
       "role": "doctor",
-      "name": "Dr. Adeyemi"
+      "name": "Dr. Ibrahim Muhammad"
     },
     {
       "id": "2",
-      "username": "jane",
+      "username": "fatima",
       "password": "123",
       "role": "record_officer",
-      "name": "Jane Doe"
+      "name": "Fatima Bashir"
     }
   ],
   "patients": [

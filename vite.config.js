@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react-swc";
 import { VitePWA } from "vite-plugin-pwa";
-import tailwindcss from '@tailwindcss/vite'
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [
@@ -9,6 +9,9 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
+      devOptions: {
+        enabled: true, // ✅ enables PWA during npm run dev
+      },
       includeAssets: ["favicon.svg", "robots.txt"],
       manifest: {
         name: "Hospital Management System",
