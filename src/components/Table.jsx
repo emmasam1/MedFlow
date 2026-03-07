@@ -14,6 +14,10 @@ import { useStore } from "../store/store";
 import { Html5Qrcode } from "html5-qrcode";
 import { useNavigate } from "react-router-dom";
 import { Tooltip } from "antd";
+import XLSX from 'xlsx-js-style';
+import toast, {Toaster} from 'react-hot-toast';
+import {format} from 'date-fns';
+
 
 const Table = ({
   columns,
@@ -29,6 +33,10 @@ const Table = ({
   const [pageSize, setPageSize] = useState(defaultPageSize);
   const [showColumnFilter, setShowColumnFilter] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false)
+
+  //select all rows
+  const [selectedRows, setSelectedRows] = useState(new Set());
 
 
   const { darkMode } = useStore();
@@ -163,6 +171,21 @@ const Table = ({
     setRefreshKey((prev)=>prev + 1)
   }
 
+  const toggleSelectAll = () => {
+    if(selectedRows.size === paginatedData.length){
+      setSelectedRows(new Set());
+    }else{
+      const newSelection = new Set(paginatedData.map(row => row.id));
+      setSelectedRows(newSelection);
+    }
+  }
+
+  //Excell download with selection logic
+  const handleDownloadExcel = async () => {
+    //decide what to export:selection or everything filtered
+    
+  }
+
   return (
     <div
       className={`${darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"} space-y-6 p-4 rounded-lg`}
@@ -246,7 +269,7 @@ const Table = ({
             />
           </Tooltip>
           
-          <Tooltip title="Refresh">
+          <Tooltip title="Refresh Table">
             <ArrowPathIcon 
               onClick={()=>{
                 handleRefresh()
