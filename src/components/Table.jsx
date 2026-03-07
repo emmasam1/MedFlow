@@ -15,8 +15,8 @@ import { Html5Qrcode } from "html5-qrcode";
 import { useNavigate } from "react-router-dom";
 import { Tooltip } from "antd";
 import XLSX from 'xlsx-js-style';
-import toast, {Toaster} from 'react-hot-toast';
-import {format} from 'date-fns';
+import toast, { Toaster } from 'react-hot-toast';
+import { format } from 'date-fns';
 
 
 const Table = ({
@@ -168,13 +168,13 @@ const Table = ({
   };
 
   const handleRefresh = () => {
-    setRefreshKey((prev)=>prev + 1)
+    setRefreshKey((prev) => prev + 1)
   }
 
   const toggleSelectAll = () => {
-    if(selectedRows.size === paginatedData.length){
+    if (selectedRows.size === paginatedData.length) {
       setSelectedRows(new Set());
-    }else{
+    } else {
       const newSelection = new Set(paginatedData.map(row => row.id));
       setSelectedRows(newSelection);
     }
@@ -183,7 +183,62 @@ const Table = ({
   //Excell download with selection logic
   const handleDownloadExcel = async () => {
     //decide what to export:selection or everything filtered
-    
+
+    console.log("Download Button Clicked");
+    console.log("Data to Export:", sortedData)
+
+    const dataToExport = selectedRows.size > 0
+      ? sortedData.filter(row => selectedRows.has(row.id))
+      : sortedData;
+
+    if (dataToExport.length === 0) {
+      toast.error("No data to export");
+      return;
+    }
+
+    setIsDownloading(true);
+    const loadingToast = toast.loading(`Exporting ${dataToExport.length} rows...`);
+
+    setTimeout(() => {
+      try {
+        const fileName = `Patients_Export_${format(new Date(), 'MMM_dd_HHmm')}.xlsx`;
+        const excelColumns = columns.filter(col => col.key !== 'actions');
+        const headers = ["S/N", ...excelColumns.map(col => col.title)];
+
+        const excelRows = dataToExport.map((row, idx) => [
+          idx + 1,
+          ...excelColumns.map(col => row[col.key] || "")
+        ]);
+
+        const worksheet = XLSX.utils.aoa_to_sheet([headers, ...excelRows]);
+
+        //Styling Headers
+        const range = XLSX.utils.decode_range(worksheet['!ref']);
+        for (let C = range.s.c; C <= range.e.c; ++C) {
+          const address = XLSX.utils.encode_col(C) + "1";
+          if (!worksheet[address]) continue;
+
+          worksheet[address].s = {
+            font: { bold: true, color: { rgb: "FFFFFF" } },
+            fill: { fgColor: { rgb: "1E293B" } },
+            alignment: { horizontal: "center" }
+          };
+        }
+
+        worksheet['!cols'] = [{ wch: 6 }, { wch: 18 }, { wch: 30 }, { wch: 15 }, { wch: 10 }, { wch: 8 }, { wch: 20 }, { wch: 12 }];
+
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Patients");
+        XLSX.writeFile(workbook, fileName);
+
+        toast.success("Download Successful", { id: loadingToast });
+        setSelectedRows(new Set()); //Clear selection after download
+      } catch (error) {
+        toast.error("Export failed", { id: loadingToast });
+      } finally {
+        setIsDownloading(false)
+      }
+    }, 800);
   }
 
   return (
@@ -268,16 +323,46 @@ const Table = ({
               className="w-5 h-5 cursor-pointer hover:text-blue-500 transition"
             />
           </Tooltip>
-          
+
           <Tooltip title="Refresh Table">
-            <ArrowPathIcon 
-              onClick={()=>{
+            <ArrowPathIcon
+              onClick={() => {
                 handleRefresh()
               }}
-              className="w-5 h-5 cursor-pointer hover:text-blue-500 transition" 
+              className="w-5 h-5 cursor-pointer hover:text-blue-500 transition"
             />
           </Tooltip>
-          <ArrowDownTrayIcon className="w-5 h-5 text-blue-500 cursor-pointer hover:text-blue-600 transition" />
+
+          {/* <Tooltip title={selectedRows.size > 0 ? "Download Selected" : "Download All"}>
+            <div className="relative cursor-pointer" onClick={handleDownloadExcel}>
+              {isDownloading ? (
+                <ArrowPathIcon className="w-5 h-5 text-blue-500 cursor-pointer hover:text-blue-600 transition animate-spin" />
+
+              ) : (
+                <>
+                  <ArrowDownTrayIcon className="w-5 h-5 text-blue-500 hover:scale-110 transition" />
+                  {selectedRows.size > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 rounded-full">
+                      {selectedRows.size}
+                    </span>
+                  )}
+                </>
+              )}
+
+            </div>
+
+          </Tooltip> */}
+
+          <Tooltip title="Download Excel">
+            <div className="p-1 cursor-pointer" onClick={handleDownloadExcel}>
+              {isDownloading ? (
+                <ArrowPathIcon className="w-5 h-5 animate-spin" />
+              ) : (
+                <ArrowDownTrayIcon className="w-5 h-5 text-blue-500 hover:text-blue-600 transition" />
+              )}
+            </div>
+          </Tooltip>
+
         </div>
       </div>
 
@@ -290,6 +375,26 @@ const Table = ({
             className={`${darkMode ? "bg-gray-800 text-gray-100" : "bg-gray-50 text-gray-500"} uppercase text-xs tracking-wider`}
           >
             <tr>
+              <th className="px-6 py-3 text-left">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 accent-blue-500 cursor-pointer"
+                  // Checks if every row on the current page is selected
+                  checked={paginatedData.length > 0 && paginatedData.every(row => selectedRows.has(row.id))}
+                  onChange={() => {
+                    const allPageIds = paginatedData.map(row => row.id);
+                    const isAllOnPageSelected = allPageIds.every(id => selectedRows.has(id));
+                    const newSelection = new Set(selectedRows);
+
+                    if (isAllOnPageSelected) {
+                      allPageIds.forEach(id => newSelection.delete(id));
+                    } else {
+                      allPageIds.forEach(id => newSelection.add(id));
+                    }
+                    setSelectedRows(newSelection);
+                  }}
+                />
+              </th>
               <th className="px-6 py-3 text-left">S/N</th>
               {filteredColumns.map((col) => (
                 <th
@@ -318,9 +423,23 @@ const Table = ({
             {paginatedData.map((row, idx) => (
               <tr
                 key={row.id}
-                className={`hover:${darkMode ? "bg-gray-800" : "bg-gray-50"} transition-colors cursor-pointer`}
+                className={`${selectedRows.has(row.id) ? (darkMode ? "bg-blue-900/20" : "bg-blue-50") : ""} hover:${darkMode ? "bg-gray-800" : "bg-gray-50"} transition-colors cursor-pointer`}
                 onClick={() => onRowClick && onRowClick(row)}
               >
+                <td className="px-6 py-3" onClick={(e) => e.stopPropagation()}>
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 accent-blue-500 cursor-pointer"
+                    checked={selectedRows.has(row.id)}
+                    onChange={() => {
+                      const newSelection = new Set(selectedRows);
+                      if (newSelection.has(row.id)) newSelection.delete(row.id);
+                      else newSelection.add(row.id);
+                      setSelectedRows(newSelection);
+                    }}
+                  />
+                </td>
+
                 <td className="px-6 py-3">
                   {(currentPage - 1) * pageSize + idx + 1}
                 </td>
