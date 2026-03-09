@@ -11,7 +11,9 @@ const BookAppointment = () => {
   const [selectedDate, setSelectedDate] = useState(null);
 
   const handleDateSelect = (date) => {
-    setSelectedDate(date);
+    // Convert to JS Date
+    const jsDate = date.toDate ? date.toDate() : date;
+    setSelectedDate(jsDate);
     setIsModalOpen(true);
   };
 
@@ -52,9 +54,7 @@ const BookAppointment = () => {
         {/* 🔥 FORCE ANTD THEME */}
         <ConfigProvider
           theme={{
-            algorithm: darkMode
-              ? theme.darkAlgorithm
-              : theme.defaultAlgorithm,
+            algorithm: darkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
             token: {
               colorPrimary: "#3B82F6", // your blue
               borderRadius: 8,
@@ -82,7 +82,7 @@ const BookAppointment = () => {
         title="Create Appointment"
         size="2xl"
       >
-        <DoctorsAppointment selectedDate={selectedDate} />
+        <DoctorsAppointment selectedDate={selectedDate} onSuccess={handleCloseModal}/>
       </Modal>
     </div>
   );

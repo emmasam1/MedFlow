@@ -16,6 +16,7 @@ export const useAppStore = create((set, get) => ({
   patients: [],
   appointments: [],
   notifications: [],
+  queue: [],
   loading: false,
 
   // --- AUTH ACTIONS (The fixed version) ---
@@ -85,17 +86,89 @@ export const useAppStore = create((set, get) => ({
 
   createAppointment: async (appt) => {
     try {
-      // Automatically sets status to pending on creation
       const res = await api.post("/appointments", {
         ...appt,
         status: "pending",
       });
-      set((state) => ({ appointments: [...state.appointments, res.data] }));
-      return res.data;
+
+      const appointment = res.data;
+
+      set((state) => ({
+        appointments: [...state.appointments, appointment],
+      }));
+
+      // Send notification to selected doctor
+      get().createNotification({
+        userId: appointment.doctorId,
+        message: `New appointment scheduled for ${appointment.date} at ${appointment.time}. Reason: ${appointment.reason}`,
+      });
+
+      return appointment;
     } catch (error) {
       console.error("Error creating appointment:", error);
       throw error;
     }
+  },
+
+  getNotifications: async (role) => {
+    try {
+      const res = await api.get("/notifications");
+
+      // Filter notifications for this role
+      const filtered = res.data.filter(
+        (n) => n.role?.toLowerCase() === role?.toLowerCase(),
+      );
+
+      // Remove duplicates
+      const unique = Array.from(
+        new Map(filtered.map((n) => [n.id, n])).values(),
+      );
+
+      set({ notifications: unique });
+
+      return unique;
+    } catch (err) {
+      console.error(err);
+      return [];
+    }
+  },
+
+  createNotification: async ({ userId, message, title = "Notification" }) => {
+    try {
+      const res = await api.post("/notifications", {
+        userId,
+        message,
+        title,
+        isRead: false,
+      });
+
+      set((state) => {
+        const combined = [...state.notifications, res.data];
+
+        // Deduplicate by ID immediately
+        const unique = Array.from(
+          new Map(combined.map((n) => [n.id, n])).values(),
+        );
+
+        return { notifications: unique };
+      });
+    } catch (error) {
+      console.error("Notification error:", error);
+    }
+  },
+
+  markAsRead: (notifId) => {
+    set((state) => ({
+      notifications: state.notifications.map((n) =>
+        n.id === notifId ? { ...n, isRead: true } : n,
+      ),
+    }));
+  },
+
+  markAllAsRead: () => {
+    set((state) => ({
+      notifications: state.notifications.map((n) => ({ ...n, isRead: true })),
+    }));
   },
 
   fetchSinglePatient: async (id) => {
@@ -149,6 +222,85 @@ export const useAppStore = create((set, get) => ({
       throw new Error(
         error.response?.data?.message || "Failed to update patient",
       );
+    }
+  },
+
+  getUsers: async () => {
+    try {
+      const res = await api.get("/users");
+
+      set({ users: res.data });
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  },
+
+  getQueue: async () => {
+    set({ loading: true });
+
+    try {
+      const res = await api.get("/queue");
+
+      // remove duplicates just in case
+      const unique = Array.from(
+        new Map(res.data.map((q) => [q.id, q])).values(),
+      );
+
+      set({ queue: unique });
+    } catch (err) {
+      console.error("Queue fetch error:", err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  createQueue: async (data) => {
+    try {
+      const res = await api.post("/queue", {
+        patientId: data.patientId,
+        patientName: data.patientName,
+        cardNumber: data.cardNumber,
+        reason: data.reason,
+        notes: data.notes,
+        priority: data.priority || "normal",
+        doctorRole: "specialist",
+        status: "waiting",
+        timeAdded: new Date().toISOString(),
+      });
+
+      set((state) => ({
+        queue: [res.data, ...state.queue],
+      }));
+
+      return res.data;
+    } catch (err) {
+      console.error("Queue creation error:", err);
+    }
+  },
+
+  updateQueueStatus: async (id, status) => {
+    try {
+      const res = await api.patch(`/queue/${id}`, { status });
+
+      set((state) => ({
+        queue: state.queue.map((q) =>
+          q.id === id ? { ...q, status: res.data.status } : q,
+        ),
+      }));
+    } catch (err) {
+      console.error("Queue update error:", err);
+    }
+  },
+
+  removeFromQueue: async (id) => {
+    try {
+      await api.delete(`/queue/${id}`);
+
+      set((state) => ({
+        queue: state.queue.filter((q) => q.id !== id),
+      }));
+    } catch (err) {
+      console.error("Queue delete error:", err);
     }
   },
 }));

@@ -2,10 +2,11 @@
   "users": [
     {
       "id": "1",
-      "username": "Ibrahim",
+      "username": "ibrahim",
       "password": "123",
-      "role": "doctor",
-      "name": "Dr. Ibrahim Muhammad"
+      "role": "specialist",
+      "name": "Dr. Ibrahim Muhammad",
+      "department": "Cardiology"
     },
     {
       "id": "2",
@@ -13,6 +14,103 @@
       "password": "123",
       "role": "record_officer",
       "name": "Fatima Bashir"
+    },
+    {
+      "id": "3",
+      "username": "abdullahi",
+      "password": "123",
+      "role": "specialist",
+      "name": "Dr. Abdullahi Sule",
+      "department": "Neurology"
+    },
+    {
+      "id": "4",
+      "username": "zainab",
+      "password": "123",
+      "role": "doctor",
+      "name": "Dr. Zainab Musa",
+      "department": "Pediatrics"
+    },
+    {
+      "id": "5",
+      "username": "musa",
+      "password": "123",
+      "role": "doctor",
+      "name": "Dr. Musa Abubakar",
+      "department": "Orthopedics"
+    },
+    {
+      "id": "6",
+      "username": "amina",
+      "password": "123",
+      "role": "doctor",
+      "name": "Dr. Amina Bello",
+      "department": "Gynecology"
+    },
+    {
+      "id": "7",
+      "username": "sani",
+      "password": "123",
+      "role": "specialist",
+      "name": "Dr. Sani Garba",
+      "department": "Dermatology"
+    },
+    {
+      "id": "8",
+      "username": "maryam",
+      "password": "123",
+      "role": "specialist",
+      "name": "Dr. Maryam Lawal",
+      "department": "ENT"
+    },
+    {
+      "id": "9",
+      "username": "usman",
+      "password": "123",
+      "role": "lab_technician",
+      "name": "Usman Abdullahi"
+    },
+    {
+      "id": "10",
+      "username": "bilal",
+      "password": "123",
+      "role": "record_officer",
+      "name": "Bilal Ibrahim"
+    },
+    {
+      "id": "11",
+      "username": "rahma",
+      "password": "123",
+      "role": "nurse",
+      "name": "Rahma Yusuf"
+    },
+    {
+      "id": "12",
+      "username": "salim",
+      "password": "123",
+      "role": "pharmacist",
+      "name": "Salim Mohammed"
+    },
+    {
+      "id": "13",
+      "username": "halima",
+      "password": "123",
+      "role": "receptionist",
+      "name": "Halima Bello"
+    },
+    {
+      "id": "14",
+      "username": "ahmad",
+      "password": "123",
+      "role": "finance_officer",
+      "name": "Ahmad Sadiq"
+    },
+    {
+      "id": "15",
+      "username": "khalid",
+      "password": "123",
+      "role": "hospital_admin",
+      "name": "Khalid Musa"
     }
   ],
   "patients": [
@@ -267,218 +365,76 @@
   ],
   "appointments": [
     {
-      "id": "1",
-      "patientId": "1",
-      "patientName": "Chinedu Okafor",
-      "date": "2024-03-25",
-      "time": "09:00 AM",
-      "status": "Cancelled",
-      "assignedDoctor": "Dr. Adeyemi",
-      "reason": "Routine Checkup"
-    },
-    {
-      "id": "c717",
-      "patientId": "PT-1001",
-      "patientName": "Chinedu Okafor",
-      "assignedDoctor": "Dr. John Smith",
-      "department": "Cardiology",
-      "date": "2026-02-23",
-      "time": "09:00",
-      "priority": "Normal",
-      "reason": "Full check up",
-      "notes": "none",
-      "status": "pending"
-    },
-    {
-      "id": "24d4",
-      "patientId": "PT-1002",
-      "patientName": "Aisha Bello",
-      "assignedDoctor": "Dr. John Smith",
-      "department": "Cardiology",
-      "date": "2026-02-24",
-      "time": "10:20",
-      "priority": "Normal",
-      "reason": "Painful mensuration ",
-      "notes": "none",
-      "status": "pending"
-    },
-    {
-      "id": "f95c",
-      "patientId": "PT-1001",
-      "patientName": "Chinedu Okafor",
-      "assignedDoctor": "Dr. Sarah Johnson",
-      "department": "Neurology",
-      "date": "2026-02-22",
-      "time": "11:00",
-      "priority": "Urgent",
-      "reason": "persistent symptoms related to the brain, spinal cord, or nerves, including chronic/severe headaches, memory loss, dizziness, numbness, weakness, or unexplained pain",
-      "notes": "",
-      "status": "pending"
-    },
-    {
-      "id": "c5a1",
-      "patientId": "PT-1002",
-      "patientName": "Aisha Bello",
-      "assignedDoctor": "Dr. Michael Brown",
-      "department": "Pediatrics",
-      "date": "2026-02-22",
-      "time": "11:00",
-      "priority": "Emergency",
-      "reason": "Bleeding from the noise ",
-      "notes": "",
-      "status": "pending"
-    },
-    {
-      "id": "0f23",
-      "patientId": "PT-1001",
-      "patientName": "Chinedu Okafor",
-      "assignedDoctor": "Dr. Michael Brown",
-      "department": "Pediatrics",
-      "date": "2026-02-22",
-      "time": "03:13",
-      "priority": "Normal",
-      "reason": "Follow up",
-      "notes": "",
-      "status": "pending"
-    },
-    {
-      "id": "3adc",
-      "patientId": "PT-1002",
-      "patientName": "Aisha Bello",
-      "assignedDoctor": "Dr. Sarah Johnson",
-      "department": "Neurology",
-      "date": "2026-02-22",
-      "time": "11:29",
-      "priority": "Normal",
-      "reason": "Run full body test",
-      "notes": "",
-      "status": "pending"
-    },
-    {
-      "id": "3baa",
-      "patientId": "PT-1002",
-      "patientName": "Aisha Bello",
-      "assignedDoctor": "Dr. John Smith",
-      "department": "Cardiology",
-      "date": "2026-02-23",
-      "time": "02:41",
-      "priority": "Normal",
-      "reason": "Bleeding ",
-      "notes": "",
-      "status": "pending"
-    },
-    {
-      "id": "668f",
-      "patientId": "PT-1002",
-      "patientName": "Aisha Bello",
-      "assignedDoctor": "Dr. Michael Brown",
-      "department": "Pediatrics",
-      "date": "2026-02-23",
-      "time": "11:00",
-      "priority": "Normal",
-      "reason": "testing",
-      "notes": "",
-      "status": "pending"
-    },
-    {
-      "id": "c701",
-      "patientId": "PT-1001",
-      "patientName": "Chinedu Okafor",
-      "assignedDoctor": "Dr. Michael Brown",
-      "department": "Pediatrics",
-      "date": "2026-02-24",
-      "time": "01:04",
-      "priority": "Normal",
-      "reason": "testing",
-      "notes": "",
-      "status": "pending"
-    },
-    {
-      "id": "97c8",
-      "patientId": "PT-6409",
-      "patientName": "eric sam",
-      "assignedDoctor": "Dr. Michael Brown",
-      "department": "Pediatrics",
-      "date": "2026-02-25",
-      "time": "15:20",
-      "priority": "Normal",
-      "reason": "test",
-      "notes": "",
-      "status": "pending"
-    },
-    {
-      "id": "3541",
-      "patientId": "PT-1001",
-      "patientName": "Chinedu Okafor",
-      "assignedDoctor": "Dr. Michael Brown",
-      "department": "Pediatrics",
-      "date": "2026-02-24",
-      "time": "03:39",
-      "priority": "Urgent",
-      "reason": "Follow Up",
-      "notes": "",
-      "status": "pending"
-    },
-    {
-      "id": "729d",
+      "id": "cf58",
       "cardNumber": "FAM-522264",
       "patientName": "Ibrahim  Musa",
-      "assignedDoctor": "Dr. Michael Brown",
-      "department": "Pediatrics",
-      "date": "2026-02-23",
-      "time": "19:47",
-      "priority": "Normal",
-      "reason": "Follow up",
-      "notes": "",
-      "status": "pending"
-    },
-    {
-      "id": "598f",
-      "cardNumber": "KCH-412225",
-      "patientName": "Blessing Nwosu",
-      "assignedDoctor": "Dr. John Smith",
+      "doctorId": "1",
+      "assignedDoctor": "Dr. Ibrahim Muhammad",
       "department": "Cardiology",
-      "date": "2026-02-23",
-      "time": "17:01",
+      "date": "2026-03-08",
+      "time": "10:00",
       "priority": "Urgent",
-      "reason": "Bleeding",
+      "reason": "Pain, tightness, or discomfort in the chest could indicate heart problems.",
       "notes": "",
-      "status": "pending"
+      "status": "Confirmed"
     },
     {
-      "id": "b2dd",
-      "cardNumber": "SGL-623631",
-      "patientName": "eric sam",
-      "assignedDoctor": "Dr. John Smith",
+      "id": "66a4",
+      "cardNumber": "SGL-889094",
+      "patientName": "Esther Ajayi",
+      "doctorId": "1",
+      "assignedDoctor": "Dr. Ibrahim Muhammad",
       "department": "Cardiology",
-      "date": "2026-02-23",
-      "time": "16:42",
+      "date": "2026-03-08",
+      "time": "10:30",
       "priority": "Urgent",
-      "reason": "gg",
-      "notes": "",
-      "status": "pending"
-    },
-    {
-      "id": "15f8",
-      "cardNumber": "FAM-522264",
-      "patientName": "Ibrahim  Musa",
-      "assignedDoctor": "Dr. John Smith",
-      "department": "Cardiology",
-      "date": "2026-02-23",
-      "time": "17:45",
-      "priority": "Normal",
-      "reason": "gggg",
+      "reason": "Difficulty breathing during activity or at rest",
       "notes": "",
       "status": "pending"
     }
   ],
   "notifications": [
     {
-      "id": "1",
-      "type": "success",
-      "title": "Patient Admitted",
-      "message": "Chinedu Okafor has been admitted",
+      "id": "52f4",
+      "message": "New appointment scheduled for 2026-03-08 at 10:00. Reason: Pain, tightness, or discomfort in the chest could indicate heart problems.",
+      "title": "Notification",
       "isRead": false
+    },
+    {
+      "id": "c297",
+      "message": "New appointment scheduled for 2026-03-08 at 10:30. Reason: Difficulty breathing during activity or at rest",
+      "title": "Notification",
+      "isRead": false
+    },
+    {
+      "id": "dc03",
+      "message": "New appointment scheduled for 2026-03-08 at 00:00. Reason: Pain, tightness, pressure, or heaviness in the chest.",
+      "title": "Notification",
+      "isRead": false
+    }
+  ],
+  "queue": [
+    {
+      "id": "11ec",
+      "patientId": "860d",
+      "patientName": "Amina Tanko",
+      "reason": "Annual Physical Exam / Well-Check",
+      "notes": "",
+      "priority": "Urgent",
+      "doctorRole": "specialist",
+      "status": "done",
+      "timeAdded": "2026-03-09T07:09:24.031Z"
+    },
+    {
+      "id": "2553",
+      "patientId": "3dbc",
+      "patientName": "Ibrahim  Musa",
+      "reason": "Upper respiratory tract infection and hypertension",
+      "notes": "",
+      "priority": "Urgent",
+      "doctorRole": "specialist",
+      "status": "waiting",
+      "timeAdded": "2026-03-09T08:16:41.775Z"
     }
   ]
 }

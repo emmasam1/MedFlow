@@ -36,6 +36,21 @@ const Appointment = () => {
 
   const isDragging = useRef(false);
 
+  const user = JSON.parse(sessionStorage.getItem("user"));
+
+  const [selectedAppt, setSelectedAppt] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  const openConfirmModal = (appt) => {
+    setSelectedAppt(appt);
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirm = () => {
+    updateStatus(selectedAppt.id, "Confirmed");
+    setShowConfirmModal(false);
+  };
+
   useEffect(() => {
     fetchAppointments();
   }, []);
@@ -114,15 +129,19 @@ const Appointment = () => {
       {/* Header */}
       <div className="flex justify-between items-center p-2">
         <span className="font-semibold">Appointments</span>
-        <motion.button
-          onClick={() => setIsOpen(true)}
-          whileHover={{ scale: 1.05, y: -2 }}
-          whileTap={{ scale: 0.97 }}
-          transition={{ type: "spring", stiffness: 300 }}
-          className=" px-2 py-1 rounded-full text-[#005CBB] font-semibold flex items-center gap-1 hover:bg-[#9DCEF8] text-xs"
-        >
-          <PlusCircleIcon className="w-5 h-5" /> Appointment
-        </motion.button>
+        {user?.role?.toLowerCase() === "specialist" ? (
+          ""
+        ) : (
+          <motion.button
+            onClick={() => setIsOpen(true)}
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 300 }}
+            className=" px-2 py-1 rounded-full text-[#005CBB] font-semibold flex items-center gap-1 hover:bg-[#9DCEF8] text-xs"
+          >
+            <PlusCircleIcon className="w-5 h-5" /> Appointment
+          </motion.button>
+        )}
 
         <Modal
           isOpen={isOpen}
@@ -318,6 +337,7 @@ const Appointment = () => {
                   </div>
 
                   <div className="flex items-center gap-3">
+                    {/* Status badge */}
                     <span
                       className={`px-3 py-1 text-xs rounded-full font-medium ${
                         statusStyles(darkMode)[appt.status]
@@ -326,24 +346,24 @@ const Appointment = () => {
                       {appt.status}
                     </span>
 
-                    {appt.status === "Pending" && (
-                      <button
-                        onClick={() => updateStatus(appt.id, "Confirmed")}
-                        className="text-xs px-3 py-1 rounded-lg hover:brightness-110 bg-emerald-100 text-emerald-700"
-                      >
-                        Confirm
-                      </button>
-                    )}
+                    {/* Doctor actions */}
+                    {user?.role?.toLowerCase() === "doctor" && (
+                      <>
+                        <button
+                          onClick={() => openConfirmModal(appt)}
+                          className="text-xs cursor-pointer px-3 py-1 rounded-lg hover:brightness-110 bg-emerald-100 text-emerald-700"
+                        >
+                          Confirm
+                        </button>
 
-                    {appt.status !== "Cancelled" &&
-                      appt.status !== "Completed" && (
                         <button
                           onClick={() => updateStatus(appt.id, "Cancelled")}
                           className="text-xs px-3 py-1 rounded-lg hover:brightness-110 bg-red-100 text-red-600"
                         >
                           Cancel
                         </button>
-                      )}
+                      </>
+                    )}
                   </div>
                 </motion.div>
               ))}
@@ -353,6 +373,33 @@ const Appointment = () => {
               <p className="text-sm text-slate-400">
                 No appointments for this day.
               </p>
+            )}
+
+            {showConfirmModal && (
+              <Modal
+                title="Confirm Appointment"
+                onClose={() => setShowConfirmModal(false)}
+              >
+                <p className="text-sm text-gray-600">
+                  Are you sure you want to confirm this appointment?
+                </p>
+
+                <div className="flex justify-end gap-3 mt-4">
+                  <button
+                    onClick={() => setShowConfirmModal(false)}
+                    className="px-4 py-2 text-sm rounded-lg bg-gray-200"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    onClick={handleConfirm}
+                    className="px-4 py-2 text-sm rounded-lg bg-emerald-500 text-white"
+                  >
+                    Yes, Confirm
+                  </button>
+                </div>
+              </Modal>
             )}
           </div>
         </div>
