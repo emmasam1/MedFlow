@@ -16,6 +16,7 @@ import Unauthorized from "./pages/Dashboard/Unauthorized";
 // Layout & Protection
 import DashboardLayout from "./layout/DashboardLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import FinancePayments from "./pages/Dashboard/FinancePayments";
 
 const App = () => {
   return (
@@ -59,6 +60,16 @@ const App = () => {
             element={
               <ProtectedRoute allowedRoles={["record_officer", "doctor"]}>
                 <Queue />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Finance (only finance officer can access) */}
+          <Route
+            path="/dashboard/finance"
+            element={
+              <ProtectedRoute allowedRoles={["finance_officer"]}>
+                <FinancePayments />
               </ProtectedRoute>
             }
           />

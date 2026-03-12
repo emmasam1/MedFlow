@@ -363,78 +363,64 @@
       "regDate": "2026-02-26"
     }
   ],
-  "appointments": [
-    {
-      "id": "cf58",
-      "cardNumber": "FAM-522264",
-      "patientName": "Ibrahim  Musa",
-      "doctorId": "1",
-      "assignedDoctor": "Dr. Ibrahim Muhammad",
-      "department": "Cardiology",
-      "date": "2026-03-08",
-      "time": "10:00",
-      "priority": "Urgent",
-      "reason": "Pain, tightness, or discomfort in the chest could indicate heart problems.",
-      "notes": "",
-      "status": "Confirmed"
-    },
-    {
-      "id": "66a4",
-      "cardNumber": "SGL-889094",
-      "patientName": "Esther Ajayi",
-      "doctorId": "1",
-      "assignedDoctor": "Dr. Ibrahim Muhammad",
-      "department": "Cardiology",
-      "date": "2026-03-08",
-      "time": "10:30",
-      "priority": "Urgent",
-      "reason": "Difficulty breathing during activity or at rest",
-      "notes": "",
-      "status": "pending"
-    }
-  ],
+  "appointments": [],
   "notifications": [
     {
-      "id": "52f4",
-      "message": "New appointment scheduled for 2026-03-08 at 10:00. Reason: Pain, tightness, or discomfort in the chest could indicate heart problems.",
-      "title": "Notification",
-      "isRead": false
+      "id": "8d10",
+      "role": "doctor",
+      "message": "Amina Tanko is ready for consultation",
+      "title": "Patient Ready",
+      "isRead": false,
+      "createdAt": "2026-03-11T13:06:14.101Z"
     },
     {
-      "id": "c297",
-      "message": "New appointment scheduled for 2026-03-08 at 10:30. Reason: Difficulty breathing during activity or at rest",
-      "title": "Notification",
-      "isRead": false
-    },
-    {
-      "id": "dc03",
-      "message": "New appointment scheduled for 2026-03-08 at 00:00. Reason: Pain, tightness, pressure, or heaviness in the chest.",
-      "title": "Notification",
-      "isRead": false
+      "id": "00e1",
+      "role": "doctor",
+      "message": "Amina Tanko is ready for consultation",
+      "title": "Patient Ready",
+      "isRead": false,
+      "createdAt": "2026-03-12T13:20:42.684Z"
     }
   ],
   "queue": [
     {
-      "id": "11ec",
+      "id": "ec96",
       "patientId": "860d",
       "patientName": "Amina Tanko",
-      "reason": "Annual Physical Exam / Well-Check",
+      "reason": "High cholesterol is a major risk factor for heart disease. If you have high cholesterol, your doctor may recommend lifestyle changes or medications to help lower your cholesterol levels",
       "notes": "",
       "priority": "Urgent",
-      "doctorRole": "specialist",
-      "status": "done",
-      "timeAdded": "2026-03-09T07:09:24.031Z"
+      "service": "consultation",
+      "paymentStatus": "paid",
+      "currentDepartment": "doctor",
+      "status": "in-progress",
+      "timeAdded": "2026-03-11T09:37:19.758Z"
     },
     {
-      "id": "2553",
-      "patientId": "3dbc",
-      "patientName": "Ibrahim  Musa",
-      "reason": "Upper respiratory tract infection and hypertension",
+      "id": "17a8",
+      "patientId": "6a48",
+      "patientName": "Blessing Nwosu",
+      "reason": "Skin disorders",
       "notes": "",
-      "priority": "Urgent",
-      "doctorRole": "specialist",
-      "status": "waiting",
-      "timeAdded": "2026-03-09T08:16:41.775Z"
+      "priority": "Normal",
+      "service": "consultation",
+      "paymentStatus": "unpaid",
+      "currentDepartment": "finance",
+      "status": "cancelled",
+      "timeAdded": "2026-03-11T21:09:41.522Z"
+    },
+    {
+      "id": "fc27",
+      "patientId": "860d",
+      "patientName": "Amina Tanko",
+      "reason": "testing",
+      "notes": "",
+      "priority": "Normal",
+      "service": "consultation",
+      "paymentStatus": "paid",
+      "currentDepartment": "doctor",
+      "status": "done",
+      "timeAdded": "2026-03-12T13:20:11.773Z"
     }
   ]
 }

@@ -38,7 +38,7 @@ const PatientQueue = () => {
 
   return (
     <div
-      className={`${containerBg} rounded-xl shadow-sm border p-4 font-sans max-w-sm transition-colors duration-300`}
+      className={`${containerBg} rounded-xl shadow-sm border p-4 font-sans max-w-sm transition-colors duration-300 `}
     >
       <h2 className={`text-sm font-bold mb-4 ${textPrimary}`}>Patient Queue</h2>
 
@@ -58,11 +58,11 @@ const PatientQueue = () => {
                 <p className={`text-sm ${textSecondary}`}>{patient.reason}</p>
               </div>
               <span
-                className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${
+                className={`px-3 py-1 rounded-full text-xs font-medium capitalize whitespace-nowrap ${
                   statusStyles[patient.status || "waiting"]
                 }`}
               >
-                {patient.status || "waiting"}
+                {(patient.status || "waiting").replace("-", " ")}
               </span>
             </li>
           ))}
