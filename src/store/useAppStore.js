@@ -382,6 +382,18 @@ export const useAppStore = create((set, get) => ({
     }
   },
 
+    fetchSinglePatient: async (id) => {
+    set({ loading: true });
+    try {
+      const res = await api.get(`/patients/${id}`);
+      set({ patient: res.data, loading: false });
+    } catch (error) {
+      set({ loading: false });
+      console.error("Error fetching patient:", error);
+      throw error;
+    }
+  },
+
   addPatient: async (data) => {
     const res = await api.post("/patients", data);
 
