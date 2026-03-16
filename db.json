@@ -366,61 +366,131 @@
   "appointments": [],
   "notifications": [
     {
-      "id": "8d10",
+      "id": "42b9",
       "role": "doctor",
-      "message": "Amina Tanko is ready for consultation",
+      "message": "David Mensah is ready for consultation",
       "title": "Patient Ready",
       "isRead": false,
-      "createdAt": "2026-03-11T13:06:14.101Z"
+      "createdAt": "2026-03-16T13:05:28.163Z"
     },
     {
-      "id": "00e1",
+      "id": "e57e",
+      "role": "pharmacy",
+      "message": "David Mensah sent to pharmacy",
+      "title": "Patient Sent",
+      "isRead": false,
+      "createdAt": "2026-03-16T13:07:40.075Z"
+    },
+    {
+      "id": "6a4e",
+      "role": "doctor",
+      "message": "AHMAD ABDULLAHI is ready for consultation",
+      "title": "Patient Ready",
+      "isRead": false,
+      "createdAt": "2026-03-16T15:50:53.721Z"
+    },
+    {
+      "id": "6c42",
+      "role": "lab",
+      "message": "AHMAD ABDULLAHI sent to lab",
+      "title": "Patient Sent",
+      "isRead": false,
+      "createdAt": "2026-03-16T15:51:32.357Z"
+    },
+    {
+      "id": "3946",
       "role": "doctor",
       "message": "Amina Tanko is ready for consultation",
       "title": "Patient Ready",
       "isRead": false,
-      "createdAt": "2026-03-12T13:20:42.684Z"
+      "createdAt": "2026-03-16T15:58:09.547Z"
+    },
+    {
+      "id": "a5b9",
+      "role": "lab",
+      "message": "Amina Tanko sent to lab",
+      "title": "Patient Sent",
+      "isRead": false,
+      "createdAt": "2026-03-16T15:59:48.596Z"
     }
   ],
   "queue": [
     {
-      "id": "ec96",
-      "patientId": "860d",
-      "patientName": "Amina Tanko",
-      "reason": "High cholesterol is a major risk factor for heart disease. If you have high cholesterol, your doctor may recommend lifestyle changes or medications to help lower your cholesterol levels",
-      "notes": "",
-      "priority": "Urgent",
+      "id": "32e1",
+      "patientId": "cdae",
+      "patientName": "David Mensah",
+      "reason": "Bleeding has stopped",
+      "notes": "He has cuts in his noise, he inserted something sharp in his noise",
+      "priority": "Normal",
       "service": "consultation",
       "paymentStatus": "paid",
       "currentDepartment": "doctor",
-      "status": "in-progress",
-      "timeAdded": "2026-03-11T09:37:19.758Z"
+      "status": "done",
+      "timeAdded": "2026-03-16T13:04:25.848Z",
+      "paymentMethod": "cash",
+      "nextDepartment": "pharmacy",
+      "doctorNotes": "Just give antibiotics and some pain medication",
+      "sentAt": "2026-03-16T13:07:40.003Z"
     },
     {
-      "id": "17a8",
-      "patientId": "6a48",
-      "patientName": "Blessing Nwosu",
-      "reason": "Skin disorders",
-      "notes": "",
-      "priority": "Normal",
-      "service": "consultation",
-      "paymentStatus": "unpaid",
-      "currentDepartment": "finance",
-      "status": "cancelled",
-      "timeAdded": "2026-03-11T21:09:41.522Z"
-    },
-    {
-      "id": "fc27",
-      "patientId": "860d",
-      "patientName": "Amina Tanko",
-      "reason": "testing",
+      "id": "0db1",
+      "patientId": "5d07",
+      "patientName": "AHMAD ABDULLAHI",
+      "reason": "Run some test",
       "notes": "",
       "priority": "Normal",
       "service": "consultation",
       "paymentStatus": "paid",
       "currentDepartment": "doctor",
       "status": "done",
-      "timeAdded": "2026-03-12T13:20:11.773Z"
+      "timeAdded": "2026-03-16T15:38:57.943Z",
+      "paymentMethod": "pos",
+      "nextDepartment": "lab",
+      "doctorNotes": "His shaking",
+      "sentAt": "2026-03-16T15:51:32.312Z"
+    },
+    {
+      "id": "4fd0",
+      "patientId": "860d",
+      "patientName": "Amina Tanko",
+      "reason": "PT test",
+      "notes": "Symptoms  of pregnancy  ",
+      "priority": "Normal",
+      "service": "consultation",
+      "paymentStatus": "paid",
+      "currentDepartment": "doctor",
+      "status": "done",
+      "timeAdded": "2026-03-16T15:57:08.153Z",
+      "paymentMethod": "cash",
+      "nextDepartment": "lab",
+      "doctorNotes": "",
+      "sentAt": "2026-03-16T15:59:48.510Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "413b",
+      "patientName": "David Mensah",
+      "service": "consultation",
+      "amount": 5000,
+      "paymentMethod": "cash",
+      "createdAt": "2026-03-16T13:05:28.119Z"
+    },
+    {
+      "id": "6b53",
+      "patientName": "AHMAD ABDULLAHI",
+      "service": "consultation",
+      "amount": 5000,
+      "paymentMethod": "pos",
+      "createdAt": "2026-03-16T15:50:53.676Z"
+    },
+    {
+      "id": "c4c9",
+      "patientName": "Amina Tanko",
+      "service": "consultation",
+      "amount": 5000,
+      "paymentMethod": "cash",
+      "createdAt": "2026-03-16T15:58:09.508Z"
     }
   ]
 }

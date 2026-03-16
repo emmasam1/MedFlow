@@ -331,6 +331,9 @@ export const useAppStore = create((set, get) => ({
   queue: [],
   notifications: [],
   users: [],
+  vitals: [],
+  transactions: [],
+  departmentHistory: [],
   loading: false,
 
   /* ---------------- AUTH ---------------- */
@@ -382,7 +385,7 @@ export const useAppStore = create((set, get) => ({
     }
   },
 
-    fetchSinglePatient: async (id) => {
+  fetchSinglePatient: async (id) => {
     set({ loading: true });
     try {
       const res = await api.get(`/patients/${id}`);
@@ -449,30 +452,77 @@ export const useAppStore = create((set, get) => ({
     get().fetchAppointments();
   },
 
-  processAppointmentPayment: async (appointmentId) => {
-    const appointment = get().appointments.find((a) => a.id === appointmentId);
+  processPayment: async (queueId, paymentMethod = "cash") => {
+    const queueItem = get().queue.find((q) => q.id === queueId);
 
-    if (!appointment) return;
+    if (!queueItem) return;
+
+    const amountMap = {
+      consultation: 5000,
+      lab: 3000,
+      pharmacy: 2000,
+      radiology: 4000,
+      cardiology: 6000,
+      physiotherapy: 3500,
+      admission: 10000,
+    };
+
+    const amount = amountMap[queueItem.service] || 0;
 
     const updated = {
       paymentStatus: "paid",
-      status: "ready",
+      paymentMethod,
     };
 
-    await api.patch(`/appointments/${appointmentId}`, updated);
+    /* -------- update queue -------- */
+
+    await api.patch(`/queue/${queueId}`, updated);
 
     set((state) => ({
-      appointments: state.appointments.map((a) =>
-        a.id === appointmentId ? { ...a, ...updated } : a,
+      queue: state.queue.map((q) =>
+        q.id === queueId ? { ...q, ...updated } : q,
       ),
     }));
 
-    // Notify specialist
-    get().createNotification({
-      role: "specialist",
-      title: "Paid Appointment",
-      message: `${appointment.patientName} is ready for consultation`,
+    /* -------- create transaction -------- */
+
+    await api.post("/transactions", {
+      patientName: queueItem.patientName,
+      service: queueItem.service,
+      amount,
+      paymentMethod,
+      createdAt: new Date().toISOString(),
     });
+
+    /* -------- routing logic -------- */
+
+    if (queueItem.service === "consultation") {
+      const move = {
+        status: "ready-for-doctor",
+        currentDepartment: "doctor",
+      };
+
+      await api.patch(`/queue/${queueId}`, move);
+
+      set((state) => ({
+        queue: state.queue.map((q) =>
+          q.id === queueId ? { ...q, ...move } : q,
+        ),
+      }));
+    } else {
+      const move = {
+        status: "ready-for-service",
+        currentDepartment: queueItem.service,
+      };
+
+      await api.patch(`/queue/${queueId}`, move);
+
+      set((state) => ({
+        queue: state.queue.map((q) =>
+          q.id === queueId ? { ...q, ...move } : q,
+        ),
+      }));
+    }
   },
 
   /* ---------------- QUEUE ---------------- */
@@ -544,16 +594,29 @@ export const useAppStore = create((set, get) => ({
 
   /* ---------------- FINANCE PAYMENT ---------------- */
 
-  processPayment: async (queueId) => {
+  processPayment: async (queueId, paymentMethod = "cash") => {
     const queueItem = get().queue.find((q) => q.id === queueId);
 
     if (!queueItem) return;
 
-    /* ---- CONSULTATION PAYMENT ---- */
+    const amountMap = {
+      consultation: 5000,
+      lab: 3000,
+      pharmacy: 2000,
+      radiology: 4000,
+      cardiology: 6000,
+      physiotherapy: 3500,
+      admission: 10000,
+    };
+
+    const amount = amountMap[queueItem.service] || 0;
+
+    /* CONSULTATION PAYMENT */
 
     if (queueItem.service === "consultation") {
       const updated = {
         paymentStatus: "paid",
+        paymentMethod,
         status: "ready-for-doctor",
         currentDepartment: "doctor",
       };
@@ -566,6 +629,13 @@ export const useAppStore = create((set, get) => ({
         ),
       }));
 
+      await get().createTransaction({
+        patientName: queueItem.patientName,
+        service: "consultation",
+        amount,
+        paymentMethod,
+      });
+
       get().createNotification({
         role: "doctor",
         title: "Patient Ready",
@@ -575,10 +645,11 @@ export const useAppStore = create((set, get) => ({
       return res.data;
     }
 
-    /* ---- SERVICE PAYMENT ---- */
+    /* SERVICE PAYMENT (LAB / PHARMACY / ETC) */
 
     const updated = {
       paymentStatus: "paid",
+      paymentMethod,
       status: "ready-for-service",
       currentDepartment: queueItem.service,
     };
@@ -590,6 +661,13 @@ export const useAppStore = create((set, get) => ({
         q.id === queueId ? { ...q, ...updated } : q,
       ),
     }));
+
+    await get().createTransaction({
+      patientName: queueItem.patientName,
+      service: queueItem.service,
+      amount,
+      paymentMethod,
+    });
 
     get().createNotification({
       role: queueItem.service,
@@ -618,35 +696,37 @@ export const useAppStore = create((set, get) => ({
 
   /* ---------------- DOCTOR ACTION ---------------- */
 
-  doctorSendPatient: async (queueId, service) => {
-    const queueItem = get().queue.find((q) => q.id === queueId);
+ doctorSendPatient: async (queueId, department, doctorNotes, reason) => {
+  const queueItem = get().queue.find((q) => q.id === queueId);
 
-    if (!queueItem) return;
+  if (!queueItem) return;
 
-    const updated = {
-      service: service,
+  const updated = {
+    status: "done", // 👈 THIS is the important fix
+    nextDepartment: department,
+    doctorNotes,
+    reason,
+    sentAt: new Date().toISOString(),
+  };
 
-      paymentStatus: "unpaid",
+  const res = await api.patch(`/queue/${queueId}`, updated);
 
-      currentDepartment: "finance",
+  set((state) => ({
+    queue: state.queue.map((q) =>
+      q.id === queueId ? { ...q, ...updated } : q
+    ),
+  }));
 
-      status: "awaiting-payment",
-    };
+  /* notify next department */
 
-    await api.patch(`/queue/${queueId}`, updated);
+  get().createNotification({
+    role: department,
+    title: "Patient Sent",
+    message: `${queueItem.patientName} sent to ${department}`,
+  });
 
-    set((state) => ({
-      queue: state.queue.map((q) =>
-        q.id === queueId ? { ...q, ...updated } : q,
-      ),
-    }));
-
-    get().createNotification({
-      role: "finance",
-      title: "Payment Required",
-      message: `${queueItem.patientName} requires payment for ${service}`,
-    });
-  },
+  return res.data;
+},
 
   /* ---------------- COMPLETE SERVICE ---------------- */
 
@@ -724,6 +804,113 @@ export const useAppStore = create((set, get) => ({
         ...n,
         isRead: true,
       })),
+    }));
+  },
+
+  /* ---------------- TRANSACTIONS ---------------- */
+  fetchTransactions: async () => {
+    const res = await api.get("/transactions");
+
+    set({ transactions: res.data });
+
+    return res.data;
+  },
+
+  getDailyTransactions: async (date) => {
+    const res = await api.get("/transactions");
+
+    const filtered = res.data.filter((t) => t.createdAt.startsWith(date));
+
+    set({ transactions: filtered });
+
+    return filtered;
+  },
+
+  createTransaction: async (data) => {
+    const res = await api.post("/transactions", {
+      ...data,
+      createdAt: new Date().toISOString(),
+    });
+
+    set((state) => ({
+      transactions: [res.data, ...state.transactions],
+    }));
+
+    return res.data;
+  },
+
+  downloadDailyReport: (date) => {
+    const { transactions } = get();
+
+    if (!transactions.length) return;
+
+    const jsPDF = require("jspdf").jsPDF;
+    require("jspdf-autotable");
+
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text("Hospital Daily Transaction Report", 14, 20);
+
+    doc.setFontSize(12);
+    doc.text(`Date: ${date}`, 14, 30);
+
+    const rows = transactions.map((t, i) => [
+      i + 1,
+      t.patientName,
+      t.service,
+      t.paymentMethod,
+      `₦${t.amount}`,
+    ]);
+
+    doc.autoTable({
+      startY: 40,
+      head: [["#", "Patient", "Service", "Payment Method", "Amount"]],
+      body: rows,
+    });
+
+    const total = transactions.reduce((sum, t) => sum + Number(t.amount), 0);
+
+    doc.text(`Total Revenue: ₦${total}`, 14, doc.lastAutoTable.finalY + 10);
+
+    doc.save(`transactions-${date}.pdf`);
+  },
+
+  /* ---------------- VITALS ---------------- */
+
+  fetchVitals: async (patientId) => {
+    try {
+      const res = await api.get(`/vitals?patientId=${patientId}`);
+      set({ vitals: res.data });
+    } catch (err) {
+      console.error("Error fetching vitals:", err);
+    }
+  },
+
+  addVitals: async (data) => {
+    try {
+      const payload = {
+        ...data,
+        takenAt: new Date().toISOString(),
+      };
+
+      const res = await api.post("/vitals", payload);
+
+      set((state) => ({
+        vitals: [res.data, ...state.vitals],
+      }));
+
+      return res.data;
+    } catch (err) {
+      console.error("Error adding vitals:", err);
+    }
+  },
+
+  deleteVitals: async (id) => {
+    await api.delete(`/vitals/${id}`);
+
+    set((state) => ({
+      vitals: state.vitals.filter((v) => v.id !== id),
     }));
   },
 }));

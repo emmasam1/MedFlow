@@ -6,7 +6,8 @@ import {
   RiUserHeartLine,
   RiCalendarCheckLine,
   RiSettings4Line,
-  RiUser3Line
+  RiUser3Line,
+  RiReceiptLine,
 } from "react-icons/ri";
 
 const Sidebar = () => {
@@ -31,7 +32,7 @@ const Sidebar = () => {
       to: "/dashboard",
       icon: <RiDashboardLine size={22} />,
       label: "Dashboard",
-      roles: ["doctor","record_officer","finance_officer","specialist"],
+      roles: ["doctor", "record_officer", "finance_officer", "specialist"],
     },
     {
       to: "/dashboard/appointment",
@@ -57,10 +58,18 @@ const Sidebar = () => {
       label: "Finance",
       roles: ["finance_officer"],
     },
+    {
+      to: "/dashboard/transactions",
+      icon: <RiReceiptLine size={22} />,
+      label: "Transactions",
+      roles: ["finance_officer"],
+    },
   ];
 
   // Filter routes based on current user's role
-  const allowedRoutes = routes.filter(route => route.roles.includes(user?.role));
+  const allowedRoutes = routes.filter((route) =>
+    route.roles.includes(user?.role),
+  );
 
   return (
     <motion.aside
@@ -76,7 +85,9 @@ const Sidebar = () => {
       }`}
     >
       {/* Logo */}
-      <div className={`h-17.5 flex items-center justify-center border-b ${borderColor} px-4`}>
+      <div
+        className={`h-17.5 flex items-center justify-center border-b ${borderColor} px-4`}
+      >
         <div className="flex items-center gap-2">
           <div className="bg-[#6777ef] p-2 rounded-lg shadow-md">
             <span className="text-white font-bold text-lg">M</span>
@@ -94,12 +105,15 @@ const Sidebar = () => {
       </div>
 
       {/* Profile */}
-      <div className={`flex flex-col items-center py-10 px-6 ${window.innerWidth >= 1024 && !isSidebarOpen && "py-8 px-2"}`}>
+      <div
+        className={`flex flex-col items-center py-10 px-6 ${window.innerWidth >= 1024 && !isSidebarOpen && "py-8 px-2"}`}
+      >
         <motion.div
           animate={{
             width: isSidebarOpen || window.innerWidth < 1024 ? 85 : 50,
             height: isSidebarOpen || window.innerWidth < 1024 ? 85 : 50,
-            borderRadius: isSidebarOpen || window.innerWidth < 1024 ? "1.25rem" : "0.75rem",
+            borderRadius:
+              isSidebarOpen || window.innerWidth < 1024 ? "1.25rem" : "0.75rem",
           }}
           className="overflow-hidden border-4 border-slate-50 dark:border-gray-800 shadow-xl mb-4"
         >
@@ -111,8 +125,14 @@ const Sidebar = () => {
         </motion.div>
 
         {(isSidebarOpen || window.innerWidth < 1024) && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
-            <h4 className={`font-bold text-base ${nameColor}`}>{user?.name || "User"}</h4>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center"
+          >
+            <h4 className={`font-bold text-base ${nameColor}`}>
+              {user?.name || "User"}
+            </h4>
             <p className="text-[11px] uppercase font-bold text-[#6777ef] tracking-widest mt-1">
               {user?.role.replace("_", " ").toUpperCase()}
             </p>
@@ -122,12 +142,14 @@ const Sidebar = () => {
 
       {/* Navigation */}
       <nav className="flex-1 px-4 overflow-y-auto no-scrollbar">
-        <p className={`text-[10px] font-bold uppercase mb-4 px-2 tracking-widest ${sidebarTheme === "dark" ? "text-gray-500" : "text-gray-400"}`}>
+        <p
+          className={`text-[10px] font-bold uppercase mb-4 px-2 tracking-widest ${sidebarTheme === "dark" ? "text-gray-500" : "text-gray-400"}`}
+        >
           {isSidebarOpen || window.innerWidth < 1024 ? "Main Menu" : "•••"}
         </p>
 
         <div className="space-y-2">
-          {allowedRoutes.map(route => (
+          {allowedRoutes.map((route) => (
             <SidebarItem
               key={route.to}
               to={route.to}
@@ -137,7 +159,7 @@ const Sidebar = () => {
               theme={sidebarTheme}
               onClick={handleLinkClick}
               isRTL={isRTL}
-              end={route.to === "/dashboard"} 
+              end={route.to === "/dashboard"}
             />
           ))}
         </div>
@@ -146,12 +168,22 @@ const Sidebar = () => {
   );
 };
 
-const SidebarItem = ({ to, icon, label, isOpen, theme, onClick, end = false, isRTL }) => {
+const SidebarItem = ({
+  to,
+  icon,
+  label,
+  isOpen,
+  theme,
+  onClick,
+  end = false,
+  isRTL,
+}) => {
   const isMobile = window.innerWidth < 1024;
 
-  const activeStyles = theme === "dark"
-    ? "bg-[#6777ef] text-white shadow-lg shadow-blue-900/20"
-    : "bg-blue-50 text-[#6777ef] shadow-sm";
+  const activeStyles =
+    theme === "dark"
+      ? "bg-[#6777ef] text-white shadow-lg shadow-blue-900/20"
+      : "bg-blue-50 text-[#6777ef] shadow-sm";
 
   return (
     <NavLink
@@ -165,12 +197,18 @@ const SidebarItem = ({ to, icon, label, isOpen, theme, onClick, end = false, isR
     >
       <div className="shrink-0">{icon}</div>
       {(isOpen || isMobile) && (
-        <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm font-semibold tracking-wide">
+        <motion.span
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-sm font-semibold tracking-wide"
+        >
           {label}
         </motion.span>
       )}
       {!isOpen && !isMobile && (
-        <div className={`fixed ${isRTL ? "right-20" : "left-20"} bg-slate-800 text-white text-xs py-1.5 px-2.5 rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-[100]`}>
+        <div
+          className={`fixed ${isRTL ? "right-20" : "left-20"} bg-slate-800 text-white text-xs py-1.5 px-2.5 rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-[100]`}
+        >
           {label}
         </div>
       )}

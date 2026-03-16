@@ -17,6 +17,7 @@ import Unauthorized from "./pages/Dashboard/Unauthorized";
 import DashboardLayout from "./layout/DashboardLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FinancePayments from "./pages/Dashboard/FinancePayments";
+import Transactions from "./pages/Dashboard/Transactions";
 
 const App = () => {
   return (
@@ -70,6 +71,15 @@ const App = () => {
             element={
               <ProtectedRoute allowedRoles={["finance_officer"]}>
                 <FinancePayments />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/transactions"
+            element={
+              <ProtectedRoute allowedRoles={["finance_officer"]}>
+                <Transactions />
               </ProtectedRoute>
             }
           />

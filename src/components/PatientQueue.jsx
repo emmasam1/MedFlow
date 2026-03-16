@@ -45,7 +45,7 @@ const PatientQueue = () => {
       {todayQueue.length === 0 ? (
         <p className={`${textSecondary} text-sm`}>No patients in queue</p>
       ) : (
-        <ul className="space-y-3">
+        <ul className="overflow-y-auto space-y-3 scrollbar-thin scrollbar-thumb-gray-300">
           {todayQueue.map((patient) => (
             <li
               key={patient.id}
