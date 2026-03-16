@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Button, Input, Form, Typography, message } from "antd";
 import { useNavigate } from "react-router-dom";
@@ -11,21 +10,22 @@ const Login = () => {
   const { login, loading } = useAppStore();
   const navigate = useNavigate();
 
-const onFinish = async (values) => {
+  const onFinish = async (values) => {
     try {
       const user = await login(values.username, values.password);
 
       sessionStorage.setItem("user", JSON.stringify(user));
 
-      if (user?.role === "record_officer") {
-        navigate("/dashboard");
-      } else if (user?.role === "doctor") {
-        navigate("/doctor-dashboard");
-      } else if (user?.role === "lab") {
-        navigate("/lab-dashboard");
-      } else {
-        message.warning("Role not authorized");
-      }
+      navigate("/dashboard");
+      // if (user?.role === "record_officer") {
+      // }
+      // } else if (user?.role === "doctor") {
+      //   navigate("/doctor-dashboard");
+      // } else if (user?.role === "lab") {
+      //   navigate("/lab-dashboard");
+      // } else {
+      //   message.warning("Role not authorized");
+      // }
     } catch (err) {
       message.error(err.message);
     }
@@ -56,7 +56,10 @@ const onFinish = async (values) => {
             }}
           />
 
-          <Title level={4} className="!m-0 !font-black tracking-tight text-gray-800">
+          <Title
+            level={4}
+            className="!m-0 !font-black tracking-tight text-gray-800"
+          >
             Health Flow
           </Title>
           <Text className="text-[9px] font-extrabold uppercase tracking-[0.25em] text-blue-500/80">
@@ -73,7 +76,11 @@ const onFinish = async (values) => {
           autoComplete="off"
         >
           <Form.Item
-            label={<span className="text-[10px] font-bold text-gray-400 uppercase ml-1">Staff ID</span>}
+            label={
+              <span className="text-[10px] font-bold text-gray-400 uppercase ml-1">
+                Staff ID
+              </span>
+            }
             name="username"
             className="mb-1"
             rules={[{ required: true, message: "Required" }]}
@@ -86,7 +93,11 @@ const onFinish = async (values) => {
           </Form.Item>
 
           <Form.Item
-            label={<span className="text-[10px] font-bold text-gray-400 uppercase ml-1">Password</span>}
+            label={
+              <span className="text-[10px] font-bold text-gray-400 uppercase ml-1">
+                Password
+              </span>
+            }
             name="password"
             className="mb-3"
             rules={[{ required: true, message: "Required" }]}
@@ -114,7 +125,11 @@ const onFinish = async (values) => {
         <div className="mt-6 pt-3 border-t border-gray-50 text-center">
           <p className="text-gray-400 text-[10px] leading-tight m-0 italic font-medium">
             Forgot credentials? <br />
-            See <span className="text-gray-600 font-bold not-italic">IT Admin</span> physically.
+            See{" "}
+            <span className="text-gray-600 font-bold not-italic">
+              IT Admin
+            </span>{" "}
+            physically.
           </p>
         </div>
       </motion.div>

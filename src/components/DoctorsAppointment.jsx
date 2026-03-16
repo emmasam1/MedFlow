@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import axios from "axios";
 import { useAppStore } from "../store/useAppStore";
 import Modal from "./Modal";
 import { Html5Qrcode } from "html5-qrcode";
@@ -6,20 +7,25 @@ import { AiOutlineClose } from "react-icons/ai";
 import { FaCheckCircle } from "react-icons/fa";
 import { ToastContainer, toast, Slide } from "react-toastify";
 
-const doctors = [
-  { id: 1, name: "Dr. John Smith", department: "Cardiology" },
-  { id: 2, name: "Dr. Sarah Johnson", department: "Neurology" },
-  { id: 3, name: "Dr. Michael Brown", department: "Pediatrics" },
-];
-
 const DoctorsAppointment = ({ onSuccess }) => {
-  const { patients, createAppointment } = useAppStore();
+  const { patients, createAppointment, getUsers, createNotification } =
+    useAppStore();
   const today = new Date().toISOString().split("T")[0];
 
   const [search, setSearch] = useState("");
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [isScanOpen, setIsScanOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const users = useAppStore((s) => s.users) || [];
+
+  useEffect(() => {
+    getUsers();
+  }, []);
+
+  const doctors = users.filter((user) => user.role === "specialist");
+
+  // console.log(doctors)
 
   const scannerRef = useRef(null);
   const [scanSuccess, setScanSuccess] = useState(false);
@@ -47,17 +53,19 @@ const DoctorsAppointment = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
     fullName: "",
     cardNumber: "",
+    doctorId: "", // ✅ add this
     doctor: "",
     department: "",
     date: "",
     time: "",
     priority: "Normal",
     reason: "",
+    notes: "", // also add this since you use it later
   });
 
   /* -------------------- SEARCH -------------------- */
 
-  const filteredPatients = patients.filter((p) =>
+  const filteredPatients = (patients || []).filter((p) =>
     p.fullName.toLowerCase().includes(search.toLowerCase()),
   );
 
@@ -79,12 +87,14 @@ const DoctorsAppointment = ({ onSuccess }) => {
     setFormData({
       fullName: "",
       cardNumber: "",
+      doctorId: "", // ✅ add
       doctor: "",
       department: "",
       date: "",
       time: "",
       priority: "Normal",
       reason: "",
+      notes: "",
     });
   };
 
@@ -151,26 +161,6 @@ const DoctorsAppointment = ({ onSuccess }) => {
     }, 1200);
   };
 
-  // const handleScanSuccess = async (cardNumberFromQR) => {
-  //   const found = patients.find((p) => p.cardNumber === cardNumberFromQR);
-
-  //   if (!found) {
-  //     alert("Patient not found in system");
-  //     return;
-  //   }
-
-  //   playBeep(); // 🔊 sound
-  //   setScanSuccess(true); // show animation
-
-  //   handleSelectPatient(found);
-
-  //   setTimeout(async () => {
-  //     await stopScanner();
-  //     setIsScanOpen(false);
-  //     setScanSuccess(false);
-  //   }, 1200);
-  // };
-
   // This Effect ensures the scanner only runs when the Modal is fully rendered
   useEffect(() => {
     let timeoutId;
@@ -194,43 +184,83 @@ const DoctorsAppointment = ({ onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!selectedPatient) {
-      alert("Please select a patient");
+    if (!formData.cardNumber) {
+      toast.error("Please select a patient");
       return;
     }
 
-    setIsSubmitting(true);
+    if (!formData.doctorId) {
+      toast.error("Please select a doctor");
+      return;
+    }
 
     try {
+      setIsSubmitting(true); // ✅ start loader
+
       const newAppointment = {
         cardNumber: formData.cardNumber,
         patientName: formData.fullName,
+        doctorId: formData.doctorId,
         assignedDoctor: formData.doctor,
         department: formData.department,
         date: formData.date,
         time: formData.time,
         priority: formData.priority,
         reason: formData.reason,
-        notes: formData.notes || "",
+        notes: formData.notes,
         status: "scheduled",
       };
 
+      // 1️⃣ Create appointment
       await createAppointment(newAppointment);
 
-      toast.success("Appointment created successfully!");
-      clearPatient();
+      // 2️⃣ Send doctor notification
+      // await createNotification({
+      //   userId: formData.doctorId,
+      //   title: "New Appointment",
+      //   message: `New appointment scheduled for ${formData.date} at ${formData.time}. Reason: ${formData.reason}`,
+      // });
 
+      // toast.success("Appointment created successfully!");
+
+      // 3️⃣ Reset form
+      setFormData({
+        fullName: "",
+        cardNumber: "",
+        doctorId: "",
+        doctor: "",
+        department: "",
+        date: "",
+        time: "",
+        priority: "Normal",
+        reason: "",
+        notes: "",
+      });
+
+      setSelectedPatient(null);
+      setSearch("");
+
+      // 4️⃣ close modal
       onSuccess?.();
     } catch (error) {
       console.error(error);
       toast.error("Failed to create appointment");
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false); // ✅ stop loader
     }
   };
+
   return (
     <div className="space-y-6">
-      <ToastContainer transition={Slide} />
+      <ToastContainer
+        transition={Slide}
+        autoClose={3000} // 3 seconds
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
       <div className="flex justify-end">
         {!selectedPatient ? (
           /* ---------------- SHOW SCAN AREA ---------------- */
@@ -280,13 +310,18 @@ const DoctorsAppointment = ({ onSuccess }) => {
         </div>
 
         {search && !selectedPatient && (
-          <div className="absolute w-full bg-white border border-gray-300 rounded-xl shadow-lg mt-2 max-h-52 overflow-y-auto z-20">
+          <div
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg 
+  bg-white text-black 
+  dark:bg-gray-800 dark:text-white dark:border-gray-600
+  focus:ring-1 outline-none"
+          >
             {filteredPatients.length > 0 ? (
               filteredPatients.map((patient) => (
                 <div
                   key={patient.id}
                   onClick={() => handleSelectPatient(patient)}
-                  className="px-4 py-3 hover:bg-blue-50 cursor-pointer"
+                  className="px-4 py-3 cursor-pointer"
                 >
                   <p className="font-medium capitalize">{patient.fullName}</p>
                   <p className="text-sm text-gray-500">
@@ -320,25 +355,32 @@ const DoctorsAppointment = ({ onSuccess }) => {
           <label className="block text-sm font-medium mb-1">
             Select Doctor
           </label>
+
           <select
-            value={formData.doctor}
+            value={formData.doctorId}
             onChange={(e) => {
               const selectedDoc = doctors.find(
-                (doc) => doc.name === e.target.value,
+                (doc) => doc.id === e.target.value,
               );
+
               setFormData({
                 ...formData,
-                doctor: e.target.value,
+                doctorId: selectedDoc?.id,
+                doctor: selectedDoc?.name,
                 department: selectedDoc?.department || "",
               });
             }}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg 
+  bg-white text-black 
+  dark:bg-gray-800 dark:text-white dark:border-gray-600
+  focus:ring-1 outline-none"
             required
           >
             <option value="">Choose Doctor</option>
+
             {doctors.map((doc) => (
-              <option key={doc.id} value={doc.name}>
-                {doc.name} - {doc.department}
+              <option key={doc.id} value={doc.id}>
+                {doc.name}
               </option>
             ))}
           </select>
@@ -390,7 +432,10 @@ const DoctorsAppointment = ({ onSuccess }) => {
             onChange={(e) =>
               setFormData({ ...formData, priority: e.target.value })
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg 
+  bg-white text-black 
+  dark:bg-gray-800 dark:text-white dark:border-gray-600
+  focus:ring-1 outline-none"
           >
             <option>Normal</option>
             <option>Urgent</option>
@@ -405,6 +450,7 @@ const DoctorsAppointment = ({ onSuccess }) => {
           </label>
           <textarea
             rows="3"
+            name="reason"
             value={formData.reason}
             onChange={(e) =>
               setFormData({ ...formData, reason: e.target.value })

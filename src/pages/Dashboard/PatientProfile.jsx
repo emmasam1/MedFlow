@@ -13,9 +13,11 @@ import {
   IdentificationIcon,
 } from "@heroicons/react/24/outline";
 import { MdFamilyRestroom } from "react-icons/md";
+import { RiHeartPulseLine } from "react-icons/ri"
 import { useStore } from "../../store/store";
 import { RiUserHeartLine } from "react-icons/ri";
 import { useAppStore } from "../../store/useAppStore";
+import VitalsTabs from "../../components/VitalsTabs";
 
 const Row = ({ label, value, darkMode }) => (
   <div className="grid grid-cols-2 items-center">
@@ -231,17 +233,23 @@ const PatientProfile = () => {
                   </div>
 
                   {/* Family Members Grid */}
-                  <div >
+                  <div>
                     {patient.familyMembers.map((member, i) => (
-                      <div className="flex justify-between items-center mt-4 px-5 pb-4" key={i}>
-                     
-                        <h3 className={`font-medium capitalize ${darkMode ? "text-gray-100" : "text-gray-900"}`}>
+                      <div
+                        className="flex justify-between items-center mt-4 px-5 pb-4"
+                        key={i}
+                      >
+                        <h3
+                          className={`font-medium capitalize ${darkMode ? "text-gray-100" : "text-gray-900"}`}
+                        >
                           {member.name || "N/A"}
                         </h3>
-                         <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+                        <p
+                          className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}
+                        >
                           {member.relationship || "Relationship not specified"}
                         </p>
-                       </div>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -357,6 +365,17 @@ const PatientProfile = () => {
                   darkMode={darkMode}
                 />
               </div>
+            </div>
+          </Section>
+
+          <Section loading={loadingAdmission}>
+            <div className={panelClass}>
+              <div className={panelHeaderClass}>
+                <RiHeartPulseLine className="w-5 h-5" />
+                Vitals
+              </div>
+
+            <VitalsTabs patient={patient} darkMode={darkMode} />
             </div>
           </Section>
 

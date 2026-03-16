@@ -24,6 +24,7 @@ const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
 const Appointments = () => {
   const { fetchAppointments, appointments } = useAppStore();
   const { darkMode } = useStore();
+  
 
   const today = new Date();
   const [currentDate, setCurrentDate] = useState(today);
