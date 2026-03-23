@@ -13,7 +13,7 @@ import {
   IdentificationIcon,
 } from "@heroicons/react/24/outline";
 import { MdFamilyRestroom } from "react-icons/md";
-import { RiHeartPulseLine } from "react-icons/ri"
+import { RiHeartPulseLine } from "react-icons/ri";
 import { useStore } from "../../store/store";
 import { RiUserHeartLine } from "react-icons/ri";
 import { useAppStore } from "../../store/useAppStore";
@@ -57,9 +57,11 @@ const PatientProfile = () => {
 
   const balance = Number(patient?.runningBalance ?? 0);
 
+
+
   let statusText = "";
   let statusColor = "";
-  let amountDisplay = `₦${Math.abs(balance).toLocaleString()}`;
+  const amountDisplay = Math.abs(balance).toLocaleString();
 
   if (balance > 0) {
     statusText = "Advance Payment";
@@ -375,7 +377,7 @@ const PatientProfile = () => {
                 Vitals
               </div>
 
-            <VitalsTabs patient={patient} darkMode={darkMode} />
+              <VitalsTabs patient={patient} darkMode={darkMode} />
             </div>
           </Section>
 
