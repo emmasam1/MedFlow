@@ -363,7 +363,23 @@
       "regDate": "2026-02-26"
     }
   ],
-  "appointments": [],
+  "appointments": [
+    {
+      "id": "3e16",
+      "cardNumber": "SGL-889094",
+      "patientName": "Esther Ajayi",
+      "doctorId": "3",
+      "assignedDoctor": "Dr. Abdullahi Sule",
+      "department": "Neurology",
+      "date": "2026-03-20",
+      "time": "12:43",
+      "priority": "Normal",
+      "reason": "Headache",
+      "notes": "",
+      "status": "pending",
+      "paymentStatus": "unpaid"
+    }
+  ],
   "notifications": [
     {
       "id": "42b9",
@@ -412,6 +428,22 @@
       "title": "Patient Sent",
       "isRead": false,
       "createdAt": "2026-03-16T15:59:48.596Z"
+    },
+    {
+      "id": "ec65",
+      "role": "finance",
+      "message": "Esther Ajayi has an appointment that requires payment",
+      "title": "Appointment Payment Required",
+      "isRead": false,
+      "createdAt": "2026-03-20T22:43:01.957Z"
+    },
+    {
+      "id": "25a3",
+      "role": "doctor",
+      "message": "Esther Ajayi is ready for consultation",
+      "title": "Patient Ready",
+      "isRead": false,
+      "createdAt": "2026-03-23T13:40:17.445Z"
     }
   ],
   "queue": [
@@ -465,6 +497,20 @@
       "nextDepartment": "lab",
       "doctorNotes": "",
       "sentAt": "2026-03-16T15:59:48.510Z"
+    },
+    {
+      "id": "4d78",
+      "patientId": "c74e",
+      "patientName": "Esther Ajayi",
+      "reason": "Headache",
+      "notes": "",
+      "priority": "Normal",
+      "service": "consultation",
+      "paymentStatus": "paid",
+      "currentDepartment": "doctor",
+      "status": "done",
+      "timeAdded": "2026-03-23T13:39:46.492Z",
+      "paymentMethod": "cash"
     }
   ],
   "transactions": [
