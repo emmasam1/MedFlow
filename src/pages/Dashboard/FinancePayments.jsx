@@ -31,26 +31,37 @@ const amountMap = {
 };
 
 const FinancePayments = () => {
-  const { queue, getQueue, processPayment, cancelQueue } = useAppStore();
+  const {
+    queue,
+    getQueue,
+    processPayment,
+    cancelQueue,
+    processPartialPayment,
+  } = useAppStore();
+
   const { darkMode } = useStore();
 
   const [search, setSearch] = useState("");
   const [openPopover, setOpenPopover] = useState(null);
+  const [openPartialPopover, setOpenPartialPopover] = useState(null);
+  const [partialAmount, setPartialAmount] = useState("");
+  const [partialMethod, setPartialMethod] = useState("cash");
 
   useEffect(() => {
     getQueue();
   }, []);
 
+  // ✅ FIXED: include partial payments
   const awaitingPayment = useMemo(() => {
     return queue
       .filter(
         (q) =>
-          q.paymentStatus === "unpaid" &&
+          ["unpaid", "partial"].includes(q.paymentStatus) &&
           q.currentDepartment === "finance" &&
-          q.status !== "cancelled"
+          q.status !== "cancelled",
       )
       .filter((q) =>
-        q.patientName?.toLowerCase().includes(search.toLowerCase())
+        q.patientName?.toLowerCase().includes(search.toLowerCase()),
       );
   }, [queue, search]);
 
@@ -68,7 +79,6 @@ const FinancePayments = () => {
       <ToastContainer />
 
       {/* HEADER */}
-
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">Finance Payments</h2>
 
@@ -86,11 +96,35 @@ const FinancePayments = () => {
       </div>
 
       {/* PAYMENT LIST */}
-
       <div className="space-y-4 max-h-[70vh] overflow-y-auto">
         <AnimatePresence>
           {awaitingPayment.map((q) => {
-            const amount = amountMap[q.service] || 0;
+            const amount =
+              q.service === "lab" ? q.labAmount : amountMap[q.service] || 0;
+
+            const remaining =
+              q.paymentStatus === "partial"
+                ? q.balance // must be updated in store after partial payment
+                : amount;
+
+            const paid = amount - remaining;
+
+            const handlePartialSubmit = (queueId) => {
+              const value = Number(partialAmount);
+
+              if (isNaN(value) || value <= 0) {
+                return alert("Enter a valid amount");
+              }
+
+              if (value > remaining) {
+                return alert("Amount exceeds remaining balance");
+              }
+
+              processPartialPayment(queueId, value, partialMethod);
+              setOpenPartialPopover(null);
+              setPartialAmount("");
+              setPartialMethod("cash");
+            };
 
             return (
               <motion.div
@@ -105,7 +139,6 @@ const FinancePayments = () => {
                 }`}
               >
                 {/* PATIENT INFO */}
-
                 <div className="flex items-center gap-4 flex-1">
                   <div className="text-blue-500 text-xl">
                     {serviceIcons[q.service] || <FaMoneyBillWave />}
@@ -119,11 +152,28 @@ const FinancePayments = () => {
                         ? "Consultation Fee"
                         : `Payment for ${q.service}`}
                     </p>
+
+                    {q.service === "lab" && q.labTests?.length > 0 && (
+                      <div className="text-xs text-gray-400 mt-1">
+                        {q.labTests.map((t) => t.name).join(", ")}
+                      </div>
+                    )}
+
+                    {/* ✅ PARTIAL INFO */}
+                    {q.paymentStatus === "partial" && (
+                      <>
+                        <p className="text-xs text-gray-400 mt-1">
+                          Paid: ₦{paid.toLocaleString()}
+                        </p>
+                        <p className="text-xs text-red-500">
+                          Remaining: ₦{remaining.toLocaleString()}
+                        </p>
+                      </>
+                    )}
                   </div>
                 </div>
 
                 {/* SERVICE BADGE */}
-
                 <div className="flex flex-col items-start md:items-center">
                   <span
                     className={`px-3 py-1 text-xs rounded-full capitalize ${
@@ -137,13 +187,11 @@ const FinancePayments = () => {
                 </div>
 
                 {/* AMOUNT */}
-
                 <div className="text-lg font-semibold text-green-500">
                   ₦{amount.toLocaleString()}
                 </div>
 
                 {/* ACTIONS */}
-
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => {
@@ -156,13 +204,12 @@ const FinancePayments = () => {
                     Cancel
                   </button>
 
+                  {/* FULL PAYMENT */}
                   <Popover
                     title="Select Payment Method"
                     trigger="click"
                     open={openPopover === q.id}
-                    onOpenChange={(open) =>
-                      setOpenPopover(open ? q.id : null)
-                    }
+                    onOpenChange={(open) => setOpenPopover(open ? q.id : null)}
                     content={
                       <div className="flex gap-2">
                         <button
@@ -189,7 +236,53 @@ const FinancePayments = () => {
                     }
                   >
                     <button className="px-3 py-1 text-xs rounded-lg bg-purple-100 text-purple-700 hover:bg-purple-200">
-                      Accept Payment
+                      {q.paymentStatus === "partial"
+                        ? "Complete Payment"
+                        : "Accept Payment"}
+                    </button>
+                  </Popover>
+
+                  {/* PARTIAL PAYMENT */}
+                  <Popover
+                    title="Partial Payment"
+                    trigger="click"
+                    open={openPartialPopover === q.id}
+                    onOpenChange={(open) => {
+                      setOpenPartialPopover(open ? q.id : null);
+                      setPartialAmount("");
+                      setPartialMethod("cash");
+                    }}
+                    content={
+                      <div className="flex flex-col gap-2">
+                        <input
+                          type="number"
+                          placeholder="Enter amount"
+                          value={partialAmount}
+                          onChange={(e) => setPartialAmount(e.target.value)}
+                          className="px-2 py-1 text-sm border rounded"
+                        />
+
+                        <select
+                          value={partialMethod}
+                          onChange={(e) => setPartialMethod(e.target.value)}
+                          className="px-2 py-1 text-sm border rounded"
+                        >
+                          <option value="cash">Cash</option>
+                          <option value="pos">POS</option>
+                          <option value="transfer">Transfer</option>
+                        </select>
+
+                        <button
+                          className="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs rounded hover:bg-yellow-200"
+                          onClick={() => handlePartialSubmit(q.id)}
+                        >
+                          Submit Payment
+                        </button>
+                      </div>
+                    }
+                  >
+                    <button className="px-3 py-1 text-xs rounded-lg bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
+                      Part Payment
                     </button>
                   </Popover>
                 </div>

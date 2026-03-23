@@ -15,29 +15,38 @@ const PER_PAGE = 10;
 
 const statusStyles = (darkMode) => ({
   waiting: darkMode ? "bg-amber-700 text-white" : "bg-amber-100 text-amber-700",
-
   "ready-for-doctor": darkMode
     ? "bg-indigo-700 text-white"
     : "bg-indigo-100 text-indigo-700",
-
   "in-progress": darkMode
     ? "bg-blue-700 text-white"
     : "bg-blue-100 text-blue-700",
-
   done: darkMode
     ? "bg-emerald-700 text-white"
     : "bg-emerald-100 text-emerald-700",
-
   cancelled: darkMode ? "bg-red-700 text-white" : "bg-red-100 text-red-700",
-
   "awaiting-payment": darkMode
     ? "bg-purple-700 text-white"
     : "bg-purple-100 text-purple-700",
+  "partial-payment": darkMode
+    ? "bg-yellow-700 text-white"
+    : "bg-yellow-100 text-yellow-700",
 });
 
 const Queue = () => {
-  const { queue, getQueue, updateQueueStatus, cancelQueue, doctorSendPatient } =
-    useAppStore();
+  const {
+    queue,
+    getQueue,
+    updateQueueStatus,
+    cancelQueue,
+    doctorSendPatient,
+    labTest,
+    fetchLabTests,
+  } = useAppStore();
+
+  useEffect(() => {
+    fetchLabTests();
+  }, []);
 
   const { darkMode } = useStore();
 
@@ -57,6 +66,9 @@ const Queue = () => {
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
   const [selectedQueue, setSelectedQueue] = useState(null);
 
+  const [labSearch, setLabSearch] = useState("");
+  const [selectedTests, setSelectedTests] = useState([]);
+
   const [department, setDepartment] = useState("");
   const [doctorNotes, setDoctorNotes] = useState("");
   const [reason, setReason] = useState("");
@@ -75,6 +87,26 @@ const Queue = () => {
   useEffect(() => {
     getQueue();
   }, []);
+
+  const filteredLabTests = useMemo(() => {
+    if (!labSearch) return labTest || [];
+
+    return labTest.filter((t) =>
+      t.name.toLowerCase().includes(labSearch.toLowerCase()),
+    );
+  }, [labSearch, labTest]);
+
+  const toggleTest = (test) => {
+    setSelectedTests((prev) => {
+      const exists = prev.find((t) => t.id === test.id);
+
+      if (exists) {
+        return prev.filter((t) => t.id !== test.id);
+      }
+
+      return [...prev, test];
+    });
+  };
 
   /* resizer */
 
@@ -111,17 +143,27 @@ const Queue = () => {
   const openDoctorModal = (queueItem) => {
     setSelectedQueue(queueItem);
     setIsDoctorModalOpen(true);
+
+    setSelectedTests([]);
+    setLabSearch("");
   };
 
   const handleSendPatient = async () => {
     if (!department) return alert("Select department");
 
-    await doctorSendPatient(selectedQueue.id, department, doctorNotes, reason);
+    await doctorSendPatient(
+      selectedQueue.id,
+      department,
+      doctorNotes,
+      reason,
+      selectedTests,
+    );
 
     setIsDoctorModalOpen(false);
     setDoctorNotes("");
     setReason("");
     setDepartment("");
+    setSelectedTests([]);
   };
 
   /* filter queue */
@@ -164,7 +206,7 @@ const Queue = () => {
         whileHover={{ scale: 1.1 }}
         className="flex justify-center mt-1"
       >
-        <div className="flex items-center gap-1 px-2 py-[2px] rounded-full bg-blue-50 dark:bg-gray-700 shadow-sm border border-blue-100 dark:border-gray-600">
+        <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-gray-700 shadow-sm border border-blue-100 dark:border-gray-600">
           {/* dots */}
           {appointments.slice(0, 3).map((_, i) => (
             <span
@@ -342,9 +384,12 @@ const Queue = () => {
                 const displayStatus =
                   q.status === "done"
                     ? "done"
-                    : q.paymentStatus !== "paid" && q.status === "waiting"
+                    : q.paymentStatus === "unpaid" &&
+                        q.currentDepartment === "finance"
                       ? "awaiting-payment"
-                      : q.status;
+                      : q.paymentStatus === "partial"
+                        ? "partial-payment"
+                        : q.status;
 
                 return (
                   <motion.div
@@ -381,36 +426,44 @@ const Queue = () => {
                           Sent to: {q.nextDepartment}
                         </p>
                       )}
+
+                      {user?.role === "doctor" &&
+                        q.currentDepartment !== "doctor" && (
+                          <p className="text-xs text-gray-400">
+                            Now at:{" "}
+                            <span className="capitalize">
+                              {q.currentDepartment}
+                            </span>
+                          </p>
+                        )}
                     </div>
 
                     <div className="flex flex-wrap gap-2">
                       {user?.role === "doctor" &&
-                        q.paymentStatus === "paid" &&
-                        q.status !== "done" && (
+                        q.currentDepartment === "doctor" && (
                           <>
-                            <button
-                              onClick={() =>
-                                updateQueueStatus(q.id, "in-progress")
-                              }
-                              className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded-lg cursor-pointer"
-                            >
-                              Start
-                            </button>
+                            {/* START → only if not started */}
+                            {q.status === "waiting" && (
+                              <button
+                                onClick={() =>
+                                  updateQueueStatus(q.id, "in-progress")
+                                }
+                                className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded-lg cursor-pointer"
+                              >
+                                Start
+                              </button>
+                            )}
 
-                            <button
-                              onClick={() => openDoctorModal(q)}
-                              className="text-xs px-3 py-1 bg-purple-100 text-purple-700 rounded-lg flex items-center gap-1 cursor-pointer"
-                            >
-                              <FaPaperPlane size={12} />
-                              Send
-                            </button>
-
-                            <button
-                              onClick={() => updateQueueStatus(q.id, "done")}
-                              className="text-xs px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg cursor-pointer"
-                            >
-                              Done
-                            </button>
+                            {/* SEND → only when in progress */}
+                            {q.status === "in-progress" && (
+                              <button
+                                onClick={() => openDoctorModal(q)}
+                                className="text-xs px-3 py-1 bg-purple-100 text-purple-700 rounded-lg flex items-center gap-1 cursor-pointer"
+                              >
+                                <FaPaperPlane size={12} />
+                                Send
+                              </button>
+                            )}
                           </>
                         )}
 
@@ -469,6 +522,71 @@ const Queue = () => {
               </option>
             ))}
           </select>
+
+          {department === "lab" && (
+            <div className="space-y-3">
+              {/* SEARCH */}
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search lab test..."
+                  value={labSearch}
+                  onChange={(e) => setLabSearch(e.target.value)}
+                  className="w-full border rounded-lg p-2 pl-9"
+                />
+
+                <HiSearch
+                  size={16}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+              </div>
+
+              {/* LAB LIST */}
+              <div
+                className={`max-h-52 overflow-y-auto border rounded-lg ${
+                  darkMode ? "bg-gray-800 border-gray-700" : "bg-white"
+                }`}
+              >
+                {filteredLabTests.map((test) => {
+                  const selected = selectedTests.some((t) => t.id === test.id);
+
+                  return (
+                    <div
+                      key={test.id}
+                      onClick={() => toggleTest(test)}
+                      className={`flex justify-between px-3 py-2 cursor-pointer text-sm
+            ${
+              selected
+                ? darkMode
+                  ? "bg-blue-700 text-white"
+                  : "bg-blue-100"
+                : darkMode
+                  ? "hover:bg-gray-700"
+                  : "hover:bg-gray-100"
+            }`}
+                    >
+                      <span>{test.name}</span>
+                      <span>₦{test.amount}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* SELECTED TESTS */}
+              {selectedTests.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {selectedTests.map((t) => (
+                    <span
+                      key={t.id}
+                      className="px-2 py-1 bg-blue-600 text-white rounded text-xs"
+                    >
+                      {t.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           <input
             value={reason}

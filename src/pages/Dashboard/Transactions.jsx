@@ -17,13 +17,15 @@ const Transactions = () => {
 
   useEffect(() => {
     getDailyTransactions(selectedDate);
-  }, [selectedDate]);
+  }, [selectedDate, getDailyTransactions]);
 
+  // ✅ TOTAL
   const total = transactions.reduce(
     (sum, t) => sum + Number(t.amount || 0),
     0
   );
 
+  // ✅ METHOD BADGE
   const methodBadge = (method) => {
     switch (method) {
       case "cash":
@@ -44,7 +46,6 @@ const Transactions = () => {
       }`}
     >
       {/* HEADER */}
-
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>
           <h2 className="text-xl font-semibold">Transactions</h2>
@@ -55,10 +56,11 @@ const Transactions = () => {
 
         <div className="flex items-center gap-3">
           <DatePicker
-            defaultValue={dayjs()}
-            onChange={(d) =>
-              setSelectedDate(d.format("YYYY-MM-DD"))
-            }
+            value={dayjs(selectedDate)}
+            onChange={(d) => {
+              if (!d) return;
+              setSelectedDate(d.format("YYYY-MM-DD"));
+            }}
           />
 
           <button
@@ -72,25 +74,21 @@ const Transactions = () => {
       </div>
 
       {/* SUMMARY */}
-
       <div
         className={`mb-6 p-4 rounded-xl ${
           darkMode ? "bg-gray-800" : "bg-slate-50"
         }`}
       >
         <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-400">
-            Total Revenue
-          </span>
+          <span className="text-sm text-gray-400">Total Revenue</span>
 
           <span className="text-lg font-semibold text-emerald-500">
-            ₦{total}
+            ₦{total.toLocaleString()}
           </span>
         </div>
       </div>
 
       {/* TABLE */}
-
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead
@@ -104,49 +102,93 @@ const Transactions = () => {
               <th className="py-3 px-3">Service</th>
               <th className="py-3 px-3">Payment Method</th>
               <th className="py-3 px-3">Amount</th>
+              <th className="py-3 px-3">Outstanding</th>
+              <th className="py-3 px-3">Type</th>
               <th className="py-3 px-3">Time</th>
             </tr>
           </thead>
 
           <tbody>
-            {transactions.map((t, i) => (
-              <tr
-                key={t.id}
-                className={`border-b ${
-                  darkMode
-                    ? "border-gray-800 hover:bg-gray-800"
-                    : "border-slate-100 hover:bg-slate-50"
-                }`}
-              >
-                <td className="py-3 px-3">{i + 1}</td>
+            {transactions.map((t, i) => {
+              // ✅ FIX: fallback values
+              const amount = Number(t.amount || 0);
 
-                <td className="py-3 px-3 font-medium">
-                  {t.patientName}
-                </td>
+              // If you later store balance in transactions, this will work
+              const outstanding = Number(t.balance || 0);
 
-                <td className="py-3 px-3 capitalize">
-                  {t.service}
-                </td>
+              // ✅ infer type
+              const isPartial = outstanding > 0;
 
-                <td className="py-3 px-3">
-                  <span
-                    className={`px-3 py-1 text-xs rounded-full capitalize ${methodBadge(
-                      t.paymentMethod
-                    )}`}
-                  >
-                    {t.paymentMethod || "unknown"}
-                  </span>
-                </td>
+              return (
+                <tr
+                  key={t.id}
+                  className={`border-b ${
+                    darkMode
+                      ? "border-gray-800 hover:bg-gray-800"
+                      : "border-slate-100 hover:bg-slate-50"
+                  }`}
+                >
+                  <td className="py-3 px-3">{i + 1}</td>
 
-                <td className="py-3 px-3 font-semibold">
-                  ₦{t.amount || 0}
-                </td>
+                  <td className="py-3 px-3 font-medium">
+                    {t.patientName}
+                  </td>
 
-                <td className="py-3 px-3 text-gray-400">
-                  {dayjs(t.timeAdded).format("HH:mm")}
-                </td>
-              </tr>
-            ))}
+                  <td className="py-3 px-3 capitalize">
+                    {t.service}
+                  </td>
+
+                  {/* PAYMENT METHOD */}
+                  <td className="py-3 px-3">
+                    <span
+                      className={`px-3 py-1 text-xs rounded-full capitalize ${methodBadge(
+                        t.paymentMethod
+                      )}`}
+                    >
+                      {t.paymentMethod || "unknown"}
+                    </span>
+                  </td>
+
+                  {/* AMOUNT */}
+                  <td className="py-3 px-3 font-semibold">
+                    ₦{amount.toLocaleString()}
+                  </td>
+
+                  {/* OUTSTANDING */}
+                  <td className="py-3 px-3">
+                    {outstanding > 0 ? (
+                      <span className="text-red-500 text-xs">
+                        ₦{outstanding.toLocaleString()}
+                      </span>
+                    ) : (
+                      <span className="text-green-500 text-xs">
+                        Cleared
+                      </span>
+                    )}
+                  </td>
+
+                  {/* TYPE */}
+                  <td className="py-3 px-3">
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${
+                        isPartial
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-emerald-100 text-emerald-700"
+                      }`}
+                    >
+                      {isPartial ? "Partial" : "Full"}
+                    </span>
+                  </td>
+
+                  {/* TIME */}
+                  <td className="py-3 px-3 text-gray-400">
+                    {t.createdAt
+                      ? dayjs(t.createdAt).format("HH:mm")
+                      : "--"}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
 

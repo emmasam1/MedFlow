@@ -145,7 +145,12 @@
           "name": "MJ",
           "relationship": "Son"
         }
-      ]
+      ],
+      "financials": {
+        "totalBill": 0,
+        "paid": 0,
+        "balance": 0
+      }
     },
     {
       "id": "3dbc",
@@ -178,7 +183,12 @@
           "name": "Tanko Musa",
           "relationship": "Son"
         }
-      ]
+      ],
+      "financials": {
+        "totalBill": 0,
+        "paid": 0,
+        "balance": 0
+      }
     },
     {
       "id": "cdae",
@@ -204,7 +214,12 @@
         "phone": "08081234567",
         "address": "21 Airport Road, Abuja"
       },
-      "regDate": "2026-02-22"
+      "regDate": "2026-02-22",
+      "financials": {
+        "totalBill": 0,
+        "paid": 0,
+        "balance": 0
+      }
     },
     {
       "id": "c74e",
@@ -230,7 +245,12 @@
         "phone": "08021234567",
         "address": "32 Bodija Estate, Ibadan"
       },
-      "regDate": "2026-02-22"
+      "regDate": "2026-02-22",
+      "financials": {
+        "totalBill": 0,
+        "paid": 0,
+        "balance": 0
+      }
     },
     {
       "id": "4d22",
@@ -256,7 +276,12 @@
         "phone": "8452848902",
         "address": "402 hangerstone"
       },
-      "regDate": "2026-02-23"
+      "regDate": "2026-02-23",
+      "financials": {
+        "totalBill": 0,
+        "paid": 0,
+        "balance": 0
+      }
     },
     {
       "id": "a8de",
@@ -282,7 +307,12 @@
         "phone": "88653456",
         "address": ""
       },
-      "regDate": "2026-02-23"
+      "regDate": "2026-02-23",
+      "financials": {
+        "totalBill": 0,
+        "paid": 0,
+        "balance": 0
+      }
     },
     {
       "id": "860d",
@@ -308,7 +338,12 @@
         "phone": "08033127677",
         "address": "Airport runway"
       },
-      "regDate": "2026-02-23"
+      "regDate": "2026-02-23",
+      "financials": {
+        "totalBill": 0,
+        "paid": 0,
+        "balance": 0
+      }
     },
     {
       "id": "6a48",
@@ -334,7 +369,12 @@
         "phone": "08027654321",
         "address": "23 Independence Layout, Enugu"
       },
-      "regDate": "2026-02-23"
+      "regDate": "2026-02-23",
+      "financials": {
+        "totalBill": 0,
+        "paid": 0,
+        "balance": 0
+      }
     },
     {
       "id": "5d07",
@@ -360,7 +400,12 @@
         "phone": "07068931192",
         "address": "Kaduna"
       },
-      "regDate": "2026-02-26"
+      "regDate": "2026-02-26",
+      "financials": {
+        "totalBill": 0,
+        "paid": 0,
+        "balance": 0
+      }
     }
   ],
   "appointments": [
@@ -382,161 +427,498 @@
   ],
   "notifications": [
     {
-      "id": "42b9",
-      "role": "doctor",
-      "message": "David Mensah is ready for consultation",
-      "title": "Patient Ready",
-      "isRead": false,
-      "createdAt": "2026-03-16T13:05:28.163Z"
-    },
-    {
-      "id": "e57e",
-      "role": "pharmacy",
-      "message": "David Mensah sent to pharmacy",
-      "title": "Patient Sent",
-      "isRead": false,
-      "createdAt": "2026-03-16T13:07:40.075Z"
-    },
-    {
-      "id": "6a4e",
-      "role": "doctor",
-      "message": "AHMAD ABDULLAHI is ready for consultation",
-      "title": "Patient Ready",
-      "isRead": false,
-      "createdAt": "2026-03-16T15:50:53.721Z"
-    },
-    {
-      "id": "6c42",
-      "role": "lab",
-      "message": "AHMAD ABDULLAHI sent to lab",
-      "title": "Patient Sent",
-      "isRead": false,
-      "createdAt": "2026-03-16T15:51:32.357Z"
-    },
-    {
-      "id": "3946",
-      "role": "doctor",
-      "message": "Amina Tanko is ready for consultation",
-      "title": "Patient Ready",
-      "isRead": false,
-      "createdAt": "2026-03-16T15:58:09.547Z"
-    },
-    {
-      "id": "a5b9",
-      "role": "lab",
-      "message": "Amina Tanko sent to lab",
-      "title": "Patient Sent",
-      "isRead": false,
-      "createdAt": "2026-03-16T15:59:48.596Z"
-    },
-    {
-      "id": "ec65",
+      "id": "f3b4",
       "role": "finance",
-      "message": "Esther Ajayi has an appointment that requires payment",
-      "title": "Appointment Payment Required",
+      "title": "Payment Needed",
+      "message": "Esther Ajayi needs payment for lab",
       "isRead": false,
-      "createdAt": "2026-03-20T22:43:01.957Z"
-    },
-    {
-      "id": "25a3",
-      "role": "doctor",
-      "message": "Esther Ajayi is ready for consultation",
-      "title": "Patient Ready",
-      "isRead": false,
-      "createdAt": "2026-03-23T13:40:17.445Z"
+      "createdAt": "2026-03-18T10:44:29.245Z"
     }
   ],
   "queue": [
     {
-      "id": "32e1",
-      "patientId": "cdae",
-      "patientName": "David Mensah",
-      "reason": "Bleeding has stopped",
-      "notes": "He has cuts in his noise, he inserted something sharp in his noise",
-      "priority": "Normal",
-      "service": "consultation",
-      "paymentStatus": "paid",
-      "currentDepartment": "doctor",
-      "status": "done",
-      "timeAdded": "2026-03-16T13:04:25.848Z",
-      "paymentMethod": "cash",
-      "nextDepartment": "pharmacy",
-      "doctorNotes": "Just give antibiotics and some pain medication",
-      "sentAt": "2026-03-16T13:07:40.003Z"
-    },
-    {
-      "id": "0db1",
-      "patientId": "5d07",
-      "patientName": "AHMAD ABDULLAHI",
-      "reason": "Run some test",
-      "notes": "",
-      "priority": "Normal",
-      "service": "consultation",
-      "paymentStatus": "paid",
-      "currentDepartment": "doctor",
-      "status": "done",
-      "timeAdded": "2026-03-16T15:38:57.943Z",
-      "paymentMethod": "pos",
-      "nextDepartment": "lab",
-      "doctorNotes": "His shaking",
-      "sentAt": "2026-03-16T15:51:32.312Z"
-    },
-    {
-      "id": "4fd0",
-      "patientId": "860d",
-      "patientName": "Amina Tanko",
-      "reason": "PT test",
-      "notes": "Symptoms  of pregnancy  ",
-      "priority": "Normal",
-      "service": "consultation",
-      "paymentStatus": "paid",
-      "currentDepartment": "doctor",
-      "status": "done",
-      "timeAdded": "2026-03-16T15:57:08.153Z",
-      "paymentMethod": "cash",
-      "nextDepartment": "lab",
-      "doctorNotes": "",
-      "sentAt": "2026-03-16T15:59:48.510Z"
-    },
-    {
-      "id": "4d78",
+      "id": "7e59",
       "patientId": "c74e",
       "patientName": "Esther Ajayi",
-      "reason": "Headache",
-      "notes": "",
+      "reason": "Having morning sickness",
       "priority": "Normal",
-      "service": "consultation",
-      "paymentStatus": "paid",
-      "currentDepartment": "doctor",
+      "notes": "",
+      "service": "lab",
+      "paymentStatus": "partial",
+      "currentDepartment": "finance",
       "status": "done",
-      "timeAdded": "2026-03-23T13:39:46.492Z",
-      "paymentMethod": "cash"
+      "labTests": [
+        {
+          "name": "Pregnancy Test",
+          "amount": 2000,
+          "id": "c0f3"
+        },
+        {
+          "name": "Thyroid Function Test",
+          "amount": 15000,
+          "id": "df73"
+        }
+      ],
+      "labAmount": 17000,
+      "balance": 2000,
+      "nextDepartment": "lab",
+      "paymentMethod": "pos",
+      "doctorNotes": "the patient only feels sick in the morning that's the reason for this test "
     }
   ],
   "transactions": [
     {
-      "id": "413b",
-      "patientName": "David Mensah",
-      "service": "consultation",
-      "amount": 5000,
-      "paymentMethod": "cash",
-      "createdAt": "2026-03-16T13:05:28.119Z"
-    },
-    {
-      "id": "6b53",
-      "patientName": "AHMAD ABDULLAHI",
+      "id": "c27f",
+      "patientName": "Esther Ajayi",
       "service": "consultation",
       "amount": 5000,
       "paymentMethod": "pos",
-      "createdAt": "2026-03-16T15:50:53.676Z"
+      "createdAt": "2026-03-18T10:42:33.949Z"
     },
     {
-      "id": "c4c9",
-      "patientName": "Amina Tanko",
-      "service": "consultation",
-      "amount": 5000,
+      "id": "c9bc",
+      "patientName": "Esther Ajayi",
+      "service": "lab",
+      "amount": 10000,
+      "paymentMethod": "pos",
+      "createdAt": "2026-03-18T10:45:08.225Z"
+    },
+    {
+      "id": "7d5d",
+      "patientName": "Esther Ajayi",
+      "service": "lab",
+      "amount": 2000,
       "paymentMethod": "cash",
-      "createdAt": "2026-03-16T15:58:09.508Z"
+      "paymentType": "partial",
+      "balance": 5000,
+      "createdAt": "2026-03-18T10:57:20.433Z"
+    },
+    {
+      "id": "5056",
+      "patientName": "Esther Ajayi",
+      "service": "lab",
+      "amount": 2000,
+      "paymentMethod": "cash",
+      "paymentType": "partial",
+      "balance": 3000,
+      "createdAt": "2026-03-18T11:09:38.140Z"
+    },
+    {
+      "id": "807c",
+      "patientName": "Esther Ajayi",
+      "service": "lab",
+      "amount": 1000,
+      "paymentMethod": "cash",
+      "paymentType": "partial",
+      "balance": 2000,
+      "createdAt": "2026-03-18T11:21:23.104Z"
+    }
+  ],
+  "labTest": [
+    {
+      "name": "Full Blood Count (FBC)",
+      "amount": 3000,
+      "id": "9595"
+    },
+    {
+      "name": "Packed Cell Volume (PCV)",
+      "amount": 1500,
+      "id": "56eb"
+    },
+    {
+      "name": "Erythrocyte Sedimentation Rate (ESR)",
+      "amount": 2000,
+      "id": "c9f1"
+    },
+    {
+      "name": "Malaria Parasite Test",
+      "amount": 1500,
+      "id": "7080"
+    },
+    {
+      "name": "Widal Test",
+      "amount": 2000,
+      "id": "81c3"
+    },
+    {
+      "name": "Blood Group",
+      "amount": 1500,
+      "id": "b1c4"
+    },
+    {
+      "name": "Genotype",
+      "amount": 4000,
+      "id": "2ed3"
+    },
+    {
+      "name": "Urinalysis",
+      "amount": 2000,
+      "id": "dcee"
+    },
+    {
+      "name": "Stool Analysis",
+      "amount": 2500,
+      "id": "4ebf"
+    },
+    {
+      "name": "Pregnancy Test",
+      "amount": 2000,
+      "id": "c0f3"
+    },
+    {
+      "name": "Fasting Blood Sugar",
+      "amount": 2500,
+      "id": "b018"
+    },
+    {
+      "name": "Random Blood Sugar",
+      "amount": 2000,
+      "id": "ed97"
+    },
+    {
+      "name": "2 Hour Post Prandial Glucose",
+      "amount": 3000,
+      "id": "47f3"
+    },
+    {
+      "name": "HbA1c",
+      "amount": 12000,
+      "id": "3236"
+    },
+    {
+      "name": "Lipid Profile",
+      "amount": 12000,
+      "id": "e69a"
+    },
+    {
+      "name": "Total Cholesterol",
+      "amount": 3500,
+      "id": "9256"
+    },
+    {
+      "name": "HDL Cholesterol",
+      "amount": 3500,
+      "id": "2520"
+    },
+    {
+      "name": "LDL Cholesterol",
+      "amount": 3500,
+      "id": "7170"
+    },
+    {
+      "name": "Triglycerides",
+      "amount": 3500,
+      "id": "1d1e"
+    },
+    {
+      "name": "Liver Function Test",
+      "amount": 10000,
+      "id": "8886"
+    },
+    {
+      "name": "ALT (SGPT)",
+      "amount": 3000,
+      "id": "e803"
+    },
+    {
+      "name": "AST (SGOT)",
+      "amount": 3000,
+      "id": "fd43"
+    },
+    {
+      "name": "Alkaline Phosphatase",
+      "amount": 3500,
+      "id": "5a73"
+    },
+    {
+      "name": "Total Bilirubin",
+      "amount": 3000,
+      "id": "0a20"
+    },
+    {
+      "name": "Direct Bilirubin",
+      "amount": 3000,
+      "id": "91a2"
+    },
+    {
+      "name": "Total Protein",
+      "amount": 3000,
+      "id": "c6ee"
+    },
+    {
+      "name": "Albumin",
+      "amount": 3000,
+      "id": "82c8"
+    },
+    {
+      "name": "Kidney Function Test",
+      "amount": 10000,
+      "id": "0fcf"
+    },
+    {
+      "name": "Urea",
+      "amount": 3000,
+      "id": "7ae6"
+    },
+    {
+      "name": "Creatinine",
+      "amount": 3000,
+      "id": "832e"
+    },
+    {
+      "name": "Electrolyte, Urea & Creatinine",
+      "amount": 9000,
+      "id": "d64e"
+    },
+    {
+      "name": "Sodium",
+      "amount": 2500,
+      "id": "a79e"
+    },
+    {
+      "name": "Potassium",
+      "amount": 2500,
+      "id": "e1d9"
+    },
+    {
+      "name": "Chloride",
+      "amount": 2500,
+      "id": "6cb8"
+    },
+    {
+      "name": "Bicarbonate",
+      "amount": 2500,
+      "id": "11af"
+    },
+    {
+      "name": "HIV Test",
+      "amount": 3000,
+      "id": "d68c"
+    },
+    {
+      "name": "Hepatitis B Surface Antigen",
+      "amount": 4000,
+      "id": "83ed"
+    },
+    {
+      "name": "Hepatitis C Test",
+      "amount": 5000,
+      "id": "00f5"
+    },
+    {
+      "name": "VDRL (Syphilis Test)",
+      "amount": 2500,
+      "id": "dcdc"
+    },
+    {
+      "name": "Prostate Specific Antigen (PSA)",
+      "amount": 8000,
+      "id": "9fd0"
+    },
+    {
+      "name": "Thyroid Function Test",
+      "amount": 15000,
+      "id": "df73"
+    },
+    {
+      "name": "TSH",
+      "amount": 6000,
+      "id": "c7d9"
+    },
+    {
+      "name": "T3",
+      "amount": 5000,
+      "id": "19d2"
+    },
+    {
+      "name": "T4",
+      "amount": 5000,
+      "id": "b8f5"
+    },
+    {
+      "name": "C-Reactive Protein",
+      "amount": 5000,
+      "id": "07aa"
+    },
+    {
+      "name": "Rheumatoid Factor",
+      "amount": 5000,
+      "id": "d1c1"
+    },
+    {
+      "name": "Anti Streptolysin O (ASO)",
+      "amount": 5000,
+      "id": "1511"
+    },
+    {
+      "name": "Vitamin D Test",
+      "amount": 18000,
+      "id": "86a3"
+    },
+    {
+      "name": "Vitamin B12 Test",
+      "amount": 15000,
+      "id": "7d3b"
+    },
+    {
+      "name": "Folate Test",
+      "amount": 12000,
+      "id": "e1fc"
+    },
+    {
+      "name": "Serum Calcium",
+      "amount": 4000,
+      "id": "24aa"
+    },
+    {
+      "name": "Serum Magnesium",
+      "amount": 4000,
+      "id": "3ce4"
+    },
+    {
+      "name": "Serum Phosphate",
+      "amount": 4000,
+      "id": "f5b1"
+    },
+    {
+      "name": "Serum Iron",
+      "amount": 5000,
+      "id": "e6af"
+    },
+    {
+      "name": "Ferritin",
+      "amount": 9000,
+      "id": "0e67"
+    },
+    {
+      "name": "Total Iron Binding Capacity",
+      "amount": 7000,
+      "id": "3167"
+    },
+    {
+      "name": "Semen Analysis",
+      "amount": 8000,
+      "id": "2017"
+    },
+    {
+      "name": "Culture and Sensitivity",
+      "amount": 12000,
+      "id": "0d86"
+    },
+    {
+      "name": "Urine Culture",
+      "amount": 10000,
+      "id": "8fcf"
+    },
+    {
+      "name": "Blood Culture",
+      "amount": 12000,
+      "id": "97ac"
+    },
+    {
+      "name": "Tuberculosis Test (GeneXpert)",
+      "amount": 15000,
+      "id": "7f86"
+    },
+    {
+      "name": "Mantoux Test",
+      "amount": 3000,
+      "id": "bfb1"
+    },
+    {
+      "name": "COVID-19 PCR Test",
+      "amount": 40000,
+      "id": "7fbf"
+    },
+    {
+      "name": "COVID-19 Antigen Test",
+      "amount": 10000,
+      "id": "adf8"
+    },
+    {
+      "name": "D-Dimer Test",
+      "amount": 15000,
+      "id": "6901"
+    },
+    {
+      "name": "Troponin Test",
+      "amount": 15000,
+      "id": "a7b9"
+    },
+    {
+      "name": "Creatine Kinase (CK)",
+      "amount": 6000,
+      "id": "5f26"
+    },
+    {
+      "name": "Lactate Dehydrogenase (LDH)",
+      "amount": 6000,
+      "id": "750f"
+    },
+    {
+      "name": "Amylase",
+      "amount": 6000,
+      "id": "f689"
+    },
+    {
+      "name": "Lipase",
+      "amount": 6000,
+      "id": "8e26"
+    },
+    {
+      "name": "Beta HCG Quantitative",
+      "amount": 8000,
+      "id": "0e50"
+    },
+    {
+      "name": "FSH",
+      "amount": 8000,
+      "id": "e27c"
+    },
+    {
+      "name": "LH",
+      "amount": 8000,
+      "id": "1d36"
+    },
+    {
+      "name": "Prolactin",
+      "amount": 8000,
+      "id": "d3ba"
+    },
+    {
+      "name": "Progesterone",
+      "amount": 8000,
+      "id": "0e06"
+    },
+    {
+      "name": "Testosterone",
+      "amount": 9000,
+      "id": "55a4"
+    },
+    {
+      "name": "Estradiol",
+      "amount": 9000,
+      "id": "c190"
+    },
+    {
+      "name": "Coagulation Profile",
+      "amount": 12000,
+      "id": "3e6f"
+    },
+    {
+      "name": "Prothrombin Time (PT)",
+      "amount": 5000,
+      "id": "6961"
+    },
+    {
+      "name": "Activated Partial Thromboplastin Time (APTT)",
+      "amount": 5000,
+      "id": "ec13"
+    },
+    {
+      "name": "INR",
+      "amount": 4000,
+      "id": "0c5d"
     }
   ]
 }
