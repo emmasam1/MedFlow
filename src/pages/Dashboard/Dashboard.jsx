@@ -114,7 +114,7 @@ const Dashboard = () => {
 
         {/* ACTION BUTTONS */}
         {user?.role?.toLowerCase() === "doctor" ||
-        user?.role?.toLowerCase() === "specialist" ? null : (
+        user?.role?.toLowerCase() === "specialist" || user?.role?.toLowerCase() === "lab_officer"  ? null : (
           <div className="flex gap-2 flex-wrap justify-center sm:justify-end">
             {/* ADD PATIENT */}
             <motion.button

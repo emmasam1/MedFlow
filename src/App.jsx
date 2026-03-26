@@ -18,6 +18,7 @@ import DashboardLayout from "./layout/DashboardLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FinancePayments from "./pages/Dashboard/FinancePayments";
 import Transactions from "./pages/Dashboard/Transactions";
+import Laboratory from "./pages/Dashboard/Laboratory";
 
 const App = () => {
   return (
@@ -30,7 +31,7 @@ const App = () => {
         {/* Protected Dashboard Routes */}
         <Route
           element={
-            <ProtectedRoute allowedRoles={["doctor","record_officer","specialist","finance_officer"]}>
+            <ProtectedRoute allowedRoles={["doctor", "record_officer", "specialist", "finance_officer", "lab_officer"]}>
               <DashboardLayout />
             </ProtectedRoute>
           }
@@ -39,7 +40,7 @@ const App = () => {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute allowedRoles={["doctor","record_officer","specialist","finance_officer"]}>
+              <ProtectedRoute allowedRoles={["doctor", "record_officer", "specialist", "finance_officer", "lab_officer"]}>
                 <Dashboard />
               </ProtectedRoute>
             }
@@ -104,11 +105,23 @@ const App = () => {
             }
           />
 
+          {/* Lab_Officer */}
+          <Route
+            path="/dashboard/laboratory"
+            element={
+              <ProtectedRoute
+                allowedRoles={["lab_officer"]}
+              >
+                <Laboratory />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Notifications (accessible to all dashboard users) */}
           <Route
             path="/dashboard/notifications/:id"
             element={
-              <ProtectedRoute allowedRoles={["doctor","record_officer","specialist","finance_officer"]}>
+              <ProtectedRoute allowedRoles={["doctor", "record_officer", "specialist", "finance_officer"]}>
                 <Notification />
               </ProtectedRoute>
             }
@@ -118,7 +131,7 @@ const App = () => {
           <Route
             path="/user-profile"
             element={
-              <ProtectedRoute allowedRoles={["doctor","record_officer","specialist","finance_officer"]}>
+              <ProtectedRoute allowedRoles={["doctor", "record_officer", "specialist", "finance_officer"]}>
                 <UserProfile />
               </ProtectedRoute>
             }

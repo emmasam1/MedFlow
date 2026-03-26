@@ -111,6 +111,14 @@
       "password": "123",
       "role": "hospital_admin",
       "name": "Khalid Musa"
+    },
+
+    {
+      "id": "16",
+      "username": "emmanuel",
+      "password": "123",
+      "role": "lab_officer",
+      "name": "Emmanuel Ambode"
     }
   ],
   "patients": [
@@ -433,6 +441,14 @@
       "message": "Esther Ajayi needs payment for lab",
       "isRead": false,
       "createdAt": "2026-03-18T10:44:29.245Z"
+    },
+    {
+      "id": "1f76",
+      "role": "finance",
+      "title": "Payment Needed",
+      "message": "David Mensah needs payment for lab",
+      "isRead": false,
+      "createdAt": "2026-03-23T14:05:32.419Z"
     }
   ],
   "queue": [
@@ -444,9 +460,9 @@
       "priority": "Normal",
       "notes": "",
       "service": "lab",
-      "paymentStatus": "partial",
-      "currentDepartment": "finance",
-      "status": "done",
+      "paymentStatus": "paid",
+      "currentDepartment": "lab",
+      "status": "waiting",
       "labTests": [
         {
           "name": "Pregnancy Test",
@@ -462,8 +478,47 @@
       "labAmount": 17000,
       "balance": 2000,
       "nextDepartment": "lab",
-      "paymentMethod": "pos",
+      "paymentMethod": "transfer",
       "doctorNotes": "the patient only feels sick in the morning that's the reason for this test "
+    },
+    {
+      "id": "3156",
+      "patientId": "cdae",
+      "patientName": "David Mensah",
+      "reason": "",
+      "priority": "Normal",
+      "notes": "",
+      "service": "lab",
+      "paymentStatus": "paid",
+      "currentDepartment": "lab",
+      "status": "waiting",
+      "labTests": [
+        {
+          "name": "Erythrocyte Sedimentation Rate (ESR)",
+          "amount": 2000,
+          "id": "c9f1"
+        },
+        {
+          "name": "Widal Test",
+          "amount": 2000,
+          "id": "81c3"
+        },
+        {
+          "name": "Malaria Parasite Test",
+          "amount": 1500,
+          "id": "7080"
+        },
+        {
+          "name": "Pregnancy Test",
+          "amount": 2000,
+          "id": "c0f3"
+        }
+      ],
+      "labAmount": 7500,
+      "balance": 0,
+      "nextDepartment": "lab",
+      "paymentMethod": "pos",
+      "doctorNotes": ""
     }
   ],
   "transactions": [
@@ -512,6 +567,30 @@
       "paymentType": "partial",
       "balance": 2000,
       "createdAt": "2026-03-18T11:21:23.104Z"
+    },
+    {
+      "id": "1497",
+      "patientName": "David Mensah",
+      "service": "consultation",
+      "amount": 5000,
+      "paymentMethod": "pos",
+      "createdAt": "2026-03-23T13:50:32.084Z"
+    },
+    {
+      "id": "e632",
+      "patientName": "David Mensah",
+      "service": "lab",
+      "amount": 7500,
+      "paymentMethod": "pos",
+      "createdAt": "2026-03-23T14:06:51.761Z"
+    },
+    {
+      "id": "0862",
+      "patientName": "Esther Ajayi",
+      "service": "lab",
+      "amount": 17000,
+      "paymentMethod": "transfer",
+      "createdAt": "2026-03-23T14:07:43.908Z"
     }
   ],
   "labTest": [
