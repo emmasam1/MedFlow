@@ -494,7 +494,7 @@ const Queue = () => {
       <Modal
         isOpen={isQueueOpen}
         onClose={() => setIsQueueOpen(false)}
-        title="Patient Queue"
+        title="Add Patient to Queue"
         size="3xl"
       >
         <CreateQueue onSuccess={() => setIsQueueOpen(false)} />

@@ -250,7 +250,8 @@
         "totalBill": 0,
         "paid": 0,
         "balance": 0
-      }
+      },
+      "runningBalance": -17000
     },
     {
       "id": "4d22",
@@ -428,9 +429,10 @@
       "priority": "Normal",
       "notes": "",
       "service": "lab",
-      "paymentStatus": "partial",
-      "currentDepartment": "finance",
-      "status": "done",
+      "paymentStatus": "paid",
+      "currentDepartment": "lab",
+      "status": "waiting",
+      "createdAt": "2026-03-18T10:42:33.949Z",
       "labTests": [
         {
           "name": "Pregnancy Test",
@@ -496,6 +498,14 @@
       "paymentType": "partial",
       "balance": 2000,
       "createdAt": "2026-03-18T11:21:23.104Z"
+    },
+    {
+      "id": "1df6",
+      "patientName": "Esther Ajayi",
+      "service": "lab",
+      "amount": 17000,
+      "paymentMethod": "pos",
+      "createdAt": "2026-03-25T03:34:14.208Z"
     }
   ],
   "labTest": [
