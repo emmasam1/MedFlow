@@ -258,7 +258,8 @@
         "totalBill": 0,
         "paid": 0,
         "balance": 0
-      }
+      },
+      "runningBalance": -17000
     },
     {
       "id": "4d22",
@@ -463,6 +464,7 @@
       "paymentStatus": "paid",
       "currentDepartment": "lab",
       "status": "waiting",
+      "createdAt": "2026-03-18T10:42:33.949Z",
       "labTests": [
         {
           "name": "Pregnancy Test",

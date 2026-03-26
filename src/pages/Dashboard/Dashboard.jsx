@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import dayjs from "dayjs";
 
 import PatientChart from "../../components/PatientChart";
 import StatCard from "../../components/StatCard";
@@ -23,6 +24,13 @@ import { useStore } from "../../store/store";
 import { useAppStore } from "../../store/useAppStore";
 import CreateQueue from "../../components/CreateQueue";
 import ScheduleCard from "../../components/ScheduleCard";
+import NurseTasks from "../../components/NurseTasks";
+import VitalsTracker from "../../components/VitalsTracker";
+import ShiftSchedule from "../../components/ShiftSchedule";
+import MedicationPanel from "../../components/MedicationPanel";
+import AssignedPatients from "../../components/AssignedPatients";
+import CriticalAlerts from "../../components/CriticalAlerts";
+import PatientNotes from "../../components/PatientNotes";
 
 const Dashboard = () => {
   const { darkMode } = useStore();
@@ -39,11 +47,14 @@ const Dashboard = () => {
   const [isAppointment, setIsAppointment] = useState(false);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
 
+  const [recordTab, setRecordTab] = useState("appointments");
+
   const location = useLocation();
   const pathName =
     location.pathname.split("/").filter(Boolean).pop() || "Dashboard";
 
   const user = JSON.parse(sessionStorage.getItem("user"));
+    const role = user?.role?.toLowerCase();
 
   useEffect(() => {
     fetchPatients();
@@ -53,29 +64,52 @@ const Dashboard = () => {
   /* ---------------- Stats ---------------- */
 
   const totalAppointments = appointments.length;
-  const totalQueue = queue.length
 
   const cancelledAppointments = appointments.filter(
-    (appt) => appt.status?.toLowerCase() === "cancelled",
+    (q) => q.status?.toLowerCase() === "cancelled",
   ).length;
 
-  const cancelledQueue = queue.filter(
-    (appt) => appt.status?.toLowerCase() === "cancel"
-  ).length
+  const totalQueue = queue.length;
 
-  const doneQueue = queue.filter(
-    (appt) => appt.status?.toLowerCase() === "done"
-  ).length
+  const today = dayjs().format("YYYY-MM-DD");
 
-  const waitingQueue = queue.filter(
-    (appt) => appt.status?.toLowerCase() === "waiting"
-  ).length
+  const todaysQueue = queue.filter(
+    (q) => dayjs(q.createdAt).format("YYYY-MM-DD") === today,
+  );
+
+  const waitingQueue = todaysQueue.filter(
+    (q) => q.status?.toLowerCase() === "waiting",
+  ).length;
+
+  const doneQueue = todaysQueue.filter(
+    (q) => q.status?.toLowerCase() === "done",
+  ).length;
+
+  const cancelledQueue = todaysQueue.filter(
+    (q) => q.status?.toLowerCase() === "cancel",
+  ).length;
+
+  const urgentQueue = todaysQueue.filter(
+    (q) => q.priority?.toLowerCase() === "urgent",
+  ).length;
 
   const totalPatients = patients.length;
 
-  const today = new Date().toISOString().split("T")[0];
+  // const today = new Date().toISOString().split("T")[0];
 
   const newPatients = patients.filter((p) => p.regDate === today).length;
+
+  const totalRevenue = queue
+    .filter((q) => q.paymentStatus === "paid" || q.paymentStatus === "partial")
+    .reduce((sum, q) => sum + (q.labAmount || 0), 0);
+
+  const pendingPayments = queue.filter(
+    (q) => q.paymentStatus === "pending",
+  ).length;
+
+  const totalBalance = queue.reduce((sum, q) => sum + (q.balance || 0), 0);
+
+  const paidCount = queue.filter((q) => q.paymentStatus === "paid").length;
 
   /* ---------------- Button Animation ---------------- */
 
@@ -114,7 +148,10 @@ const Dashboard = () => {
 
         {/* ACTION BUTTONS */}
         {user?.role?.toLowerCase() === "doctor" ||
-        user?.role?.toLowerCase() === "specialist" || user?.role?.toLowerCase() === "lab_officer"  ? null : (
+        user?.role?.toLowerCase() === "specialist" || user?.role?.toLowerCase() === "lab_officer" ||
+        user?.role?.toLowerCase() === "nurse" ||
+        user?.role?.toLowerCase() === "finance_officer" ||
+        user?.role?.toLowerCase() === "specialist" ? null : (
           <div className="flex gap-2 flex-wrap justify-center sm:justify-end">
             {/* ADD PATIENT */}
             <motion.button
@@ -160,11 +197,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {user?.role?.toLowerCase() === "doctor" && (
             <>
-              <StatCard
-                title="Total Queue"
-                value={totalQueue}
-                color="purple"
-              />
+              {/* <StatCard title="Total Queue" value={totalQueue} color="purple" />
               <StatCard
                 title="Cancelled Queue"
                 value={cancelledQueue}
@@ -179,7 +212,25 @@ const Dashboard = () => {
                 title="Waiting Queue"
                 value={waitingQueue}
                 color="green"
-              />
+              /> */}
+              <>
+                <StatCard
+                  title="Today Queue"
+                  value={totalQueue}
+                  color="purple"
+                />
+                <StatCard
+                  title="Waiting Patients"
+                  value={waitingQueue}
+                  color="orange"
+                />
+                <StatCard title="Completed" value={doneQueue} color="green" />
+                <StatCard
+                  title="Urgent Cases"
+                  value={urgentQueue}
+                  color="red"
+                />
+              </>
             </>
           )}
 
@@ -196,71 +247,235 @@ const Dashboard = () => {
                 color="orange"
               />
               <StatCard
-                title="Total Patients"
+                title="Waiting Patients"
                 value={totalPatients}
                 color="blue"
               />
               <StatCard
-                title="New Patients"
+                title="Urgent Cases"
                 value={newPatients}
-                color="green"
+                color="red"
               />
             </>
           )}
 
-          {user?.role?.toLowerCase() !== "doctor" &&
-            user?.role?.toLowerCase() !== "specialist" && (
-              <>
-                <StatCard
-                  title="Appointments"
-                  value={totalAppointments}
-                  color="purple"
-                />
-                <StatCard
-                  title="Cancelled Appointments"
-                  value={cancelledAppointments}
-                  color="orange"
-                />
-                <StatCard
-                  title="Total Patients"
-                  value={totalPatients}
-                  color="blue"
-                />
-                <StatCard
-                  title="New Patients"
-                  value={newPatients}
-                  color="green"
-                />
-              </>
-            )}
+          {user?.role?.toLowerCase() === "nurse" && (
+            <>
+              <StatCard
+                title="Assigned Patients"
+                value="0"
+                // value={assignedPatients?.length || 0}
+                color="blue"
+              />
+              <StatCard
+                title="Pending Tasks"
+                value={waitingQueue} // temporary
+                color="orange"
+              />
+              <StatCard
+                title="Completed Tasks"
+                value={doneQueue}
+                color="green"
+              />
+              <StatCard
+                title="Critical Alerts"
+                value={0} // replace later with real alerts
+                color="red"
+              />
+            </>
+          )}
+
+          {user?.role?.toLowerCase() === "record_officer" && (
+            <div className="col-span-full">
+              {/* 🔥 TOGGLE */}
+              <div className="flex gap-2 mb-4 relative">
+                {["appointments", "queue"].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setRecordTab(tab)}
+                    className="relative px-3 py-1 text-xs font-semibold capitalize"
+                  >
+                    {recordTab === tab && (
+                      <motion.div
+                        layoutId="recordToggle"
+                        className="absolute inset-0 bg-blue-500 rounded-full"
+                        transition={{ type: "spring", stiffness: 300 }}
+                      />
+                    )}
+
+                    <span
+                      className={`relative z-10 ${
+                        recordTab === tab ? "text-white" : "text-gray-500"
+                      }`}
+                    >
+                      {tab}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              {/* 🔥 CARDS */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <motion.div
+                  key={recordTab}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.25 }}
+                  className="contents"
+                >
+                  {recordTab === "appointments" ? (
+                    <>
+                      <StatCard
+                        title="Appointments"
+                        value={totalAppointments}
+                        color="purple"
+                      />
+                      <StatCard
+                        title="Cancelled Appointments"
+                        value={cancelledAppointments}
+                        color="orange"
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <StatCard
+                        title="Total Queue"
+                        value={totalQueue}
+                        color="purple"
+                      />
+                      <StatCard
+                        title="Cancelled Queue"
+                        value={cancelledQueue}
+                        color="orange"
+                      />
+                    </>
+                  )}
+
+                  {/* ALWAYS STATIC */}
+                  <StatCard
+                    title="Total Patients"
+                    value={totalPatients}
+                    color="blue"
+                  />
+                  <StatCard
+                    title="New Patients"
+                    value={newPatients}
+                    color="green"
+                  />
+                </motion.div>
+              </div>
+            </div>
+          )}
+
+          {user?.role?.toLowerCase() === "finance_officer" && (
+            <>
+              <StatCard
+                title="Revenue"
+                value={`₦${totalRevenue}`}
+                color="green"
+              />
+              <StatCard
+                title="Pending Payments"
+                value={pendingPayments}
+                color="orange"
+              />
+              <StatCard
+                title="Outstanding Balance"
+                value={`₦${totalBalance}`}
+                color="red"
+              />
+              <StatCard
+                title="Paid Transactions"
+                value={paidCount}
+                color="blue"
+              />
+            </>
+          )}
         </div>
 
         {/* MIDDLE SECTION */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <PatientChart />
-          {user?.role?.toLowerCase() === "doctor" ||
-          user?.role?.toLowerCase === "specialist" ? (
+        {user?.role === "nurse" && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <PatientChart />
+            <NurseTasks />
+            <ShiftSchedule
+              shifts={[
+                { time: "8AM-4PM", notes: "Day Shift" },
+                { time: "4PM-12AM", notes: "Evening Shift" },
+              ]}
+            />
+          </div>
+        )}
+
+        {user?.role === "doctor" && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <PatientChart />
             <ScheduleCard />
-          ) : (
-            <Appointments />
-          )}
-          {user?.role?.toLowerCase() === "doctor" ? (
             <PatientQueue />
-          ) : (
+          </div>
+        )}
+
+        {user?.role === "specialist" && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <PatientChart />
+            <ScheduleCard />
+            <Appointments />
+          </div>
+        )}
+
+        {user?.role === "record_officer" && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <PatientChart />
+            <Appointments />
             <BookAppointment />
-          )}
-        </div>
+          </div>
+        )}
       </motion.div>
 
+      {user?.role?.toLowerCase() === "nurse" && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <VitalsTracker />
+          {/* <MedicationPanel medications={[
+          { name: "Paracetamol", dosage: "500mg", status: "pending" },
+          { name: "Ibuprofen", dosage: "200mg", status: "administered" }
+        ]} /> */}
+          <div className="space-y-6">
+            <AssignedPatients />
+            {/* <AssignedPatients patients={assignedPatients} /> */}
+            <PatientNotes patientId={1} />
+            <CriticalAlerts />
+            {/* <CriticalAlerts alerts={criticalAlerts.map(a => ({ message: `Patient ${a.patientName} requires attention!` }))} /> */}
+          </div>
+        </div>
+      )}
+
       {/* BOTTOM SECTION */}
-      <div className="flex flex-col md:flex-row gap-4 mt-3">
-        <div className="md:w-2/3">
+      <div
+        className={`mt-6 ${
+          role === "doctor" || role === "finance" || role === "finance_officer" || role === "specialist"
+            ? ""
+            : "flex flex-col md:flex-row gap-4"
+        }`}
+      >
+        <div
+          className={`${
+            role === "doctor" ||
+            role === "finance" ||
+            role === "specialist" ||
+            role === "finance_officer"
+              ? "w-full"
+              : "md:w-2/3"
+          }`}
+        >
           <AppointmentTable />
         </div>
 
-        <div className="md:w-1/3">
-          <NewPatientChart />
-        </div>
+        {role === "record_officer" && (
+          <div className="md:w-1/3">
+            <NewPatientChart />
+          </div>
+        )}
       </div>
 
       {/* ADD PATIENT MODAL */}

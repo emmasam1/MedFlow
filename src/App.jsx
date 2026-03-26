@@ -31,7 +31,7 @@ const App = () => {
         {/* Protected Dashboard Routes */}
         <Route
           element={
-            <ProtectedRoute allowedRoles={["doctor", "record_officer", "specialist", "finance_officer", "lab_officer"]}>
+            <ProtectedRoute allowedRoles={["doctor", "record_officer", "specialist", "finance_officer", "nurse", "lab_officer"]}>
               <DashboardLayout />
             </ProtectedRoute>
           }
@@ -40,7 +40,7 @@ const App = () => {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute allowedRoles={["doctor", "record_officer", "specialist", "finance_officer", "lab_officer"]}>
+              <ProtectedRoute allowedRoles={["doctor", "record_officer", "specialist", "finance_officer", "nurse", "lab_officer"]}>
                 <Dashboard />
               </ProtectedRoute>
             }

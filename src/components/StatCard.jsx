@@ -3,8 +3,10 @@ import {
   LuCalendarCheck,
   LuCalendarX,
   LuUsers,
-  LuUserPlus,
+  LuUserPlus, 
+  // LuCalendarX
 } from "react-icons/lu";
+import { AiTwotoneAlert } from "react-icons/ai";
 import { useStore } from "../store/store";
 
 const icons = {
@@ -12,58 +14,67 @@ const icons = {
   orange: LuCalendarX,
   blue: LuUsers,
   green: LuUserPlus,
+  red: AiTwotoneAlert, 
 };
 
 const StatCard = ({ title, value, color }) => {
   const { darkMode } = useStore();
   const Icon = icons[color];
 
-  const colors = {
-    purple: {
-      light: {
-        card: "bg-[#F3EEFF]",
-        icon: "bg-[#E0DAFF] text-purple-700",
-      },
-      dark: {
-        card: "bg-[#2A2438]",
-        icon: "bg-[#3A3153] text-purple-300",
-      },
+ const colors = {
+  purple: {
+    light: {
+      card: "bg-[#E6D9FF]",       // darker than #F3EEFF
+      icon: "bg-[#CFC0FF] text-purple-800", // darker icon color
     },
-    orange: {
-      light: {
-        card: "bg-[#FFF4EC]",
-        icon: "bg-[#FFD9BE] text-orange-600",
-      },
-      dark: {
-        card: "bg-[#3A2A1E]",
-        icon: "bg-[#4A3426] text-orange-300",
-      },
+    dark: {
+      card: "bg-[#2A2438]",
+      icon: "bg-[#3A3153] text-purple-300",
     },
-    green: {
-      light: {
-        card: "bg-[#EAF7EF]",
-        icon: "bg-[#CFE9D8] text-green-700",
-      },
-      dark: {
-        card: "bg-[#1F3A2E]",
-        icon: "bg-[#294C3C] text-green-300",
-      },
+  },
+  orange: {
+    light: {
+      card: "bg-[#FFE3CC]",       // darker than #FFF4EC
+      icon: "bg-[#FFCAA3] text-orange-700", // darker icon color
     },
-    blue: {
-      light: {
-        card: "bg-[#EDF6FF]",
-        icon: "bg-[#CFE6FF] text-blue-700",
-      },
-      dark: {
-        card: "bg-[#1E2F3F]",
-        icon: "bg-[#2A435C] text-blue-300",
-      },
+    dark: {
+      card: "bg-[#3A2A1E]",
+      icon: "bg-[#4A3426] text-orange-300",
     },
-  };
+  },
+  green: {
+    light: {
+      card: "bg-[#DFF3DF]",       // darker than #EAF7EF
+      icon: "bg-[#BFE3C1] text-green-800",
+    },
+    dark: {
+      card: "bg-[#1F3A2E]",
+      icon: "bg-[#294C3C] text-green-300",
+    },
+  },
+  blue: {
+    light: {
+      card: "bg-[#D9EDFF]",       // darker than #EDF6FF
+      icon: "bg-[#BFDFFF] text-blue-800",
+    },
+    dark: {
+      card: "bg-[#1E2F3F]",
+      icon: "bg-[#2A435C] text-blue-300",
+    },
+  },
+  red: {
+    light: {
+      card: "bg-[#FFD6D6]",       // darker than #FFEDED
+      icon: "bg-[#FFBABA] text-red-800",
+    },
+    dark: {
+      card: "bg-[#3F1E1E]",
+      icon: "bg-[#5C2A2A] text-red-300",
+    },
+  },
+};
 
-  const theme = darkMode
-    ? colors[color].dark
-    : colors[color].light;
+  const theme = darkMode ? colors[color].dark : colors[color].light;
 
   return (
     <motion.div

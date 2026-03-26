@@ -38,7 +38,7 @@ const PatientQueue = () => {
 
   return (
     <div
-      className={`${containerBg} rounded-xl shadow-sm border p-4 font-sans max-w-sm transition-colors duration-300 `}
+      className={`${containerBg} rounded-xl shadow-sm border p-4 font-sans transition-colors duration-300 `}
     >
       <h2 className={`text-sm font-bold mb-4 ${textPrimary}`}>Patient Queue</h2>
 
