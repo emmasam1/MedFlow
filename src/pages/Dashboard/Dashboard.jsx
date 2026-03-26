@@ -287,23 +287,23 @@ const Dashboard = () => {
           {user?.role?.toLowerCase() === "lab_officer" && (
             <>
               <StatCard
-                title="Assigned Patients"
+                title="Total Tests"
                 value="0"
                 // value={assignedPatients?.length || 0}
                 color="blue"
               />
               <StatCard
-                title="Pending Tasks"
+                title="Pending Tests"
                 value={waitingQueue} // temporary
                 color="orange"
               />
               <StatCard
-                title="Completed Tasks"
+                title="In-Progress Tests"
                 value={doneQueue}
                 color="green"
               />
               <StatCard
-                title="Critical Alerts"
+                title="Completed Tests"
                 value={0} // replace later with real alerts
                 color="red"
               />
