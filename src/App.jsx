@@ -18,7 +18,8 @@ import DashboardLayout from "./layout/DashboardLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FinancePayments from "./pages/Dashboard/FinancePayments";
 import Transactions from "./pages/Dashboard/Transactions";
-import Laboratory from "./pages/Dashboard/Laboratory";
+import LabRequest from "./pages/Dashboard/LabRequest";
+
 
 const App = () => {
   return (
@@ -107,12 +108,12 @@ const App = () => {
 
           {/* Lab_Officer */}
           <Route
-            path="/dashboard/laboratory"
+            path="/dashboard/lab-request"
             element={
               <ProtectedRoute
                 allowedRoles={["lab_officer"]}
               >
-                <Laboratory />
+                <LabRequest />
               </ProtectedRoute>
             }
           />

@@ -32,7 +32,7 @@ const Sidebar = () => {
       to: "/dashboard",
       icon: <RiDashboardLine size={22} />,
       label: "Dashboard",
-      roles: ["doctor", "record_officer", "finance_officer", "specialist"],
+      roles: ["doctor", "record_officer", "finance_officer", "specialist","lab_officer"],
     },
     {
       to: "/dashboard/appointment",
@@ -63,6 +63,13 @@ const Sidebar = () => {
       icon: <RiReceiptLine size={22} />,
       label: "Transactions",
       roles: ["finance_officer"],
+    },
+
+    {
+      to: "/dashboard/lab-request",
+      icon: <RiReceiptLine size={22} />,
+      label: "Lab Request",
+      roles: ["lab_officer"],
     },
   ];
 

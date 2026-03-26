@@ -54,7 +54,7 @@ const Dashboard = () => {
     location.pathname.split("/").filter(Boolean).pop() || "Dashboard";
 
   const user = JSON.parse(sessionStorage.getItem("user"));
-    const role = user?.role?.toLowerCase();
+  const role = user?.role?.toLowerCase();
 
   useEffect(() => {
     fetchPatients();
@@ -130,9 +130,8 @@ const Dashboard = () => {
       <div className="flex flex-col sm:flex-row justify-between items-center text-center sm:text-left mb-8 gap-4 px-4">
         <div>
           <h2
-            className={`text-xl font-bold capitalize ${
-              darkMode ? "text-white" : "text-slate-800"
-            }`}
+            className={`text-xl font-bold capitalize ${darkMode ? "text-white" : "text-slate-800"
+              }`}
           >
             {pathName.replace(/-/g, " ")}
           </h2>
@@ -148,10 +147,10 @@ const Dashboard = () => {
 
         {/* ACTION BUTTONS */}
         {user?.role?.toLowerCase() === "doctor" ||
-        user?.role?.toLowerCase() === "specialist" || user?.role?.toLowerCase() === "lab_officer" ||
-        user?.role?.toLowerCase() === "nurse" ||
-        user?.role?.toLowerCase() === "finance_officer" ||
-        user?.role?.toLowerCase() === "specialist" ? null : (
+          user?.role?.toLowerCase() === "specialist" || user?.role?.toLowerCase() === "lab_officer" ||
+          user?.role?.toLowerCase() === "nurse" ||
+          user?.role?.toLowerCase() === "finance_officer" ||
+          user?.role?.toLowerCase() === "specialist" ? null : (
           <div className="flex gap-2 flex-wrap justify-center sm:justify-end">
             {/* ADD PATIENT */}
             <motion.button
@@ -285,6 +284,32 @@ const Dashboard = () => {
             </>
           )}
 
+          {user?.role?.toLowerCase() === "lab_officer" && (
+            <>
+              <StatCard
+                title="Assigned Patients"
+                value="0"
+                // value={assignedPatients?.length || 0}
+                color="blue"
+              />
+              <StatCard
+                title="Pending Tasks"
+                value={waitingQueue} // temporary
+                color="orange"
+              />
+              <StatCard
+                title="Completed Tasks"
+                value={doneQueue}
+                color="green"
+              />
+              <StatCard
+                title="Critical Alerts"
+                value={0} // replace later with real alerts
+                color="red"
+              />
+            </>
+          )}
+
           {user?.role?.toLowerCase() === "record_officer" && (
             <div className="col-span-full">
               {/* 🔥 TOGGLE */}
@@ -304,9 +329,8 @@ const Dashboard = () => {
                     )}
 
                     <span
-                      className={`relative z-10 ${
-                        recordTab === tab ? "text-white" : "text-gray-500"
-                      }`}
+                      className={`relative z-10 ${recordTab === tab ? "text-white" : "text-gray-500"
+                        }`}
                     >
                       {tab}
                     </span>
@@ -450,23 +474,38 @@ const Dashboard = () => {
         </div>
       )}
 
+      {user?.role?.toLowerCase() === "lab_officer" && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <VitalsTracker />
+          {/* <MedicationPanel medications={[
+          { name: "Paracetamol", dosage: "500mg", status: "pending" },
+          { name: "Ibuprofen", dosage: "200mg", status: "administered" }
+        ]} /> */}
+          <div className="space-y-6">
+            <AssignedPatients />
+            {/* <AssignedPatients patients={assignedPatients} /> */}
+            <PatientNotes patientId={1} />
+            <CriticalAlerts />
+            {/* <CriticalAlerts alerts={criticalAlerts.map(a => ({ message: `Patient ${a.patientName} requires attention!` }))} /> */}
+          </div>
+        </div>
+      )}
+
       {/* BOTTOM SECTION */}
       <div
-        className={`mt-6 ${
-          role === "doctor" || role === "finance" || role === "finance_officer" || role === "specialist"
-            ? ""
-            : "flex flex-col md:flex-row gap-4"
-        }`}
+        className={`mt-6 ${role === "doctor" || role === "finance" || role === "finance_officer" || role === "specialist"
+          ? ""
+          : "flex flex-col md:flex-row gap-4"
+          }`}
       >
         <div
-          className={`${
-            role === "doctor" ||
+          className={`${role === "doctor" ||
             role === "finance" ||
             role === "specialist" ||
             role === "finance_officer"
-              ? "w-full"
-              : "md:w-2/3"
-          }`}
+            ? "w-full"
+            : "md:w-2/3"
+            }`}
         >
           <AppointmentTable />
         </div>
