@@ -9,12 +9,12 @@ import {
   RiUser3Line,
   RiReceiptLine,
 } from "react-icons/ri";
+import { useAppStore } from "../store/useAppStore";
 
 const Sidebar = () => {
-  const { isSidebarOpen, toggleSidebar, sidebarTheme, isRTL, darkMode } =
-    useStore();
+  const { isSidebarOpen, toggleSidebar, sidebarTheme, isRTL, darkMode } = useStore();
 
-  const user = JSON.parse(sessionStorage.getItem("user"));
+  const user = useAppStore((state) => state.user);
 
   const bgColor = sidebarTheme === "dark" ? "bg-slate-900" : "bg-white";
   const borderColor = darkMode ? "border-gray-800" : "border-gray-100";
@@ -32,7 +32,13 @@ const Sidebar = () => {
       to: "/dashboard",
       icon: <RiDashboardLine size={22} />,
       label: "Dashboard",
-      roles: ["doctor", "record_officer", "finance_officer", "specialist","lab_officer"],
+      roles: ["doctor", "record_officer", "finance_officer", "specialist","lab_officer", "nurse", "admin"],
+    },
+    {
+      to: "/dashboard/users",
+      icon: <RiUserHeartLine size={22} />,
+      label: "Users",
+      roles: ["admin"],
     },
     {
       to: "/dashboard/appointment",
@@ -44,7 +50,7 @@ const Sidebar = () => {
       to: "/dashboard/queue",
       icon: <RiUser3Line size={22} />,
       label: "Queue",
-      roles: ["record_officer", "doctor"],
+      roles: ["record_officer", "doctor", "nurse"],
     },
     {
       to: "/dashboard/patients",
@@ -122,10 +128,10 @@ const Sidebar = () => {
             borderRadius:
               isSidebarOpen || window.innerWidth < 1024 ? "1.25rem" : "0.75rem",
           }}
-          className="overflow-hidden border-4 border-slate-50 dark:border-gray-800 shadow-xl mb-4"
+          // className="overflow-hidden border-4 border-slate-50 dark:border-gray-800 shadow-xl mb-4"
         >
           <img
-            src="https://i.pravatar.cc/150?u=sarah"
+            src={user?.avatar}
             alt="Profile"
             className="w-full h-full object-cover"
           />
@@ -138,7 +144,7 @@ const Sidebar = () => {
             className="text-center"
           >
             <h4 className={`font-bold text-base ${nameColor}`}>
-              {user?.name || "User"}
+              {user?.firstName || "User"}
             </h4>
             <p className="text-[11px] uppercase font-bold text-[#6777ef] tracking-widest mt-1">
               {user?.role.replace("_", " ").toUpperCase()}

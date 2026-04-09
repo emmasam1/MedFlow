@@ -74,16 +74,16 @@ const StatCard = ({ title, value, color }) => {
   },
 };
 
-  const theme = darkMode ? colors[color].dark : colors[color].light;
+  const theme = darkMode ? colors[color].dark : colors[color]?.light;
 
   return (
     <motion.div
       whileHover={{ y: -4 }}
       transition={{ type: "spring", stiffness: 300 }}
-      className={`${theme.card} rounded-2xl p-5 py-7 flex justify-between items-center transition-colors duration-300`}
+      className={`${theme?.card} rounded-2xl p-5 py-7 flex justify-between items-center transition-colors duration-300`}
     >
       <div
-        className={`w-11 h-11 rounded-xl flex items-center justify-center ${theme.icon}`}
+        className={`w-11 h-11 rounded-xl flex items-center justify-center ${theme?.icon}`}
       >
         <Icon size={22} strokeWidth={2} />
       </div>
