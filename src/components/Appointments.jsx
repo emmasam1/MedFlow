@@ -25,7 +25,7 @@ const Appointments = () => {
   const { fetchAppointments, appointments, queue, getQueue } = useAppStore();
   const { darkMode } = useStore();
 
-  const user = JSON.parse(sessionStorage.getItem("user"));
+const user = useAppStore((state) => state.user);
   const role = user?.role?.toLowerCase().replace("_", " ");
   const isRecordOfficer = role === "record officer";
 
@@ -38,10 +38,10 @@ const Appointments = () => {
     Math.max(today.getDate() - 2, 0),
   );
 
-  useEffect(() => {
-    fetchAppointments();
-    getQueue && getQueue();
-  }, []);
+  // useEffect(() => {
+  //   fetchAppointments();
+  //   getQueue && getQueue();
+  // }, []);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -91,12 +91,11 @@ const Appointments = () => {
     );
   };
 
-  const todaysAppointments = appointments.filter((a) =>
+  const todaysAppointments = appointments?.filter((a) =>
     isSameDate(a.date || a.createdAt),
   );
 
-  const todaysQueue = queue.filter((q) => isSameDate(q.createdAt));
-
+  const todaysQueue = queue?.filter((q) => isSameDate(q.createdAt));
   /* 🎨 THEME */
   const containerBg = darkMode
     ? "bg-[#1a202c] border-gray-700"
@@ -218,8 +217,8 @@ const Appointments = () => {
         className="text-sm font-medium text-orange-500 mb-3"
       >
         {activeTab === "queue"
-          ? `${todaysQueue.length} patient(s) in queue`
-          : `${todaysAppointments.length} appointment(s)`}
+          ? `${todaysQueue?.length} patient(s) in queue`
+          : `${todaysAppointments?.length} appointment(s)`}
       </motion.p>
 
       {/* LIST */}
@@ -249,10 +248,10 @@ const Appointments = () => {
                   </div>
                 ))
               )
-            ) : todaysAppointments.length === 0 ? (
+            ) : todaysAppointments?.length === 0 ? (
               <p className={`${textMuted}`}>No appointments</p>
             ) : (
-              todaysAppointments.map((appt) => (
+              todaysAppointments?.map((appt) => (
                 <div
                   key={appt.id}
                   className={`p-3 border rounded-xl ${cardBg}`}

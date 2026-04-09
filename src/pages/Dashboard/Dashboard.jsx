@@ -59,27 +59,28 @@ const Dashboard = () => {
     location.pathname.split("/").filter(Boolean).pop() || "Dashboard";
 
  // Auth & Role
-  const encryptedUser = sessionStorage.getItem("user");
-  let user = null;
+  // const encryptedUser = sessionStorage.getItem("user");
+  // let user = null;
 
-  if (encryptedUser) {
-    try {
-      // Pull the key from your .env file
-      const secretKey = import.meta.env.VITE_ENCRYPTION_KEY;
+  // if (encryptedUser) {
+  //   try {
+  //     // Pull the key from your .env file
+  //     const secretKey = import.meta.env.VITE_ENCRYPTION_KEY;
       
-      const bytes = CryptoJS.AES.decrypt(encryptedUser, secretKey);
-      const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
+  //     const bytes = CryptoJS.AES.decrypt(encryptedUser, secretKey);
+  //     const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
 
-      // Check if decryptedText is empty (happens if the key is wrong)
-      if (!decryptedText) {
-        console.error("Decryption resulted in empty string. Check your VITE_ENCRYPTION_KEY.");
-      } else {
-        user = JSON.parse(decryptedText);
-      }
-    } catch (e) {
-      console.error("Failed to decrypt user data:", e);
-    }
-  }
+  //     // Check if decryptedText is empty (happens if the key is wrong)
+  //     if (!decryptedText) {
+  //       console.error("Decryption resulted in empty string. Check your VITE_ENCRYPTION_KEY.");
+  //     } else {
+  //       user = JSON.parse(decryptedText);
+  //     }
+  //   } catch (e) {
+  //     console.error("Failed to decrypt user data:", e);
+  //   }
+  // }
+  const user = useAppStore((state) => state.user);
 
   const role = user?.role?.toLowerCase();
   console.log("Current User Role:", role);

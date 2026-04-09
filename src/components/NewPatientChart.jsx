@@ -76,9 +76,9 @@ const NewPatientChart = () => {
     setChartData(hourly);
   };
 
-  useEffect(() => {
-    computeChartData(selectedDay);
-  }, [patients, selectedDay]);
+  // useEffect(() => {
+  //   computeChartData(selectedDay);
+  // }, [patients, selectedDay]);
 
   const selectDay = (day) => {
     if (day < 1 || day > daysInMonth) return;

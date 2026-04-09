@@ -1,21 +1,5 @@
 import React, { useState, useRef, useEffect, use } from "react";
-import {
-  Table,
-  Tag,
-  Button,
-  Space,
-  Card,
-  Input,
-  Form,
-  Select,
-  Tooltip,
-  Badge,
-  Popconfirm,
-  Tabs,
-  Row,
-  Col,
-  Statistic,
-} from "antd";
+import { Card, Form, Select, Tooltip, Badge, Row, Col } from "antd";
 import {
   RiSearchLine,
   RiEditLine,
@@ -36,52 +20,6 @@ import Modal from "../../components/Modal";
 import { useAppStore } from "../../store/useAppStore";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 
-const { Option } = Select;
-
-// --- Mock Data ---
-const MOCK_USERS = [
-  {
-    _id: "1",
-    firstName: "System",
-    lastName: "Admin",
-    email: "admin@medflow.com",
-    role: "admin",
-    department: "IT",
-    isActive: true,
-    lastLogin: "2 mins ago",
-  },
-  {
-    _id: "2",
-    firstName: "Sarah",
-    lastName: "Johnson",
-    email: "s.johnson@medflow.com",
-    role: "doctor",
-    department: "Cardiology",
-    isActive: true,
-    lastLogin: "1 hour ago",
-  },
-  {
-    _id: "3",
-    firstName: "Michael",
-    lastName: "Chen",
-    email: "m.chen@medflow.com",
-    role: "lab_officer",
-    department: "Diagnostics",
-    isActive: false,
-    lastLogin: "2 days ago",
-  },
-  {
-    _id: "4",
-    firstName: "Janet",
-    lastName: "Okon",
-    email: "j.okon@medflow.com",
-    role: "record_officer",
-    department: "Admin",
-    isActive: true,
-    lastLogin: "5 mins ago",
-  },
-];
-
 const User = () => {
   const [users, setUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -93,21 +31,12 @@ const User = () => {
   const fileInputRef = useRef(null);
   const { registerStaff, getStaff } = useAppStore();
   const [showPassword, setShowPassword] = useState(false);
-
-  //   useEffect(() => {
-  //   const fetchStaff = async () => {
-  //     try {
-  //       const data = await getStaff();
-  //       setUsers(data);
-  //     } catch (err) {
-  //       toast.error("Could not load staff list");
-  //     }
-  //   };
-  //   fetchStaff();
-  // }, [getStaff]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [filterRole, setFilterRole] = useState("all");
 
   useEffect(() => {
     const fetchStaff = async () => {
+      setIsLoading(true);
       try {
         const response = await getStaff();
         // console.log(response)
@@ -117,12 +46,59 @@ const User = () => {
       } catch (err) {
         toast.error("Could not load staff list");
         setUsers([]); // Fallback to empty array
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchStaff();
   }, [getStaff]);
 
-//   console.log(users);
+  // --- Search and Filter Logic ---
+  const filteredUsers = Array.isArray(users)
+    ? users.filter((u) => {
+        const fullName = `${u.firstName} ${u.lastName}`.toLowerCase();
+        const matchesSearch =
+          fullName.includes(searchText.toLowerCase()) ||
+          u.email?.toLowerCase().includes(searchText.toLowerCase());
+        const matchesRole = filterRole === "all" || u.role === filterRole;
+        return matchesSearch && matchesRole;
+      })
+    : [];
+
+  console.log(users);
+
+  const SkeletonRows = () => (
+    <tr className="animate-pulse border-b border-gray-50">
+      <td className="px-6 py-4 flex items-center gap-3">
+        <div className="h-10 w-10 bg-slate-200 rounded-xl" />
+        <div className="space-y-2">
+          <div className="h-3 w-32 bg-slate-200 rounded" />
+          <div className="h-2 w-24 bg-slate-100 rounded" />
+        </div>
+      </td>
+      <td className="px-6 py-4">
+        <div className="h-3 w-20 bg-slate-100 rounded" />
+      </td>
+      <td className="px-6 py-4">
+        <div className="h-3 w-24 bg-slate-100 rounded" />
+      </td>
+      <td className="px-6 py-4">
+        <div className="h-3 w-16 bg-slate-200 rounded ml-auto" />
+      </td>
+    </tr>
+  );
+
+  const getRoleStyles = (role) => {
+    const roleLower = role?.toLowerCase() || "";
+    if (roleLower.includes("admin")) return "bg-purple-100 text-purple-700";
+    if (roleLower.includes("doctor")) return "bg-blue-100 text-blue-700";
+    if (roleLower.includes("nurse")) return "bg-pink-100 text-pink-700";
+    if (roleLower.includes("lab")) return "bg-amber-100 text-amber-700";
+    if (roleLower.includes("pharmacist"))
+      return "bg-emerald-100 text-emerald-700";
+    if (roleLower.includes("finance")) return "bg-cyan-100 text-cyan-700";
+    return "bg-slate-100 text-slate-700";
+  };
 
   const buttonMotion = {
     whileHover: { scale: 1.05, y: -2 },
@@ -198,154 +174,33 @@ const User = () => {
       setIsSubmitting(false);
     }
   };
-// const handleAddUser = async (e) => {
-//     e.preventDefault();
-//     setIsSubmitting(true);
+  // const handleAddUser = async (e) => {
+  //     e.preventDefault();
+  //     setIsSubmitting(true);
 
-//     const formData = new FormData(e.currentTarget);
-//     const file = fileInputRef.current?.files[0];
-//     if (file) formData.append("avatar", file);
+  //     const formData = new FormData(e.currentTarget);
+  //     const file = fileInputRef.current?.files[0];
+  //     if (file) formData.append("avatar", file);
 
-//     try {
-//       const response = await registerStaff(formData);
-//       toast.success("Staff registered successfully!");
+  //     try {
+  //       const response = await registerStaff(formData);
+  //       toast.success("Staff registered successfully!");
 
-//       // Ensure we push the new staff object into the array
-//       // Depending on your backend, the new user is usually in response.data or just response
-//       const newStaff = response?.data || response;
-      
-//       if (newStaff && typeof newStaff === 'object') {
-//         setUsers((prev) => [newStaff, ...prev]);
-//       }
+  //       // Ensure we push the new staff object into the array
+  //       // Depending on your backend, the new user is usually in response.data or just response
+  //       const newStaff = response?.data || response;
 
-//       handleClose();
-//     } catch (err) {
-//       toast.error(err.message || "Registration failed");
-//     } finally {
-//       setIsSubmitting(false);
-//     }
-//   };
+  //       if (newStaff && typeof newStaff === 'object') {
+  //         setUsers((prev) => [newStaff, ...prev]);
+  //       }
 
-  const toggleStatus = (id) => {
-    setUsers(
-      users.map((u) => (u._id === id ? { ...u, isActive: !u.isActive } : u)),
-    );
-  };
-
-  // --- Columns Configuration ---
-  const columns = [
-    {
-      title: "Staff Member",
-      key: "name",
-      render: (_, record) => (
-        <div className="flex items-center gap-3">
-          <div
-            className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm ${record.isActive ? "bg-blue-600" : "bg-gray-400"}`}
-          >
-           <img
-              src={record.avatar || "https://via.placeholder.com/40?text=NA"}
-              alt={`${record.firstName} ${record.lastName}`} />
-          </div>
-          <div>
-            <div className="font-bold text-slate-800 text-sm leading-tight">
-              {record.firstName} {record.lastName}
-            </div>
-            <div className="text-[11px] text-slate-400">{record.email}</div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: "System Role",
-      dataIndex: "role",
-      key: "role",
-      render: (role) => {
-        const colors = {
-          admin: "volcano",
-          doctor: "blue",
-          lab_officer: "purple",
-          record_office: "cyan",
-        };
-        return (
-          <Tag
-            color={colors[role]}
-            className="uppercase font-bold text-[9px] px-2 rounded-md border-none"
-          >
-            {role.replace("_", " ")}
-          </Tag>
-        );
-      },
-    },
-    {
-      title: "Department",
-      dataIndex: "department",
-      key: "department",
-      render: (text) => (
-        <span className="text-xs text-slate-500 font-medium">{text}</span>
-      ),
-    },
-    {
-      title: "Phone",
-      dataIndex: "phoneNumber",
-      key: "phoneNumber",
-      render: (text) => (
-        <span className="text-xs text-slate-500 font-medium">{text}</span>
-      ),
-    },
-    {
-      title: "Status",
-      dataIndex: "isActive",
-      key: "status",
-      render: (active) => (
-        <Badge
-          status={active ? "success" : "error"}
-          text={
-            <span className="text-xs font-semibold">
-              {active ? "Active" : "Suspended"}
-            </span>
-          }
-        />
-      ),
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      align: "right",
-      render: (_, record) => (
-        <Space size="small">
-          <Tooltip title="Reset Password">
-            <Button
-              type="text"
-              icon={
-                <RiKey2Line className="text-slate-400 hover:text-orange-500" />
-              }
-            />
-          </Tooltip>
-          <Tooltip title="Edit Profile">
-            <Button
-              type="text"
-              icon={
-                <RiEditLine className="text-slate-400 hover:text-blue-500" />
-              }
-            />
-          </Tooltip>
-          <Tooltip title={record.isActive ? "Suspend" : "Activate"}>
-            <Button
-              type="text"
-              onClick={() => toggleStatus(record._id)}
-              icon={
-                record.isActive ? (
-                  <RiUserForbidLine className="text-red-400" />
-                ) : (
-                  <RiUserFollowLine className="text-green-500" />
-                )
-              }
-            />
-          </Tooltip>
-        </Space>
-      ),
-    },
-  ];
+  //       handleClose();
+  //     } catch (err) {
+  //       toast.error(err.message || "Registration failed");
+  //     } finally {
+  //       setIsSubmitting(false);
+  //     }
+  //   };
 
   const stats = [
     {
@@ -425,35 +280,160 @@ const User = () => {
         ))}
       </Row>
 
-      {/* 3. Filter & Table Card */}
-      <Card className="rounded-3xl border-none shadow-sm overflow-hidden">
-        <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
-          <Input
-            prefix={<RiSearchLine className="text-slate-300" />}
-            placeholder="Search by name or email..."
-            className="rounded-2xl h-12 bg-slate-50 border-none max-w-md"
-            onChange={(e) => setSearchText(e.target.value)}
-          />
-          <div className="flex items-center gap-2 text-slate-400 font-bold text-xs uppercase">
-            <RiFilter3Line /> Filter By Role:
-            <Select
-              defaultValue="all"
-              className="w-40 h-10 border-none bg-slate-50 rounded-xl"
+      <Card className="rounded-md border-none overflow-hidden p-0 bg-white">
+        {/* Header */}
+        <div className="mb-4 pb-3 border-b border-gray-100 flex flex-wrap gap-4 items-center justify-between">
+          <div className="relative w-full max-w-md flex items-center">
+            {/* The Icon */}
+            <img
+              src="/search.png"
+              alt="Search"
+              className="absolute left-4 w-5 h-5 object-contain pointer-events-none opacity-50"
+            />
+
+            {/* The Input */}
+            <input
+              type="text"
+              placeholder="Search staff..."
+              className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-gray-300 rounded-xl text-sm outline-none focus:bg-white focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all"
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <select
+              className="px-3 py-2 border rounded-lg border-gray-300 cursor-pointer"
+              onChange={(e) => setFilterRole(e.target.value)}
             >
-              <Option value="all">All Staff</Option>
-              <Option value="doctor">Doctors</Option>
-              <Option value="admin">Admins</Option>
-            </Select>
+              <option value="all">All Roles</option>
+              <option value="admin">Admin</option>
+              <option value="doctor">Doctor</option>
+              <option value="record_officer">Record Officer</option>
+              <option value="lab_officer">Lab Scientist</option>
+            </select>
           </div>
         </div>
 
-        <Table
-          columns={columns}
-          dataSource={users}
-          rowKey="_id"
-          pagination={{ pageSize: 6 }}
-          className="custom-table"
-        />
+        {/* Table Container */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-separate border-spacing-0">
+            <thead>
+              <tr className="bg-slate-50/50">
+                <th className="px-6 py-4 text-[12px] uppercase tracking-wider border-b border-gray-100 font-bold text-slate-500">
+                  Member
+                </th>
+                <th className="px-6 py-4 text-[12px] uppercase tracking-wider border-b border-gray-100 font-bold text-slate-500">
+                  Role
+                </th>
+                <th className="px-6 py-4 text-[12px] uppercase tracking-wider border-b border-gray-100 font-bold text-slate-500">
+                  Department
+                </th>
+                <th className="px-6 py-4 text-[12px] uppercase tracking-wider border-b border-gray-100 font-bold text-slate-500">
+                  Phone
+                </th>
+                <th className="px-6 py-4 text-[12px] uppercase tracking-wider border-b border-gray-100 font-bold text-slate-500">
+                  Status
+                </th>
+                <th className="px-6 py-4 text-right text-[12px] uppercase tracking-wider border-b border-gray-100 w-1 whitespace-nowrap font-bold text-slate-500">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {isLoading ? (
+                <SkeletonRows />
+              ) : filteredUsers.length > 0 ? (
+                filteredUsers.map((user) => (
+                  <tr
+                    key={user._id}
+                    className="hover:bg-blue-50/30 transition-colors group"
+                  >
+                    <td className="px-6 py-4 align-middle">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-xl bg-blue-100 shrink-0 flex items-center justify-center overflow-hidden">
+                          {user.avatar ? (
+                            <img
+                              src={user.avatar}
+                              className="h-full w-full object-cover"
+                              alt=""
+                            />
+                          ) : (
+                            <span className="text-blue-600 text-sm font-bold">
+                              {user.firstName[0]}
+                            </span>
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-slate-700 truncate leading-tight">
+                            {user.firstName} {user.lastName}
+                          </p>
+                          <p className="text-[11px] font-medium text-slate-400 truncate mt-0.5">
+                            {user.email}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 align-middle">
+                      <span
+                        className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide ${getRoleStyles(user.role)}`}
+                      >
+                        {user.role?.replace("_", " ")}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 align-middle">
+                      <span className="text-sm text-slate-600 font-medium">
+                        {user.department}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 align-middle whitespace-nowrap">
+                      <span className="text-sm text-slate-600 font-medium">
+                        {user.phoneNumber}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 align-middle">
+                      <div
+                        className={`inline-flex font-bold text-[10px] items-center gap-1.5 px-2.5 py-1 rounded-full uppercase tracking-wide ${
+                          user.isActive
+                            ? "bg-green-50 text-green-600"
+                            : "bg-red-50 text-red-600"
+                        }`}
+                      >
+                        <span
+                          className={`h-1.5 w-1.5 rounded-full ${user.isActive ? "bg-green-500" : "bg-red-500"}`}
+                        />
+                        {user.isActive ? "Active" : "Suspended"}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 align-middle text-right w-1 whitespace-nowrap">
+                      <div className="flex items-center justify-end gap-1">
+                        <button className="p-2 hover:bg-orange-50 rounded-lg transition-colors group/btn">
+                          <RiKey2Line className="text-lg text-slate-400 group-hover/btn:text-orange-500" />
+                        </button>
+                        <button className="p-2 hover:bg-blue-50 rounded-lg transition-colors group/btn">
+                          <RiEditLine className="text-lg text-slate-400 group-hover/btn:text-blue-500" />
+                        </button>
+                        <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors group/btn">
+                          {user.isActive ? (
+                            <RiUserForbidLine className="text-lg text-slate-400 group-hover/btn:text-red-500" />
+                          ) : (
+                            <RiUserFollowLine className="text-lg text-slate-400 group-hover/btn:text-green-500" />
+                          )}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="py-24 text-center">
+                    <p className="text-slate-400 text-sm font-medium">
+                      No members found
+                    </p>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </Card>
 
       {/* 4. Add User Modal */}
