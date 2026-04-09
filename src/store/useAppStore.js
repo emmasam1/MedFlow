@@ -83,4 +83,22 @@ export const useAppStore = create((set) => ({
     sessionStorage.clear();
     set({ user: null, notifications: [] });
   },
+
+  // getAllLabResults: () => {
+  //   const { patients } = get();
+  
+  //   const results = patients.flatMap((p) =>
+  //     (p.labHistory || []).map((lab) => ({
+  //       ...lab,
+  //       patientId: p.id,
+  //       patientName: p.fullName,
+  //       patientCode: p.patientId,
+  //     }))
+  //   );
+  
+  //   return results.sort(
+  //     (a, b) => new Date(b.date) - new Date(a.date)
+  //   );
+  // },
+    
 }));
