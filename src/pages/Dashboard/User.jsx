@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, use } from "react";
 import {
   Table,
   Tag,
@@ -83,7 +83,7 @@ const MOCK_USERS = [
 ];
 
 const User = () => {
-  const [users, setUsers] = useState();
+  const [users, setUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [form] = Form.useForm();
@@ -94,19 +94,35 @@ const User = () => {
   const { registerStaff, getStaff } = useAppStore();
   const [showPassword, setShowPassword] = useState(false);
 
-  useEffect(() => {
-  const fetchStaff = async () => {
-    try {
-      const data = await getStaff();
-      setUsers(data);
-    } catch (err) {
-      toast.error("Could not load staff list");
-    }
-  };
-  fetchStaff();
-}, [getStaff]);
+  //   useEffect(() => {
+  //   const fetchStaff = async () => {
+  //     try {
+  //       const data = await getStaff();
+  //       setUsers(data);
+  //     } catch (err) {
+  //       toast.error("Could not load staff list");
+  //     }
+  //   };
+  //   fetchStaff();
+  // }, [getStaff]);
 
-console.log(users)
+  useEffect(() => {
+    const fetchStaff = async () => {
+      try {
+        const response = await getStaff();
+        // console.log(response)
+        // Extract the array from the object structure: { staffMembers: [], totalStaff: 0 }
+        const staffArray = response?.staffMembers || [];
+        setUsers(staffArray);
+      } catch (err) {
+        toast.error("Could not load staff list");
+        setUsers([]); // Fallback to empty array
+      }
+    };
+    fetchStaff();
+  }, [getStaff]);
+
+//   console.log(users);
 
   const buttonMotion = {
     whileHover: { scale: 1.05, y: -2 },
@@ -166,7 +182,11 @@ console.log(users)
 
       // 3. Update local UI state so the new user appears in the table immediately
       if (response?.data) {
-        setUsers((prev) => [response.data, ...prev]);
+        // Use the spread operator only if you're sure prev is an array
+        setUsers((prev) => [
+          response.data,
+          ...(Array.isArray(prev) ? prev : []),
+        ]);
       }
 
       handleClose();
@@ -178,6 +198,33 @@ console.log(users)
       setIsSubmitting(false);
     }
   };
+// const handleAddUser = async (e) => {
+//     e.preventDefault();
+//     setIsSubmitting(true);
+
+//     const formData = new FormData(e.currentTarget);
+//     const file = fileInputRef.current?.files[0];
+//     if (file) formData.append("avatar", file);
+
+//     try {
+//       const response = await registerStaff(formData);
+//       toast.success("Staff registered successfully!");
+
+//       // Ensure we push the new staff object into the array
+//       // Depending on your backend, the new user is usually in response.data or just response
+//       const newStaff = response?.data || response;
+      
+//       if (newStaff && typeof newStaff === 'object') {
+//         setUsers((prev) => [newStaff, ...prev]);
+//       }
+
+//       handleClose();
+//     } catch (err) {
+//       toast.error(err.message || "Registration failed");
+//     } finally {
+//       setIsSubmitting(false);
+//     }
+//   };
 
   const toggleStatus = (id) => {
     setUsers(
@@ -193,10 +240,11 @@ console.log(users)
       render: (_, record) => (
         <div className="flex items-center gap-3">
           <div
-            className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold shadow-sm ${record.isActive ? "bg-blue-600" : "bg-gray-400"}`}
+            className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm ${record.isActive ? "bg-blue-600" : "bg-gray-400"}`}
           >
-            {record.firstName[0]}
-            {record.lastName[0]}
+           <img
+              src={record.avatar || "https://via.placeholder.com/40?text=NA"}
+              alt={`${record.firstName} ${record.lastName}`} />
           </div>
           <div>
             <div className="font-bold text-slate-800 text-sm leading-tight">
@@ -216,7 +264,7 @@ console.log(users)
           admin: "volcano",
           doctor: "blue",
           lab_officer: "purple",
-          record_officer: "cyan",
+          record_office: "cyan",
         };
         return (
           <Tag
@@ -229,9 +277,17 @@ console.log(users)
       },
     },
     {
-      title: "Last Activity",
-      dataIndex: "lastLogin",
-      key: "lastLogin",
+      title: "Department",
+      dataIndex: "department",
+      key: "department",
+      render: (text) => (
+        <span className="text-xs text-slate-500 font-medium">{text}</span>
+      ),
+    },
+    {
+      title: "Phone",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
       render: (text) => (
         <span className="text-xs text-slate-500 font-medium">{text}</span>
       ),
@@ -294,7 +350,7 @@ console.log(users)
   const stats = [
     {
       title: "Total Staff",
-      value: 0,
+      value: users.length,
       color: "blue",
     },
     {
@@ -391,23 +447,13 @@ console.log(users)
           </div>
         </div>
 
-        {/* <Table
+        <Table
           columns={columns}
-          dataSource={users?.filter(
-            (u) =>
-              // Added ?. before toLowerCase() and a fallback to empty string
-              u.firstName
-                ?.toLowerCase()
-                .includes(searchText?.toLowerCase() || "") ||
-              u.lastName
-                ?.toLowerCase()
-                .includes(searchText?.toLowerCase() || "") ||
-              u.email?.toLowerCase().includes(searchText?.toLowerCase() || ""),
-          )}
+          dataSource={users}
           rowKey="_id"
           pagination={{ pageSize: 6 }}
           className="custom-table"
-        /> */}
+        />
       </Card>
 
       {/* 4. Add User Modal */}
