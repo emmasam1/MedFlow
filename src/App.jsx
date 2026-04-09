@@ -21,6 +21,7 @@ import FinancePayments from "./pages/Dashboard/FinancePayments";
 import Transactions from "./pages/Dashboard/Transactions";
 // import LabRequest from "./pages/Dashboard/LabRequest";
 import User from "./pages/Dashboard/User";
+import ShiftManagement from "./pages/Dashboard/ShiftManagement";
 
 const App = () => {
   // Common list for all authorized dashboard users
@@ -57,6 +58,16 @@ const App = () => {
             element={
               <ProtectedRoute allowedRoles={["admin"]}>
                 <User />
+              </ProtectedRoute>
+            }
+          />
+
+           {/* 2. Shift Management (Strictly Admin) */}
+           <Route
+            path="/dashboard/shifts"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <ShiftManagement />
               </ProtectedRoute>
             }
           />
