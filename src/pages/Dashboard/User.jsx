@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Table,
   Tag,
@@ -83,7 +83,7 @@ const MOCK_USERS = [
 ];
 
 const User = () => {
-  const [users, setUsers] = useState(MOCK_USERS);
+  const [users, setUsers] = useState();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [form] = Form.useForm();
@@ -91,8 +91,22 @@ const User = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [preview, setPreview] = useState(null);
   const fileInputRef = useRef(null);
-  const { registerStaff } = useAppStore();
+  const { registerStaff, getStaff } = useAppStore();
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+  const fetchStaff = async () => {
+    try {
+      const data = await getStaff();
+      setUsers(data);
+    } catch (err) {
+      toast.error("Could not load staff list");
+    }
+  };
+  fetchStaff();
+}, [getStaff]);
+
+console.log(users)
 
   const buttonMotion = {
     whileHover: { scale: 1.05, y: -2 },
@@ -141,7 +155,7 @@ const User = () => {
     };
 
     // Log the data being sent (Note: FormData is hard to view, so we log the object)
-    console.log("Submitting Data:", submissionData);
+    // console.log("Submitting Data:", submissionData);
 
     try {
       const response = await registerStaff(submissionData);
@@ -280,22 +294,22 @@ const User = () => {
   const stats = [
     {
       title: "Total Staff",
-      value: users.length,
+      value: 0,
       color: "blue",
     },
     {
       title: "On Duty Now", // <--- The new critical metric
-      value: users.filter((u) => u.isOnline).length,
+      value: 0,
       color: "purple",
     },
     {
       title: "Active Accounts",
-      value: users.filter((u) => u.isActive).length,
+      value: 0,
       color: "green",
     },
     {
       title: "Suspended",
-      value: users.filter((u) => !u.isActive).length,
+      value: 0,
       color: "red",
     },
   ];
@@ -377,7 +391,7 @@ const User = () => {
           </div>
         </div>
 
-        <Table
+        {/* <Table
           columns={columns}
           dataSource={users?.filter(
             (u) =>
@@ -393,7 +407,7 @@ const User = () => {
           rowKey="_id"
           pagination={{ pageSize: 6 }}
           className="custom-table"
-        />
+        /> */}
       </Card>
 
       {/* 4. Add User Modal */}
