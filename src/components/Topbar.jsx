@@ -24,7 +24,7 @@ const Topbar = () => {
     markAsRead,
   } = useStore();
 
-  const { getNotifications, notifications } = useAppStore();
+  const { notifications, user, logout, getNotifications } = useAppStore();
 
   const [profileDropdown, setProfileDropdown] = useState(false);
   const [notifDropdown, setNotifDropdown] = useState(false);
@@ -33,20 +33,22 @@ const Topbar = () => {
   const notifRef = useRef(null);
   const navigate = useNavigate();
 
-  const user = JSON.parse(sessionStorage.getItem("user"));
   const role = user?.role;
 
+  useEffect(() => {
+    if (user?.role) getNotifications(user.role);
+  }, [user]);
+
   // 🔹 Fetch notifications only once per user
-useEffect(() => {
-  if (role) {
-    getNotifications(role);
-  }
-}, [getNotifications, role]);
+  useEffect(() => {
+    if (role) {
+      getNotifications(role);
+    }
+  }, [getNotifications, role]);
 
   // 🔹 Deduplicate notifications by ID
-const userNotifications = notifications; // store already contains unique notifications
-const unreadCount = userNotifications.filter((n) => !n.isRead).length;
-
+  const userNotifications = notifications; // store already contains unique notifications
+  const unreadCount = userNotifications.filter((n) => !n.isRead).length;
 
   // const unreadCount = userNotifications.filter((n) => !n.isRead).length;
 
@@ -123,7 +125,7 @@ const unreadCount = userNotifications.filter((n) => !n.isRead).length;
           )}
         </button>
         <div className="hidden md:block">
-          <h1 className="text-lg font-bold">Afternoon Shift</h1>
+          {user?.role === "admin" ? "" : <h1 className="text-lg font-bold">Afternoon Shift</h1>}
         </div>
       </div>
 
@@ -197,10 +199,10 @@ const unreadCount = userNotifications.filter((n) => !n.isRead).length;
             className="flex items-center gap-3 cursor-pointer py-1 px-3 rounded-full"
           >
             <p className="text-sm font-bold hidden md:block">
-              {user?.name?.split(" ").slice(0, 2).join(" ") || "User"}
+              {user?.firstName || "User"}
             </p>
             <img
-              src="https://i.pravatar.cc/150?u=ella"
+              src={user?.avatar}
               alt="profile"
               className="w-8 h-8 rounded-full"
             />

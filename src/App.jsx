@@ -2,6 +2,7 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
 
+
 // Pages
 import Login from "./pages/auth/Login";
 import Dashboard from "./pages/Dashboard/Dashboard";
@@ -18,12 +19,13 @@ import DashboardLayout from "./layout/DashboardLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FinancePayments from "./pages/Dashboard/FinancePayments";
 import Transactions from "./pages/Dashboard/Transactions";
-import LabRequest from "./pages/Dashboard/LabRequests";
-import LabResults from "./pages/Dashboard/LabResults";
-import LabRequests from "./pages/Dashboard/LabRequests";
-
+import LabRequest from "./pages/Dashboard/LabRequest";
+import User from "./pages/Dashboard/User";
 
 const App = () => {
+  // Common list for all authorized dashboard users
+  const ALL_ROLES = ["doctor", "record_officer", "specialist", "finance_officer", "nurse", "lab_officer", "admin"];
+
   return (
     <>
       <ScrollToTop />
@@ -34,46 +36,56 @@ const App = () => {
         {/* Protected Dashboard Routes */}
         <Route
           element={
-            <ProtectedRoute allowedRoles={["doctor", "record_officer", "specialist", "finance_officer", "nurse", "lab_officer"]}>
+            <ProtectedRoute allowedRoles={ALL_ROLES}>
               <DashboardLayout />
             </ProtectedRoute>
           }
         >
-          {/* Dashboard home */}
+          {/* 1. Dashboard home (Accessible to Everyone) */}
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute allowedRoles={["doctor", "record_officer", "specialist", "finance_officer", "nurse", "lab_officer"]}>
+              <ProtectedRoute allowedRoles={ALL_ROLES}>
                 <Dashboard />
               </ProtectedRoute>
             }
           />
 
-          {/* Appointments (only record officer can access) */}
+          {/* 2. User Management (Strictly Admin) */}
+          <Route
+            path="/dashboard/users"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <User />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 3. Appointments (Record Officer + Admin should see this) */}
           <Route
             path="/dashboard/appointment"
             element={
-              <ProtectedRoute allowedRoles={["record_officer", "specialist"]}>
+              <ProtectedRoute allowedRoles={["record_officer", "specialist", "admin"]}>
                 <Appointment />
               </ProtectedRoute>
             }
           />
 
-          {/* Queue (only record officer can access) */}
+          {/* 4. Queue (Added 'admin' so they can monitor traffic) */}
           <Route
             path="/dashboard/queue"
             element={
-              <ProtectedRoute allowedRoles={["record_officer", "doctor"]}>
+              <ProtectedRoute allowedRoles={["record_officer", "doctor", "nurse", "admin"]}>
                 <Queue />
               </ProtectedRoute>
             }
           />
 
-          {/* Finance (only finance officer can access) */}
+          {/* 5. Finance (Added 'admin' for oversight) */}
           <Route
             path="/dashboard/finance"
             element={
-              <ProtectedRoute allowedRoles={["finance_officer"]}>
+              <ProtectedRoute allowedRoles={["finance_officer", "admin"]}>
                 <FinancePayments />
               </ProtectedRoute>
             }
@@ -82,70 +94,56 @@ const App = () => {
           <Route
             path="/dashboard/transactions"
             element={
-              <ProtectedRoute allowedRoles={["finance_officer"]}>
+              <ProtectedRoute allowedRoles={["finance_officer", "admin"]}>
                 <Transactions />
               </ProtectedRoute>
             }
           />
 
-          {/* Patients (only record officer can access) */}
+          {/* 6. Patients (Record Officer, Doctor, and Nurse usually need this) */}
           <Route
             path="/dashboard/patients"
             element={
-              <ProtectedRoute allowedRoles={["record_officer"]}>
+              <ProtectedRoute allowedRoles={["record_officer", "doctor", "nurse", "admin"]}>
                 <Patients />
               </ProtectedRoute>
             }
           />
 
-          {/* Patient Profile (only record officer can access) */}
+          {/* 7. Patient Profile */}
           <Route
             path="/dashboard/patient-profile/:id"
             element={
-              <ProtectedRoute allowedRoles={["record_officer"]}>
+              <ProtectedRoute allowedRoles={["record_officer", "doctor", "nurse", "admin"]}>
                 <PatientProfile />
               </ProtectedRoute>
             }
           />
 
-          {/* Lab_Officer */}
+          {/* 8. Lab_Officer */}
           <Route
             path="/dashboard/lab-requests"
             element={
-              <ProtectedRoute
-                allowedRoles={["lab_officer"]}
-              >
+              <ProtectedRoute allowedRoles={["lab_officer", "doctor", "admin"]}>
                 <LabRequest />
               </ProtectedRoute>
             }
           />
 
-          <Route
-            path="/dashboard/lab-results"
-            element={
-              <ProtectedRoute
-                allowedRoles={["lab_officer"]}
-              >
-                <LabResults/>
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Notifications (accessible to all dashboard users) */}
+          {/* 9. Global Profile & Notifications (Everyone) */}
           <Route
             path="/dashboard/notifications/:id"
             element={
-              <ProtectedRoute allowedRoles={["doctor", "record_officer", "specialist", "finance_officer"]}>
+              <ProtectedRoute allowedRoles={ALL_ROLES}>
                 <Notification />
               </ProtectedRoute>
             }
           />
 
-          {/* User Profile (accessible to all dashboard users) */}
           <Route
             path="/user-profile"
             element={
-              <ProtectedRoute allowedRoles={["doctor", "record_officer", "specialist", "finance_officer"]}>
+              <ProtectedRoute allowedRoles={ALL_ROLES}>
                 <UserProfile />
               </ProtectedRoute>
             }

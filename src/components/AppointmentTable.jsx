@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 
 function AppointmentTable() {
   const {
-    fetchAppointments,
+    // fetchAppointments,
     appointments,
     queue,
     getQueue,
@@ -18,7 +18,7 @@ function AppointmentTable() {
 
   const [activeTab, setActiveTab] = useState("appointments");
 
-  const user = JSON.parse(sessionStorage.getItem("user"));
+  const user = useAppStore((state) => state.user);
   const role = user?.role?.toLowerCase();
 
   const isRecordOfficer = role === "record_officer";
@@ -27,20 +27,20 @@ function AppointmentTable() {
   const isFinance = role === "finance_officer";
 
   useEffect(() => {
-    fetchAppointments();
+    // fetchAppointments();
     getQueue && getQueue();
     getTransactions && getTransactions();
   }, []);
 
   const todayStr = dayjs().format("YYYY-MM-DD");
 
-  const todaysAppointments = appointments.filter(
+  const todaysAppointments = appointments?.filter(
     (appt) => appt.date === todayStr,
   );
 
   const todayQueue = queue || [];
 
-  const financeQueue = queue.filter(
+  const financeQueue = queue?.filter(
   (q) => q.paymentStatus !== "paid" || q.balance > 0
 );
 

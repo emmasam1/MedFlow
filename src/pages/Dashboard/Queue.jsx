@@ -10,6 +10,7 @@ import { useAppStore } from "../../store/useAppStore";
 import { useStore } from "../../store/store";
 import { ToastContainer } from "react-toastify";
 import CreateQueue from "../../components/CreateQueue";
+import VitalsModal from "../../components/VitalsModal";
 
 const PER_PAGE = 10;
 
@@ -60,6 +61,7 @@ const Queue = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [leftWidth, setLeftWidth] = useState(380);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
+  const [vitalsModalOpen, setVitalsModalOpen] = useState(false);
 
   /* doctor modal */
 
@@ -106,6 +108,12 @@ const Queue = () => {
 
       return [...prev, test];
     });
+  };
+
+  const openVitalsModal = (q) => {
+    setSelectedQueue(q)
+    // console.log(selectedQueue)
+    setVitalsModalOpen(true);
   };
 
   /* resizer */
@@ -239,7 +247,7 @@ const Queue = () => {
       <div className="flex justify-between items-center p-3">
         <span className="font-semibold">Queue</span>
 
-        {user?.role !== "doctor" && (
+        {user?.role !== "doctor" && user?.role !== "nurse" && (
           <motion.button
             onClick={() => setIsQueueOpen(true)}
             whileHover={{ scale: 1.05 }}
@@ -398,7 +406,7 @@ const Queue = () => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
                     className={`${
-                      darkMode ? "bg-gray-800" : "bg-slate-50"
+                      darkMode ? "bg-gray-800" : "bg-gray-100"
                     } px-4 py-2 rounded-xl`}
                   >
                     <div className="flex justify-end mb-2">
@@ -439,10 +447,19 @@ const Queue = () => {
                     </div>
 
                     <div className="flex flex-wrap gap-2">
+                      {user?.role === "nurse" && q.status === "waiting" && (
+                        <button
+                          onClick={() => openVitalsModal(q)}
+                          className="text-xs px-3 py-1 bg-green-100 text-green-700 rounded-lg cursor-pointer"
+                        >
+                          Take Vitals
+                        </button>
+                      )}
                       {user?.role === "doctor" &&
                         q.currentDepartment === "doctor" && (
                           <>
                             {/* START → only if not started */}
+
                             {q.status === "waiting" && (
                               <button
                                 onClick={() =>
@@ -488,6 +505,19 @@ const Queue = () => {
           </div>
         </div>
       </div>
+
+      {/* {vital modal} */}
+      <Modal
+        isOpen={vitalsModalOpen}
+        onClose={() => setVitalsModalOpen(false)}
+        title={`Clinical Assessment: ${selectedQueue?.patientName}`}
+        size="lg"
+      >
+        <VitalsModal
+          queueItem={selectedQueue}
+          onClose={() => setVitalsModalOpen(false)}
+        />
+      </Modal>
 
       {/* create queue modal */}
 

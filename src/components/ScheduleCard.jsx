@@ -19,17 +19,17 @@ const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
 const ScheduleCard = ({ type }) => {
   const { fetchAppointments, appointments, getQueue, queue } = useAppStore();
   const { darkMode } = useStore();
-  const user = JSON.parse(sessionStorage.getItem("user"));
+  const user = useAppStore((state) => state.user);
 
   const today = new Date();
   const [currentDate, setCurrentDate] = useState(today);
   const [selectedDay, setSelectedDay] = useState(today.getDate());
   const [startIndex, setStartIndex] = useState(Math.max(today.getDate() - 2, 0));
 
-  useEffect(() => {
-    if (type === "specialist") fetchAppointments();
-    else getQueue();
-  }, [type]);
+  // useEffect(() => {
+  //   if (type === "specialist") fetchAppointments();
+  //   else getQueue();
+  // }, [type]);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -63,7 +63,7 @@ const ScheduleCard = ({ type }) => {
           const apptDate = new Date(appt.date);
           return apptDate.getFullYear() === year && apptDate.getMonth() === month && apptDate.getDate() === selectedDay;
         })
-      : queue.filter((q) => {
+      : queue?.filter((q) => {
           const qDate = new Date(q.timeAdded);
           return qDate.getFullYear() === year && qDate.getMonth() === month && qDate.getDate() === selectedDay;
         });
@@ -126,19 +126,19 @@ const ScheduleCard = ({ type }) => {
 
       {/* COUNT */}
       <motion.p key={selectedDay} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="text-sm font-medium text-orange-500 mb-4 flex-shrink-0">
-        {todaysItems.length} {user?.role?.toLowerCase() === "doctor" ? "queue" : "appointment"}
-        {todaysItems.length !== 1 && "s"} on {monthNames[month]} {selectedDay}
+        {todaysItems?.length} {user?.role?.toLowerCase() === "doctor" ? "queue" : "appointment"}
+        {todaysItems?.length !== 1 && "s"} on {monthNames[month]} {selectedDay}
       </motion.p>
 
       {/* LIST */}
       <div className="flex-1 overflow-y-auto space-y-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
         <AnimatePresence mode="popLayout">
-          {todaysItems.length === 0 ? (
+          {todaysItems?.length === 0 ? (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center py-10">
               <p className={`${textMuted} italic`}>No {user?.role?.toLowerCase() === "doctor" ? "queues" : "appointments"} for today</p>
             </motion.div>
           ) : (
-            todaysItems.map((item) => (
+            todaysItems?.map((item) => (
               <motion.div
                 key={item.id}
                 layout

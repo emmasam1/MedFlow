@@ -3,7 +3,9 @@ import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import dayjs from "dayjs";
+import CryptoJS from "crypto-js";
 
+// Layout & UI Components
 import PatientChart from "../../components/PatientChart";
 import StatCard from "../../components/StatCard";
 import Appointments from "../../components/Appointments";
@@ -13,106 +15,118 @@ import NewPatientChart from "../../components/NewPatientChart";
 import Modal from "../../components/Modal";
 import AddPatients from "../../components/AddPatients";
 import DoctorsAppointment from "../../components/DoctorsAppointment";
-
-import PatientQueue from "../../components/PatientQueue";
-
-import { AiOutlineUserAdd } from "react-icons/ai";
-import { MdOutlineQueue } from "react-icons/md";
-import { FiCalendar } from "react-icons/fi";
-
-import { useStore } from "../../store/store";
-import { useAppStore } from "../../store/useAppStore";
 import CreateQueue from "../../components/CreateQueue";
 import ScheduleCard from "../../components/ScheduleCard";
+import PatientQueue from "../../components/PatientQueue";
+
+// Role-Specific Panels
 import NurseTasks from "../../components/NurseTasks";
 import VitalsTracker from "../../components/VitalsTracker";
 import ShiftSchedule from "../../components/ShiftSchedule";
-import MedicationPanel from "../../components/MedicationPanel";
+import MedicationList from "../../components/MedicationList";
+import NurseTodo from "../../components/NurseTodo";
 import AssignedPatients from "../../components/AssignedPatients";
-import CriticalAlerts from "../../components/CriticalAlerts";
 import PatientNotes from "../../components/PatientNotes";
+import CriticalAlerts from "../../components/RealTimeIndicator";
+
+// Icons
+import { AiOutlineUserAdd } from "react-icons/ai";
+import { MdOutlineQueue } from "react-icons/md";
+import { FiCalendar } from "react-icons/fi";
+import {
+  RiTeamLine,
+  RiUserSharedLine,
+  RiMoneyDollarCircleLine,
+  RiShieldUserLine,
+} from "react-icons/ri";
+
+// Store
+import { useStore } from "../../store/store";
+import { useAppStore } from "../../store/useAppStore";
 
 const Dashboard = () => {
   const { darkMode } = useStore();
-  const {
-    patients,
-    appointments,
-    fetchPatients,
-    fetchAppointments,
-    getQueue,
-    queue,
-  } = useAppStore();
+  const { patients, appointments, fetchPatients, fetchAppointments, queue } =
+    useAppStore();
 
   const [isOpen, setIsOpen] = useState(false);
   const [isAppointment, setIsAppointment] = useState(false);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
-
   const [recordTab, setRecordTab] = useState("appointments");
 
   const location = useLocation();
   const pathName =
     location.pathname.split("/").filter(Boolean).pop() || "Dashboard";
 
-  const user = JSON.parse(sessionStorage.getItem("user"));
+ // Auth & Role
+  const encryptedUser = sessionStorage.getItem("user");
+  let user = null;
+
+  if (encryptedUser) {
+    try {
+      // Pull the key from your .env file
+      const secretKey = import.meta.env.VITE_ENCRYPTION_KEY;
+      
+      const bytes = CryptoJS.AES.decrypt(encryptedUser, secretKey);
+      const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
+
+      // Check if decryptedText is empty (happens if the key is wrong)
+      if (!decryptedText) {
+        console.error("Decryption resulted in empty string. Check your VITE_ENCRYPTION_KEY.");
+      } else {
+        user = JSON.parse(decryptedText);
+      }
+    } catch (e) {
+      console.error("Failed to decrypt user data:", e);
+    }
+  }
+
   const role = user?.role?.toLowerCase();
+  console.log("Current User Role:", role);
 
   useEffect(() => {
-    fetchPatients();
-    fetchAppointments();
+    // fetchPatients();
+    // fetchAppointments();
   }, []);
 
-  /* ---------------- Stats ---------------- */
-
-  const totalAppointments = appointments.length;
-
-  const cancelledAppointments = appointments.filter(
-    (q) => q.status?.toLowerCase() === "cancelled",
-  ).length;
-
-  const totalQueue = queue.length;
-
+  /* ---------------- Computed Stats ---------------- */
+ /* ---------------- Computed Stats ---------------- */
   const today = dayjs().format("YYYY-MM-DD");
 
-  const todaysQueue = queue.filter(
+  // Use optional chaining and default to empty arrays to prevent .length errors
+  const safeAppointments = appointments || [];
+  const safePatients = patients || [];
+  const safeQueue = queue || [];
+
+  const totalAppointments = safeAppointments.length;
+  const totalPatients = safePatients.length;
+  
+  const newPatients = safePatients.filter((p) => p.regDate === today).length;
+
+  const todaysQueue = safeQueue.filter(
     (q) => dayjs(q.createdAt).format("YYYY-MM-DD") === today,
   );
 
   const waitingQueue = todaysQueue.filter(
     (q) => q.status?.toLowerCase() === "waiting",
   ).length;
-
   const doneQueue = todaysQueue.filter(
     (q) => q.status?.toLowerCase() === "done",
   ).length;
-
-  const cancelledQueue = todaysQueue.filter(
-    (q) => q.status?.toLowerCase() === "cancel",
-  ).length;
-
   const urgentQueue = todaysQueue.filter(
     (q) => q.priority?.toLowerCase() === "urgent",
   ).length;
 
-  const totalPatients = patients.length;
-
-  // const today = new Date().toISOString().split("T")[0];
-
-  const newPatients = patients.filter((p) => p.regDate === today).length;
-
-  const totalRevenue = queue
+  const totalRevenue = safeQueue
     .filter((q) => q.paymentStatus === "paid" || q.paymentStatus === "partial")
     .reduce((sum, q) => sum + (q.labAmount || 0), 0);
 
-  const pendingPayments = queue.filter(
+  const pendingPayments = safeQueue.filter(
     (q) => q.paymentStatus === "pending",
   ).length;
+  const totalBalance = safeQueue.reduce((sum, q) => sum + (q.balance || 0), 0);
 
-  const totalBalance = queue.reduce((sum, q) => sum + (q.balance || 0), 0);
-
-  const paidCount = queue.filter((q) => q.paymentStatus === "paid").length;
-
-  /* ---------------- Button Animation ---------------- */
-
+  /* ---------------- Animations & Styles ---------------- */
   const buttonMotion = {
     whileHover: { scale: 1.05, y: -2 },
     whileTap: { scale: 0.97 },
@@ -120,24 +134,22 @@ const Dashboard = () => {
   };
 
   const buttonStyle =
-    "hover:bg-[#9DCEF8] px-3 py-2 rounded-full text-[#005CBB] font-bold flex items-center gap-2 transition-colors duration-300 text-sm cursor-pointer";
+    "hover:bg-[#9DCEF8] px-4 py-2 rounded-full text-[#005CBB] font-bold flex items-center gap-2 transition-colors duration-300 text-sm cursor-pointer border-none shadow-sm bg-white";
 
   return (
     <>
       <ToastContainer />
 
-      {/* HEADER */}
-      <div className="flex flex-col sm:flex-row justify-between items-center text-center sm:text-left mb-8 gap-4 px-4">
+      {/* HEADER SECTION */}
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4 px-4">
         <div>
           <h2
-            className={`text-xl font-bold capitalize ${darkMode ? "text-white" : "text-slate-800"
-              }`}
+            className={`text-2xl font-black capitalize ${darkMode ? "text-white" : "text-slate-800"}`}
           >
             {pathName.replace(/-/g, " ")}
           </h2>
-
-          <p className="text-xs text-gray-400 mt-1 flex items-center justify-center sm:justify-start gap-2">
-            Dashboard <span className="text-[10px]">🏠</span> Home{" "}
+          <p className="text-xs text-gray-400 mt-1 flex items-center gap-2">
+            Dashboard <span className="text-[10px]">🏠</span> Home
             <span className="text-[10px]">&gt;</span>
             <span className="text-blue-500 font-medium capitalize">
               {pathName}
@@ -145,254 +157,81 @@ const Dashboard = () => {
           </p>
         </div>
 
-        {/* ACTION BUTTONS */}
-        {user?.role?.toLowerCase() === "doctor" ||
-          user?.role?.toLowerCase() === "specialist" || user?.role?.toLowerCase() === "lab_officer" ||
-          user?.role?.toLowerCase() === "nurse" ||
-          user?.role?.toLowerCase() === "finance_officer" ||
-          user?.role?.toLowerCase() === "specialist" ? null : (
-          <div className="flex gap-2 flex-wrap justify-center sm:justify-end">
-            {/* ADD PATIENT */}
+        {/* ADMIN & RECORDS ACTION BUTTONS */}
+        {["admin", "record_officer"].includes(role) && (
+          <div className="flex gap-3 flex-wrap justify-center sm:justify-end">
             <motion.button
               {...buttonMotion}
               onClick={() => setIsOpen(true)}
               className={buttonStyle}
             >
-              <AiOutlineUserAdd size={18} />
-              Add Patient
+              <AiOutlineUserAdd size={18} /> Add Patient
             </motion.button>
-
-            {/* APPOINTMENT */}
             <motion.button
               {...buttonMotion}
               onClick={() => setIsAppointment(true)}
               className={buttonStyle}
             >
-              <FiCalendar size={18} />
-              Appointment
+              <FiCalendar size={18} /> Appointment
             </motion.button>
-
-            {/* QUEUE */}
             <motion.button
               {...buttonMotion}
               onClick={() => setIsQueueOpen(true)}
               className={buttonStyle}
             >
-              <MdOutlineQueue size={18} />
-              Queue
+              <MdOutlineQueue size={18} /> Queue
             </motion.button>
           </div>
         )}
       </div>
 
-      {/* MAIN CONTENT */}
+      {/* STATS GRID (4 Columns) */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4 }}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
         className="space-y-6"
       >
-        {/* STATS */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {user?.role?.toLowerCase() === "doctor" && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
+          {/* ADMIN VIEW */}
+          {role === "admin" && (
             <>
-              {/* <StatCard title="Total Queue" value={totalQueue} color="purple" />
+              <StatCard title="Total Staff" value="42" color="blue" />
+              <StatCard title="On Duty" value="12" color="purple" />
               <StatCard
-                title="Cancelled Queue"
-                value={cancelledQueue}
-                color="orange"
-              />
-              <StatCard
-                title="Completed Queue"
-                value={doneQueue}
-                color="blue"
-              />
-              <StatCard
-                title="Waiting Queue"
-                value={waitingQueue}
+                title="Total Revenue"
+                value={`₦${totalRevenue.toLocaleString()}`}
                 color="green"
-              /> */}
-              <>
-                <StatCard
-                  title="Today Queue"
-                  value={totalQueue}
-                  color="purple"
-                />
-                <StatCard
-                  title="Waiting Patients"
-                  value={waitingQueue}
-                  color="orange"
-                />
-                <StatCard title="Completed" value={doneQueue} color="green" />
-                <StatCard
-                  title="Urgent Cases"
-                  value={urgentQueue}
-                  color="red"
-                />
-              </>
+              />
+              <StatCard title="System Alerts" value="3" color="red" />
             </>
           )}
 
-          {user?.role?.toLowerCase() === "specialist" && (
+          {/* DOCTOR VIEW */}
+          {role === "doctor" && (
             <>
               <StatCard
-                title="Specialist Appointments"
-                value={totalAppointments}
+                title="Today Queue"
+                value={todaysQueue.length}
                 color="purple"
               />
-              <StatCard
-                title="Cancelled Appointments"
-                value={cancelledAppointments}
-                color="orange"
-              />
-              <StatCard
-                title="Waiting Patients"
-                value={totalPatients}
-                color="blue"
-              />
-              <StatCard
-                title="Urgent Cases"
-                value={newPatients}
-                color="red"
-              />
+              <StatCard title="Waiting" value={waitingQueue} color="orange" />
+              <StatCard title="Completed" value={doneQueue} color="green" />
+              <StatCard title="Urgent" value={urgentQueue} color="red" />
             </>
           )}
 
-          {user?.role?.toLowerCase() === "nurse" && (
+          {/* NURSE VIEW */}
+          {role === "nurse" && (
             <>
-              <StatCard
-                title="Assigned Patients"
-                value="0"
-                // value={assignedPatients?.length || 0}
-                color="blue"
-              />
-              <StatCard
-                title="Pending Tasks"
-                value={waitingQueue} // temporary
-                color="orange"
-              />
-              <StatCard
-                title="Completed Tasks"
-                value={doneQueue}
-                color="green"
-              />
-              <StatCard
-                title="Critical Alerts"
-                value={0} // replace later with real alerts
-                color="red"
-              />
+              <StatCard title="Assigned Patients" value="8" color="blue" />
+              <StatCard title="Pending Tasks" value="5" color="orange" />
+              <StatCard title="Completed" value="12" color="green" />
+              <StatCard title="Critical Alerts" value="2" color="red" />
             </>
           )}
 
-          {user?.role?.toLowerCase() === "lab_officer" && (
-            <>
-              <StatCard
-                title="Total Tests"
-                value="0"
-                // value={assignedPatients?.length || 0}
-                color="blue"
-              />
-              <StatCard
-                title="Pending Tests"
-                value={waitingQueue} // temporary
-                color="orange"
-              />
-              <StatCard
-                title="Completed Tests"
-                value={doneQueue}
-                color="green"
-              />
-              <StatCard
-                title="Delivered Test"
-                value={0} // replace later with real alerts
-                color="red"
-              />
-            </>
-          )}
-
-          {user?.role?.toLowerCase() === "record_officer" && (
-            <div className="col-span-full">
-              {/* 🔥 TOGGLE */}
-              <div className="flex gap-2 mb-4 relative">
-                {["appointments", "queue"].map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setRecordTab(tab)}
-                    className="relative px-3 py-1 text-xs font-semibold capitalize"
-                  >
-                    {recordTab === tab && (
-                      <motion.div
-                        layoutId="recordToggle"
-                        className="absolute inset-0 bg-blue-500 rounded-full"
-                        transition={{ type: "spring", stiffness: 300 }}
-                      />
-                    )}
-
-                    <span
-                      className={`relative z-10 ${recordTab === tab ? "text-white" : "text-gray-500"
-                        }`}
-                    >
-                      {tab}
-                    </span>
-                  </button>
-                ))}
-              </div>
-
-              {/* 🔥 CARDS */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <motion.div
-                  key={recordTab}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.25 }}
-                  className="contents"
-                >
-                  {recordTab === "appointments" ? (
-                    <>
-                      <StatCard
-                        title="Appointments"
-                        value={totalAppointments}
-                        color="purple"
-                      />
-                      <StatCard
-                        title="Cancelled Appointments"
-                        value={cancelledAppointments}
-                        color="orange"
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <StatCard
-                        title="Total Queue"
-                        value={totalQueue}
-                        color="purple"
-                      />
-                      <StatCard
-                        title="Cancelled Queue"
-                        value={cancelledQueue}
-                        color="orange"
-                      />
-                    </>
-                  )}
-
-                  {/* ALWAYS STATIC */}
-                  <StatCard
-                    title="Total Patients"
-                    value={totalPatients}
-                    color="blue"
-                  />
-                  <StatCard
-                    title="New Patients"
-                    value={newPatients}
-                    color="green"
-                  />
-                </motion.div>
-              </div>
-            </div>
-          )}
-
-          {user?.role?.toLowerCase() === "finance_officer" && (
+          {/* FINANCE VIEW */}
+          {role === "finance_officer" && (
             <>
               <StatCard
                 title="Revenue"
@@ -400,124 +239,98 @@ const Dashboard = () => {
                 color="green"
               />
               <StatCard
-                title="Pending Payments"
+                title="Pending"
                 value={pendingPayments}
                 color="orange"
               />
               <StatCard
-                title="Outstanding Balance"
+                title="Outstanding"
                 value={`₦${totalBalance}`}
                 color="red"
               />
+              <StatCard title="Paid Count" value={doneQueue} color="blue" />
+            </>
+          )}
+
+          {/* RECORD OFFICER VIEW (Uses Toggle Logic) */}
+          {role === "record_officer" && (
+            <div className="col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <StatCard
-                title="Paid Transactions"
-                value={paidCount}
+                title="Total Patients"
+                value={totalPatients}
                 color="blue"
               />
-            </>
+              <StatCard title="New Today" value={newPatients} color="green" />
+              <StatCard
+                title="Appointments"
+                value={totalAppointments}
+                color="purple"
+              />
+              <StatCard
+                title="Active Queue"
+                value={waitingQueue}
+                color="orange"
+              />
+            </div>
           )}
         </div>
 
-        {/* MIDDLE SECTION */}
-        {user?.role === "nurse" && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <PatientChart />
-            <NurseTasks />
-            <ShiftSchedule
-              shifts={[
-                { time: "8AM-4PM", notes: "Day Shift" },
-                { time: "4PM-12AM", notes: "Evening Shift" },
-              ]}
-            />
-          </div>
-        )}
+        {/* MAIN DASHBOARD LAYOUTS */}
+        <div className="px-4">
+          {/* ADMIN & DOCTOR & SPECIALIST GRID */}
+          {(role === "admin" || role === "doctor" || role === "specialist") && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 shadow-sm rounded-3xl overflow-hidden">
+                <PatientChart />
+              </div>
+              <div className="space-y-6">
+                <ScheduleCard />
+                {role === "doctor" ? <PatientQueue /> : <CriticalAlerts />}
+              </div>
+            </div>
+          )}
 
-        {user?.role === "doctor" && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <PatientChart />
-            <ScheduleCard />
-            <PatientQueue />
-          </div>
-        )}
+          {/* NURSE SPECIFIC LAYOUT */}
+          {role === "nurse" && (
+            <>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <PatientChart />
+                <NurseTasks />
+                <ShiftSchedule shifts={[{ time: "8AM-4PM", notes: "Day" }]} />
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+                <MedicationList />
+                <NurseTodo />
+                <div className="space-y-6">
+                  <AssignedPatients />
+                  <CriticalAlerts />
+                </div>
+              </div>
+            </>
+          )}
 
-        {user?.role === "specialist" && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <PatientChart />
-            <ScheduleCard />
-            <Appointments />
-          </div>
-        )}
+          {/* RECORD OFFICER LAYOUT */}
+          {role === "record_officer" && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <PatientChart />
+              <div className="space-y-6">
+                <BookAppointment />
+                <NewPatientChart />
+              </div>
+              <Appointments />
+            </div>
+          )}
+        </div>
 
-        {user?.role === "record_officer" && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <PatientChart />
-            <Appointments />
-            <BookAppointment />
+        {/* BOTTOM SECTION: DATA TABLES */}
+        <div className="px-4 pb-10">
+          <div className="bg-white rounded-3xl shadow-sm overflow-hidden border border-slate-100">
+            <AppointmentTable />
           </div>
-        )}
+        </div>
       </motion.div>
 
-      {user?.role?.toLowerCase() === "nurse" && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-          <VitalsTracker />
-          {/* <MedicationPanel medications={[
-          { name: "Paracetamol", dosage: "500mg", status: "pending" },
-          { name: "Ibuprofen", dosage: "200mg", status: "administered" }
-        ]} /> */}
-          <div className="space-y-6">
-            <AssignedPatients />
-            {/* <AssignedPatients patients={assignedPatients} /> */}
-            <PatientNotes patientId={1} />
-            <CriticalAlerts />
-            {/* <CriticalAlerts alerts={criticalAlerts.map(a => ({ message: `Patient ${a.patientName} requires attention!` }))} /> */}
-          </div>
-        </div>
-      )}
-
-      {user?.role?.toLowerCase() === "lab_officer" && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-          <VitalsTracker />
-          {/* <MedicationPanel medications={[
-          { name: "Paracetamol", dosage: "500mg", status: "pending" },
-          { name: "Ibuprofen", dosage: "200mg", status: "administered" }
-        ]} /> */}
-          <div className="space-y-6">
-            <AssignedPatients />
-            {/* <AssignedPatients patients={assignedPatients} /> */}
-            <PatientNotes patientId={1} />
-            <CriticalAlerts />
-            {/* <CriticalAlerts alerts={criticalAlerts.map(a => ({ message: `Patient ${a.patientName} requires attention!` }))} /> */}
-          </div>
-        </div>
-      )}
-
-      {/* BOTTOM SECTION */}
-      <div
-        className={`mt-6 ${role === "doctor" || role === "finance" || role === "finance_officer" || role === "specialist"
-          ? ""
-          : "flex flex-col md:flex-row gap-4"
-          }`}
-      >
-        <div
-          className={`${role === "doctor" ||
-            role === "finance" ||
-            role === "specialist" ||
-            role === "finance_officer"
-            ? "w-full"
-            : "md:w-2/3"
-            }`}
-        >
-          <AppointmentTable />
-        </div>
-
-        {role === "record_officer" && (
-          <div className="md:w-1/3">
-            <NewPatientChart />
-          </div>
-        )}
-      </div>
-
-      {/* ADD PATIENT MODAL */}
+      {/* MODAL PORTALS */}
       <Modal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
@@ -527,7 +340,6 @@ const Dashboard = () => {
         <AddPatients onSuccess={() => setIsOpen(false)} />
       </Modal>
 
-      {/* APPOINTMENT MODAL */}
       <Modal
         isOpen={isAppointment}
         onClose={() => setIsAppointment(false)}
@@ -537,7 +349,6 @@ const Dashboard = () => {
         <DoctorsAppointment onSuccess={() => setIsAppointment(false)} />
       </Modal>
 
-      {/* QUEUE MODAL */}
       <Modal
         isOpen={isQueueOpen}
         onClose={() => setIsQueueOpen(false)}
