@@ -379,8 +379,16 @@ const User = () => {
 
         <Table
           columns={columns}
-          dataSource={users.filter((u) =>
-            u.firstName.toLowerCase().includes(searchText.toLowerCase()),
+          dataSource={users?.filter(
+            (u) =>
+              // Added ?. before toLowerCase() and a fallback to empty string
+              u.firstName
+                ?.toLowerCase()
+                .includes(searchText?.toLowerCase() || "") ||
+              u.lastName
+                ?.toLowerCase()
+                .includes(searchText?.toLowerCase() || "") ||
+              u.email?.toLowerCase().includes(searchText?.toLowerCase() || ""),
           )}
           rowKey="_id"
           pagination={{ pageSize: 6 }}
@@ -592,12 +600,24 @@ const User = () => {
               placeholder="License Number"
               className="px-3 py-2 border rounded-lg border-gray-300"
             />
-            <input
-              type="text"
-              name="phone"
-              placeholder="Phone Number"
-              className="px-3 py-2 border rounded-lg border-gray-300"
-            />
+            <div className="flex flex-col">
+              <div className="relative flex items-center">
+                {/* Country Prefix Section */}
+                <div className="absolute left-3 flex items-center gap-2 pointer-events-none border-r pr-2 border-gray-200">
+                  <span className="text-xs font-bold text-gray-500">+234</span>
+                </div>
+
+                <input
+                  type="tel" // Opens numeric keypad on mobile
+                  name="phoneNumber"
+                  placeholder="801 234 5678"
+                  className="w-full pl-16 pr-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                />
+              </div>
+              <span className="text-[10px] text-gray-400 mt-1 ml-1">
+                Format: 8012345678
+              </span>
+            </div>
           </div>
 
           <div className="md:col-span-2 mt-4">
