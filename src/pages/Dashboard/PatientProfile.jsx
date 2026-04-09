@@ -508,6 +508,72 @@ const PatientProfile = () => {
               </div>
             </div>
           </Section>
+          
+          {/* LAB HISTORY */}
+          <Section loading={loadingVisitHistory}>
+            <div className={panelClass}>
+              <div className="panelHeaderClass">
+                <RiHeartPulseLine className="w-5 h-5" />
+                Lab Result
+              </div>
+
+              <div className="p-5 space-y-4">
+                {patient.labhistory && patient.labhistory.length>0?(
+                  patient.labHistory.map((lab, i)=> (
+                    <div key={lab.id || i} className={`border rounded-lg p-4 ${darkMode ? "border-gray-600" : "border-gray-200"}`}>
+                      {/* HEADER */}
+
+                      <div className="flex justify-between items-center mb-2">
+                        <h3 className="font-semibold text-sm">
+                          Lab Session #{i + 1}
+                        </h3>
+                        <span className="text-xs text-gray-400">
+                          {new Date(lab.date).toLocaleDateString()}
+                        </span>
+                      </div>
+
+                      {/* REQUESTED BY */}
+                      <p>
+                        Requested by:{lab.requestedBy || "_"}
+                      </p>
+
+                      {/* TESTS */}
+                      <div className="space-y-2">
+                        {lab.tests?.map((test, idx) => (
+                          <div key={idx} className="flex justify-between text-sm">
+                            <span>{test.name}</span>
+                            <span className="font-medium">{test.result || "_"}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* NOTES */}
+                      {lab.notes && (
+                        <p className="mt-3 text-sm text-gray-500">
+                          <span className="font-medium">Notes:</span>{lab.notes}
+                        </p>
+                      )}
+
+                      {/* FILE */}
+                      {lab.file && (
+                        <div className="mt-2">
+                          <button className="text-blue-500 text-xs underline">
+                            View Report({lab.file})
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                  
+                ):(
+                  <p className="text-sm text-gray-400">
+                    No Lab Result Available
+                  </p>
+                )}
+
+              </div>
+            </div>
+          </Section>
         </div>
       </div>
     </div>

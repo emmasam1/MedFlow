@@ -89,11 +89,20 @@ export const useAppStore = create((set, get) => ({
     const res = await api.patch(`/patients/${id}`, data);
 
     set((s) => ({
-      patients: s.patients.map((p) => (p.id === id ? res.data : p)),
+      patients: s.patients.map((p) =>
+        p.id === id ? res.data : p
+      ),
+
+      // 🔥 THIS IS THE MISSING PIECE
+      patient:
+        s.patient?.id === id ? res.data : s.patient,
     }));
 
     return res.data;
   },
+
+
+
 
   updatePatientBalance: async (id, amount, type = "add") => {
     const patient = get().patients.find((p) => p.id === id);
@@ -212,9 +221,9 @@ export const useAppStore = create((set, get) => ({
       patient:
         s.patient?.id === q.patientId
           ? {
-              ...s.patient,
-              runningBalance: (s.patient.runningBalance || 0) - amount,
-            }
+            ...s.patient,
+            runningBalance: (s.patient.runningBalance || 0) - amount,
+          }
           : s.patient,
     }));
 
@@ -295,9 +304,9 @@ export const useAppStore = create((set, get) => ({
       patient:
         s.patient?.id === q.patientId
           ? {
-              ...s.patient,
-              runningBalance: (s.patient.runningBalance || 0) - paid,
-            }
+            ...s.patient,
+            runningBalance: (s.patient.runningBalance || 0) - paid,
+          }
           : s.patient,
     }));
 
@@ -477,9 +486,108 @@ export const useAppStore = create((set, get) => ({
   },
 
   /* ---------------- LAB ---------------- */
+  // submitLabResult: async (queueItem, resultData) => {
+  //   const { patients, updatePatient, fetchSinglePatient, getPatients } = get();
+
+  //   // 1. find patient
+  //   const patient = patients.find((p) => p.id === queueItem.patientId);
+  //   if (!patient) return;
+
+  //   // 2. build lab result
+  //   const newLab = {
+  //     id: Date.now().toString(),
+  //     date: new Date().toISOString(),
+  //     requestedBy: queueItem.doctorNotes || "Doctor",
+  //     tests: resultData.tests,
+  //     notes: resultData.notes,
+  //     file: resultData.file || "",
+  //   };
+
+  //   // 3. update patient
+  //   await updatePatient(patient.id, {
+  //     ...patient,
+  //     labHistory: [...(patient.labHistory || []), newLab],
+  //   });
+
+  //   // 🔥 4. REFRESH DATA (THIS WAS MISSING)
+  //   await getPatients();
+  //   await fetchSinglePatient(patient.id);
+
+  //   // 5. update queue
+  //   await api.patch(`/queue/${queueItem.id}`, {
+  //     status: "done",
+  //     currentDepartment: "doctor",
+  //   });
+
+  //   // 6. update UI instantly
+  //   set((s) => ({
+  //     queue: s.queue.map((q) =>
+  //       q.id === queueItem.id
+  //         ? { ...q, status: "done", currentDepartment: "doctor" }
+  //         : q
+  //     ),
+  //   }));
+  // },
+
+  submitLabResult: async (queueItem, resultData) => {
+    const { patients, updatePatient } = get();
+
+    const patient = patients.find(
+      (p) => p.id === queueItem.patientId
+    );
+
+    if (!patient) return;
+
+    const newLab = {
+      id: Date.now().toString(),
+      date: new Date().toISOString(),
+      requestedBy: queueItem.doctorNotes || "Doctor",
+      tests: resultData.tests,
+      notes: resultData.notes,
+      file: resultData.file || "",
+    };
+
+    await updatePatient(patient.id, {
+      ...patient,
+      labHistory: [...(patient.labHistory || []), newLab],
+    });
+
+    // 🔥 NO NEED TO FETCH AGAIN
+
+    await api.patch(`/queue/${queueItem.id}`, {
+      status: "done",
+      currentDepartment: "doctor",
+    });
+
+    set((s) => ({
+      queue: s.queue.map((q) =>
+        q.id === queueItem.id
+          ? { ...q, status: "done", currentDepartment: "doctor" }
+          : q
+      ),
+    }));
+  },
 
   fetchLabTests: async () => {
     const res = await api.get("/labTest");
     set({ labTest: res.data });
   },
+
+  getAllLabResults: () => {
+    const { patients } = get();
+  
+    const results = patients.flatMap((p) =>
+      (p.labHistory || []).map((lab) => ({
+        ...lab,
+        patientId: p.id,
+        patientName: p.fullName,
+        patientCode: p.patientId,
+      }))
+    );
+  
+    return results.sort(
+      (a, b) => new Date(b.date) - new Date(a.date)
+    );
+  },
+    
 }));

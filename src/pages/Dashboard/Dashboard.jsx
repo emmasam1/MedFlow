@@ -298,12 +298,12 @@ const Dashboard = () => {
                 color="orange"
               />
               <StatCard
-                title="In-Progress Tests"
+                title="Completed Tests"
                 value={doneQueue}
                 color="green"
               />
               <StatCard
-                title="Completed Tests"
+                title="Delivered Test"
                 value={0} // replace later with real alerts
                 color="red"
               />

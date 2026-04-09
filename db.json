@@ -112,7 +112,6 @@
       "role": "hospital_admin",
       "name": "Khalid Musa"
     },
-
     {
       "id": "16",
       "username": "emmanuel",
@@ -158,7 +157,36 @@
         "totalBill": 0,
         "paid": 0,
         "balance": 0
-      }
+      },
+      "labHistory": [
+        {
+          "id": "lab_001",
+          "date": "2026-03-28",
+          "requestedBy": "Dr. Ibrahim",
+          "tests": [
+            {
+              "name": "Malaria Test",
+              "result": "Positive",
+              "reference": "Negative"
+            }
+          ],
+          "notes": "Patient has malaria",
+          "file": ""
+        },
+        {
+          "id": "1774897308783",
+          "date": "2026-03-30T19:01:48.783Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Full Blood Count (FBC)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "",
+          "file": ""
+        }
+      ]
     },
     {
       "id": "3dbc",
@@ -196,7 +224,43 @@
         "totalBill": 0,
         "paid": 0,
         "balance": 0
-      }
+      },
+      "runningBalance": -10000,
+      "labHistory": [
+        {
+          "id": "1774886802422",
+          "date": "2026-03-30T16:06:42.422Z",
+          "requestedBy": "yeah",
+          "tests": [
+            {
+              "name": "Thyroid Function Test",
+              "result": "Negative"
+            },
+            {
+              "name": "Blood Culture",
+              "result": "Positive"
+            }
+          ],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774895139300",
+          "date": "2026-03-30T18:25:39.300Z",
+          "requestedBy": "test",
+          "tests": [],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1775074689662",
+          "date": "2026-04-01T20:18:09.662Z",
+          "requestedBy": "test",
+          "tests": [],
+          "notes": "",
+          "file": ""
+        }
+      ]
     },
     {
       "id": "cdae",
@@ -227,7 +291,34 @@
         "totalBill": 0,
         "paid": 0,
         "balance": 0
-      }
+      },
+      "labHistory": [
+        {
+          "id": "1774886941174",
+          "date": "2026-03-30T16:09:01.174Z",
+          "requestedBy": "Doctor",
+          "tests": [
+            {
+              "name": "Erythrocyte Sedimentation Rate (ESR)",
+              "result": "Positive"
+            },
+            {
+              "name": "Widal Test",
+              "result": "Negative"
+            },
+            {
+              "name": "Malaria Parasite Test",
+              "result": "Positive"
+            },
+            {
+              "name": "Pregnancy Test",
+              "result": "Positive"
+            }
+          ],
+          "notes": "Further test needed",
+          "file": ""
+        }
+      ]
     },
     {
       "id": "c74e",
@@ -259,7 +350,39 @@
         "paid": 0,
         "balance": 0
       },
-      "runningBalance": -17000
+      "runningBalance": -17000,
+      "labHistory": [
+        {
+          "id": "1774886833053",
+          "date": "2026-03-30T16:07:13.053Z",
+          "requestedBy": "the patient only feels sick in the morning that's the reason for this test ",
+          "tests": [
+            {
+              "name": "Pregnancy Test",
+              "result": "positive"
+            },
+            {
+              "name": "Thyroid Function Test",
+              "result": "negative"
+            }
+          ],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774897133557",
+          "date": "2026-03-30T18:58:53.557Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Erythrocyte Sedimentation Rate (ESR)",
+              "result": "positive"
+            }
+          ],
+          "notes": "",
+          "file": ""
+        }
+      ]
     },
     {
       "id": "4d22",
@@ -290,7 +413,30 @@
         "totalBill": 0,
         "paid": 0,
         "balance": 0
-      }
+      },
+      "labHistory": [
+        {
+          "id": "1774889985306",
+          "date": "2026-03-30T16:59:45.306Z",
+          "requestedBy": "Doctor",
+          "tests": [],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774890183244",
+          "date": "2026-03-30T17:03:03.244Z",
+          "requestedBy": "Yes",
+          "tests": [
+            {
+              "name": "Erythrocyte Sedimentation Rate (ESR)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "test",
+          "file": ""
+        }
+      ]
     },
     {
       "id": "a8de",
@@ -352,7 +498,23 @@
         "totalBill": 0,
         "paid": 0,
         "balance": 0
-      }
+      },
+      "runningBalance": 2000,
+      "labHistory": [
+        {
+          "id": "1774886785253",
+          "date": "2026-03-30T16:06:25.253Z",
+          "requestedBy": "Doctor",
+          "tests": [
+            {
+              "name": "Erythrocyte Sedimentation Rate (ESR)",
+              "result": "positive"
+            }
+          ],
+          "notes": "",
+          "file": ""
+        }
+      ]
     },
     {
       "id": "6a48",
@@ -383,7 +545,389 @@
         "totalBill": 0,
         "paid": 0,
         "balance": 0
-      }
+      },
+      "labHistory": [
+        {
+          "id": "1774891411699",
+          "date": "2026-03-30T17:23:31.699Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "test",
+          "file": ""
+        },
+        {
+          "id": "1774891411893",
+          "date": "2026-03-30T17:23:31.893Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "test",
+          "file": ""
+        },
+        {
+          "id": "1774891412392",
+          "date": "2026-03-30T17:23:32.392Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "test",
+          "file": ""
+        },
+        {
+          "id": "1774891412595",
+          "date": "2026-03-30T17:23:32.595Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "test",
+          "file": ""
+        },
+        {
+          "id": "1774891414896",
+          "date": "2026-03-30T17:23:34.896Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "test",
+          "file": ""
+        },
+        {
+          "id": "1774891415086",
+          "date": "2026-03-30T17:23:35.086Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "test",
+          "file": ""
+        },
+        {
+          "id": "1774891415514",
+          "date": "2026-03-30T17:23:35.514Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "test",
+          "file": ""
+        },
+        {
+          "id": "1774891415702",
+          "date": "2026-03-30T17:23:35.702Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "test",
+          "file": ""
+        },
+        {
+          "id": "1774891415878",
+          "date": "2026-03-30T17:23:35.878Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "test",
+          "file": ""
+        },
+        {
+          "id": "1774892082113",
+          "date": "2026-03-30T17:34:42.113Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892082781",
+          "date": "2026-03-30T17:34:42.781Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892083847",
+          "date": "2026-03-30T17:34:43.847Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892085569",
+          "date": "2026-03-30T17:34:45.569Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892086239",
+          "date": "2026-03-30T17:34:46.239Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892086425",
+          "date": "2026-03-30T17:34:46.425Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892086599",
+          "date": "2026-03-30T17:34:46.599Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892086799",
+          "date": "2026-03-30T17:34:46.799Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892087996",
+          "date": "2026-03-30T17:34:47.996Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892088187",
+          "date": "2026-03-30T17:34:48.187Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892088357",
+          "date": "2026-03-30T17:34:48.357Z",
+          "requestedBy": "test",
+          "tests": [
+            {
+              "name": "Packed Cell Volume (PCV)",
+              "result": "Positive"
+            }
+          ],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892091333",
+          "date": "2026-03-30T17:34:51.333Z",
+          "requestedBy": "test",
+          "tests": [],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892091729",
+          "date": "2026-03-30T17:34:51.729Z",
+          "requestedBy": "test",
+          "tests": [],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892091887",
+          "date": "2026-03-30T17:34:51.887Z",
+          "requestedBy": "test",
+          "tests": [],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892092065",
+          "date": "2026-03-30T17:34:52.065Z",
+          "requestedBy": "test",
+          "tests": [],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892092241",
+          "date": "2026-03-30T17:34:52.241Z",
+          "requestedBy": "test",
+          "tests": [],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892092422",
+          "date": "2026-03-30T17:34:52.422Z",
+          "requestedBy": "test",
+          "tests": [],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892092580",
+          "date": "2026-03-30T17:34:52.580Z",
+          "requestedBy": "test",
+          "tests": [],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892092746",
+          "date": "2026-03-30T17:34:52.746Z",
+          "requestedBy": "test",
+          "tests": [],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892092919",
+          "date": "2026-03-30T17:34:52.919Z",
+          "requestedBy": "test",
+          "tests": [],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892093085",
+          "date": "2026-03-30T17:34:53.085Z",
+          "requestedBy": "test",
+          "tests": [],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892093251",
+          "date": "2026-03-30T17:34:53.251Z",
+          "requestedBy": "test",
+          "tests": [],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892093437",
+          "date": "2026-03-30T17:34:53.437Z",
+          "requestedBy": "test",
+          "tests": [],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892105170",
+          "date": "2026-03-30T17:35:05.170Z",
+          "requestedBy": "test",
+          "tests": [],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892118908",
+          "date": "2026-03-30T17:35:18.908Z",
+          "requestedBy": "test",
+          "tests": [],
+          "notes": "",
+          "file": ""
+        },
+        {
+          "id": "1774892564101",
+          "date": "2026-03-30T17:42:44.101Z",
+          "requestedBy": "test",
+          "tests": [],
+          "notes": "",
+          "file": ""
+        }
+      ]
     },
     {
       "id": "5d07",
@@ -450,6 +994,78 @@
       "message": "David Mensah needs payment for lab",
       "isRead": false,
       "createdAt": "2026-03-23T14:05:32.419Z"
+    },
+    {
+      "id": "c029",
+      "role": "finance",
+      "title": "Payment Needed",
+      "message": "Ibrahim  Musa needs payment for lab",
+      "isRead": false,
+      "createdAt": "2026-03-26T17:09:10.220Z"
+    },
+    {
+      "id": "3bab",
+      "role": "finance",
+      "title": "Payment Needed",
+      "message": "Amina Tanko needs payment for lab",
+      "isRead": false,
+      "createdAt": "2026-03-28T13:48:20.320Z"
+    },
+    {
+      "id": "e58a",
+      "role": "finance",
+      "title": "Payment Needed",
+      "message": "Kano Adam needs payment for lab",
+      "isRead": false,
+      "createdAt": "2026-03-30T16:55:14.881Z"
+    },
+    {
+      "id": "602d",
+      "role": "finance",
+      "title": "Payment Needed",
+      "message": "Kano Adam needs payment for lab",
+      "isRead": false,
+      "createdAt": "2026-03-30T17:02:20.775Z"
+    },
+    {
+      "id": "1736",
+      "role": "finance",
+      "title": "Payment Needed",
+      "message": "Blessing Nwosu needs payment for lab",
+      "isRead": false,
+      "createdAt": "2026-03-30T17:20:36.698Z"
+    },
+    {
+      "id": "0331",
+      "role": "finance",
+      "title": "Payment Needed",
+      "message": "Ibrahim  Musa needs payment for lab",
+      "isRead": false,
+      "createdAt": "2026-03-30T17:44:34.001Z"
+    },
+    {
+      "id": "5b4e",
+      "role": "finance",
+      "title": "Payment Needed",
+      "message": "Esther Ajayi needs payment for lab",
+      "isRead": false,
+      "createdAt": "2026-03-30T18:27:09.925Z"
+    },
+    {
+      "id": "98ef",
+      "role": "finance",
+      "title": "Payment Needed",
+      "message": "eric sam needs payment for lab",
+      "isRead": false,
+      "createdAt": "2026-03-30T19:00:36.718Z"
+    },
+    {
+      "id": "da49",
+      "role": "finance",
+      "title": "Payment Needed",
+      "message": "Ibrahim  Musa needs payment for lab",
+      "isRead": false,
+      "createdAt": "2026-04-01T16:08:03.433Z"
     }
   ],
   "queue": [
@@ -463,7 +1079,7 @@
       "service": "lab",
       "paymentStatus": "paid",
       "currentDepartment": "lab",
-      "status": "waiting",
+      "status": "done",
       "createdAt": "2026-03-18T10:42:33.949Z",
       "labTests": [
         {
@@ -493,7 +1109,7 @@
       "service": "lab",
       "paymentStatus": "paid",
       "currentDepartment": "lab",
-      "status": "waiting",
+      "status": "done",
       "labTests": [
         {
           "name": "Erythrocyte Sedimentation Rate (ESR)",
@@ -521,6 +1137,249 @@
       "nextDepartment": "lab",
       "paymentMethod": "pos",
       "doctorNotes": ""
+    },
+    {
+      "id": "c923",
+      "patientId": "3dbc",
+      "patientName": "Ibrahim  Musa",
+      "reason": "good",
+      "priority": "Normal",
+      "notes": "",
+      "service": "lab",
+      "paymentStatus": "paid",
+      "currentDepartment": "lab",
+      "status": "done",
+      "labTests": [
+        {
+          "name": "Thyroid Function Test",
+          "amount": 15000,
+          "id": "df73"
+        },
+        {
+          "name": "Blood Culture",
+          "amount": 12000,
+          "id": "97ac"
+        }
+      ],
+      "labAmount": 27000,
+      "balance": 0,
+      "nextDepartment": "lab",
+      "paymentMethod": "pos",
+      "doctorNotes": "yeah"
+    },
+    {
+      "id": "53f6",
+      "patientId": "860d",
+      "patientName": "Amina Tanko",
+      "reason": "test",
+      "priority": "Normal",
+      "notes": "",
+      "service": "lab",
+      "paymentStatus": "paid",
+      "currentDepartment": "lab",
+      "status": "done",
+      "labTests": [
+        {
+          "name": "Erythrocyte Sedimentation Rate (ESR)",
+          "amount": 2000,
+          "id": "c9f1"
+        }
+      ],
+      "labAmount": 2000,
+      "balance": 0,
+      "nextDepartment": "lab",
+      "paymentMethod": "pos",
+      "doctorNotes": ""
+    },
+    {
+      "id": "8a2a",
+      "patientId": "4d22",
+      "patientName": "Kano Adam",
+      "reason": "",
+      "priority": "Normal",
+      "notes": "",
+      "service": "lab",
+      "paymentStatus": "paid",
+      "currentDepartment": "lab",
+      "status": "done",
+      "labTests": [
+        {
+          "name": "Full Blood Count (FBC)",
+          "amount": 3000,
+          "id": "9595"
+        },
+        {
+          "name": "Packed Cell Volume (PCV)",
+          "amount": 1500,
+          "id": "56eb"
+        }
+      ],
+      "labAmount": 4500,
+      "balance": 0,
+      "nextDepartment": "lab",
+      "paymentMethod": "cash",
+      "doctorNotes": ""
+    },
+    {
+      "id": "7064",
+      "patientId": "4d22",
+      "patientName": "Kano Adam",
+      "reason": "test",
+      "priority": "Normal",
+      "notes": "",
+      "service": "lab",
+      "paymentStatus": "paid",
+      "currentDepartment": "lab",
+      "status": "done",
+      "labTests": [
+        {
+          "name": "Erythrocyte Sedimentation Rate (ESR)",
+          "amount": 2000,
+          "id": "c9f1"
+        }
+      ],
+      "labAmount": 2000,
+      "balance": 0,
+      "nextDepartment": "lab",
+      "paymentMethod": "cash",
+      "doctorNotes": "Yes"
+    },
+    {
+      "id": "ad09",
+      "patientId": "6a48",
+      "patientName": "Blessing Nwosu",
+      "reason": "test",
+      "priority": "Normal",
+      "notes": "",
+      "service": "lab",
+      "paymentStatus": "paid",
+      "currentDepartment": "doctor",
+      "status": "done",
+      "labTests": [
+        {
+          "name": "Packed Cell Volume (PCV)",
+          "amount": 1500,
+          "id": "56eb"
+        }
+      ],
+      "labAmount": 1500,
+      "balance": 0,
+      "nextDepartment": "lab",
+      "paymentMethod": "cash",
+      "doctorNotes": "test"
+    },
+    {
+      "id": "d950",
+      "patientId": "3dbc",
+      "patientName": "Ibrahim  Musa",
+      "reason": "test",
+      "priority": "Normal",
+      "notes": "test",
+      "service": "lab",
+      "paymentStatus": "paid",
+      "currentDepartment": "doctor",
+      "status": "done",
+      "labTests": [
+        {
+          "name": "Erythrocyte Sedimentation Rate (ESR)",
+          "amount": 2000,
+          "id": "c9f1"
+        }
+      ],
+      "labAmount": 2000,
+      "balance": 0,
+      "nextDepartment": "lab",
+      "paymentMethod": "cash",
+      "doctorNotes": "test"
+    },
+    {
+      "id": "3de8",
+      "patientId": "c74e",
+      "patientName": "Esther Ajayi",
+      "reason": "test",
+      "priority": "Normal",
+      "notes": "test",
+      "service": "lab",
+      "paymentStatus": "paid",
+      "currentDepartment": "doctor",
+      "status": "done",
+      "labTests": [
+        {
+          "name": "Erythrocyte Sedimentation Rate (ESR)",
+          "amount": 2000,
+          "id": "c9f1"
+        }
+      ],
+      "labAmount": 2000,
+      "balance": 0,
+      "nextDepartment": "lab",
+      "paymentMethod": "cash",
+      "doctorNotes": "test"
+    },
+    {
+      "id": "5ddc",
+      "patientId": "690d",
+      "patientName": "eric sam",
+      "reason": "test",
+      "priority": "Normal",
+      "notes": "",
+      "service": "lab",
+      "paymentStatus": "paid",
+      "currentDepartment": "doctor",
+      "status": "done",
+      "labTests": [
+        {
+          "name": "Full Blood Count (FBC)",
+          "amount": 3000,
+          "id": "9595"
+        }
+      ],
+      "labAmount": 3000,
+      "balance": 0,
+      "nextDepartment": "lab",
+      "paymentMethod": "cash",
+      "doctorNotes": "test"
+    },
+    {
+      "id": "540d",
+      "patientId": "3dbc",
+      "patientName": "Ibrahim  Musa",
+      "reason": "test",
+      "priority": "Normal",
+      "notes": "test",
+      "service": "lab",
+      "paymentStatus": "paid",
+      "currentDepartment": "doctor",
+      "status": "done",
+      "labTests": [
+        {
+          "name": "Packed Cell Volume (PCV)",
+          "amount": 1500,
+          "id": "56eb"
+        }
+      ],
+      "labAmount": 1500,
+      "balance": 0,
+      "nextDepartment": "lab",
+      "paymentMethod": "cash",
+      "doctorNotes": "test"
+    },
+    {
+      "id": "9f1d",
+      "patientId": "6a48",
+      "patientName": "Blessing Nwosu",
+      "reason": "test",
+      "priority": "Normal",
+      "notes": "test",
+      "service": "consultation",
+      "paymentStatus": "paid",
+      "currentDepartment": "doctor",
+      "status": "in-progress",
+      "labTests": [],
+      "labAmount": 0,
+      "balance": 0,
+      "nextDepartment": null,
+      "paymentMethod": "cash"
     }
   ],
   "transactions": [
@@ -593,6 +1452,158 @@
       "amount": 17000,
       "paymentMethod": "transfer",
       "createdAt": "2026-03-23T14:07:43.908Z"
+    },
+    {
+      "id": "9e5c",
+      "patientName": "Ibrahim  Musa",
+      "service": "consultation",
+      "amount": 5000,
+      "paymentMethod": "pos",
+      "createdAt": "2026-03-26T17:08:07.059Z"
+    },
+    {
+      "id": "5246",
+      "patientName": "Ibrahim  Musa",
+      "service": "lab",
+      "amount": 27000,
+      "paymentMethod": "pos",
+      "createdAt": "2026-03-27T19:02:55.707Z"
+    },
+    {
+      "id": "933c",
+      "patientName": "Amina Tanko",
+      "service": "consultation",
+      "amount": 5000,
+      "paymentMethod": "cash",
+      "createdAt": "2026-03-28T13:47:11.519Z"
+    },
+    {
+      "id": "831d",
+      "patientName": "Amina Tanko",
+      "service": "lab",
+      "amount": 2000,
+      "paymentMethod": "pos",
+      "createdAt": "2026-03-28T13:48:53.120Z"
+    },
+    {
+      "id": "6cce",
+      "patientName": "Kano Adam",
+      "service": "consultation",
+      "amount": 5000,
+      "paymentMethod": "cash",
+      "createdAt": "2026-03-30T16:54:54.768Z"
+    },
+    {
+      "id": "b5df",
+      "patientName": "Kano Adam",
+      "service": "lab",
+      "amount": 4500,
+      "paymentMethod": "cash",
+      "createdAt": "2026-03-30T16:55:37.105Z"
+    },
+    {
+      "id": "e7cf",
+      "patientName": "Kano Adam",
+      "service": "consultation",
+      "amount": 5000,
+      "paymentMethod": "cash",
+      "createdAt": "2026-03-30T17:01:48.168Z"
+    },
+    {
+      "id": "8842",
+      "patientName": "Kano Adam",
+      "service": "lab",
+      "amount": 2000,
+      "paymentMethod": "cash",
+      "createdAt": "2026-03-30T17:02:37.122Z"
+    },
+    {
+      "id": "1b20",
+      "patientName": "Blessing Nwosu",
+      "service": "consultation",
+      "amount": 5000,
+      "paymentMethod": "cash",
+      "createdAt": "2026-03-30T17:20:12.561Z"
+    },
+    {
+      "id": "85f4",
+      "patientName": "Blessing Nwosu",
+      "service": "lab",
+      "amount": 1500,
+      "paymentMethod": "cash",
+      "createdAt": "2026-03-30T17:20:50.275Z"
+    },
+    {
+      "id": "8c0c",
+      "patientName": "Ibrahim  Musa",
+      "service": "consultation",
+      "amount": 5000,
+      "paymentMethod": "pos",
+      "createdAt": "2026-03-30T17:44:07.416Z"
+    },
+    {
+      "id": "accb",
+      "patientName": "Ibrahim  Musa",
+      "service": "lab",
+      "amount": 2000,
+      "paymentMethod": "cash",
+      "createdAt": "2026-03-30T17:44:44.220Z"
+    },
+    {
+      "id": "441b",
+      "patientName": "Esther Ajayi",
+      "service": "consultation",
+      "amount": 5000,
+      "paymentMethod": "cash",
+      "createdAt": "2026-03-30T18:26:45.514Z"
+    },
+    {
+      "id": "40dc",
+      "patientName": "Esther Ajayi",
+      "service": "lab",
+      "amount": 2000,
+      "paymentMethod": "cash",
+      "createdAt": "2026-03-30T18:27:22.418Z"
+    },
+    {
+      "id": "ddb0",
+      "patientName": "eric sam",
+      "service": "consultation",
+      "amount": 5000,
+      "paymentMethod": "cash",
+      "createdAt": "2026-03-30T19:00:08.614Z"
+    },
+    {
+      "id": "f3d1",
+      "patientName": "eric sam",
+      "service": "lab",
+      "amount": 3000,
+      "paymentMethod": "cash",
+      "createdAt": "2026-03-30T19:00:46.388Z"
+    },
+    {
+      "id": "3765",
+      "patientName": "Ibrahim  Musa",
+      "service": "consultation",
+      "amount": 5000,
+      "paymentMethod": "cash",
+      "createdAt": "2026-04-01T15:52:28.320Z"
+    },
+    {
+      "id": "918b",
+      "patientName": "Blessing Nwosu",
+      "service": "consultation",
+      "amount": 5000,
+      "paymentMethod": "cash",
+      "createdAt": "2026-04-01T15:59:54.825Z"
+    },
+    {
+      "id": "bccc",
+      "patientName": "Ibrahim  Musa",
+      "service": "lab",
+      "amount": 1500,
+      "paymentMethod": "cash",
+      "createdAt": "2026-04-01T16:08:20.055Z"
     }
   ],
   "labTest": [

@@ -66,9 +66,16 @@ const Sidebar = () => {
     },
 
     {
-      to: "/dashboard/lab-request",
+      to: "/dashboard/lab-requests",
       icon: <RiReceiptLine size={22} />,
-      label: "Lab Request",
+      label: "Requests",
+      roles: ["lab_officer"],
+    },
+
+    {
+      to: "/dashboard/lab-results",
+      icon: <RiReceiptLine size={22} />,
+      label: "Results",
       roles: ["lab_officer"],
     },
   ];
