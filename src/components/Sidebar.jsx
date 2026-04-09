@@ -9,6 +9,7 @@ import {
   RiUser3Line,
   RiReceiptLine,
 } from "react-icons/ri";
+import { FaUserClock } from "react-icons/fa";
 import { useAppStore } from "../store/useAppStore";
 
 const Sidebar = () => {
@@ -38,6 +39,12 @@ const Sidebar = () => {
       to: "/dashboard/users",
       icon: <RiUserHeartLine size={22} />,
       label: "Users",
+      roles: ["admin"],
+    },
+    {
+      to: "/dashboard/shifts",
+      icon: <FaUserClock size={22} />,
+      label: "Shift Management",
       roles: ["admin"],
     },
     {

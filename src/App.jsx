@@ -19,7 +19,7 @@ import DashboardLayout from "./layout/DashboardLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FinancePayments from "./pages/Dashboard/FinancePayments";
 import Transactions from "./pages/Dashboard/Transactions";
-import LabRequest from "./pages/Dashboard/LabRequest";
+// import LabRequest from "./pages/Dashboard/LabRequest";
 import User from "./pages/Dashboard/User";
 
 const App = () => {
@@ -121,14 +121,14 @@ const App = () => {
           />
 
           {/* 8. Lab_Officer */}
-          <Route
+          {/* <Route
             path="/dashboard/lab-requests"
             element={
               <ProtectedRoute allowedRoles={["lab_officer", "doctor", "admin"]}>
                 <LabRequest />
               </ProtectedRoute>
             }
-          />
+          /> */}
 
           {/* 9. Global Profile & Notifications (Everyone) */}
           <Route
