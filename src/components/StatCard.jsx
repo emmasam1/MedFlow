@@ -15,9 +15,10 @@ const icons = {
   blue: LuUsers,
   green: LuUserPlus,
   red: AiTwotoneAlert, 
+  indigo: LuCalendarCheck,
 };
 
-const StatCard = ({ title, value, color }) => {
+const StatCard = ({ title, value, color, }) => {
   const { darkMode } = useStore();
   const Icon = icons[color];
 
@@ -71,6 +72,10 @@ const StatCard = ({ title, value, color }) => {
       card: "bg-[#3F1E1E]",
       icon: "bg-[#5C2A2A] text-red-300",
     },
+  },
+  indigo: {
+    light: { card: "bg-[#E0E7FF]", icon: "bg-[#C7D2FE] text-indigo-800" },
+    dark: { card: "bg-[#1E1B4B]", icon: "bg-[#312E81] text-indigo-300" },
   },
 };
 
