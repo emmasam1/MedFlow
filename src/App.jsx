@@ -22,6 +22,7 @@ import Transactions from "./pages/Dashboard/Transactions";
 // import LabRequest from "./pages/Dashboard/LabRequest";
 import User from "./pages/Dashboard/User";
 import ShiftManagement from "./pages/Dashboard/ShiftManagement";
+import Departments from "./pages/Dashboard/Departments";
 
 const App = () => {
   // Common list for all authorized dashboard users
@@ -58,6 +59,14 @@ const App = () => {
             element={
               <ProtectedRoute allowedRoles={["admin"]}>
                 <User />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/departments"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <Departments />
               </ProtectedRoute>
             }
           />
