@@ -1,18 +1,23 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
-import { VitePWA } from "vite-plugin-pwa";
 import tailwindcss from "@tailwindcss/vite";
+import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+
     VitePWA({
       registerType: "autoUpdate",
+
+      // ❌ disable in dev (important)
       devOptions: {
-        enabled: true, // ✅ enables PWA during npm run dev
+        enabled: false,
       },
+
       includeAssets: ["favicon.svg", "robots.txt"],
+
       manifest: {
         name: "Hospital Management System",
         short_name: "HMS",
@@ -37,6 +42,34 @@ export default defineConfig({
             sizes: "512x512",
             type: "image/png",
             purpose: "any maskable",
+          },
+        ],
+      },
+
+      // ✅ ADD THIS (important)
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,png,svg,ico}"],
+
+        runtimeCaching: [
+          {
+            urlPattern: ({ request }) =>
+              request.destination === "image",
+            handler: "CacheFirst",
+            options: {
+              cacheName: "images",
+              expiration: {
+                maxEntries: 50,
+              },
+            },
+          },
+          {
+            urlPattern: ({ request }) =>
+              request.destination === "script" ||
+              request.destination === "style",
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "assets",
+            },
           },
         ],
       },

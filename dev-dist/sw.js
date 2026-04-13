@@ -77,13 +77,93 @@ define(['./workbox-5a5d9309'], (function (workbox) { 'use strict';
    * requests for URLs in the manifest.
    * See https://goo.gl/S9QRab
    */
-  workbox.precacheAndRoute([{
-    "url": "index.html",
-    "revision": "0.2oote1ulhi"
-  }], {});
+ /**
+ * Service Worker (Workbox)
+ */
+
+// Prevent duplicate loader
+if (!self.define) {
+  let registry = {};
+  let nextDefineUri;
+
+  const singleRequire = (uri, parentUri) => {
+    uri = new URL(uri + ".js", parentUri).href;
+
+    return registry[uri] || (
+      new Promise(resolve => {
+        if ("document" in self) {
+          const script = document.createElement("script");
+          script.src = uri;
+          script.onload = resolve;
+          document.head.appendChild(script);
+        } else {
+          nextDefineUri = uri;
+          importScripts(uri);
+          resolve();
+        }
+      }).then(() => {
+        let promise = registry[uri];
+        if (!promise) {
+          throw new Error(`Module ${uri} didn’t register`);
+        }
+        return promise;
+      })
+    );
+  };
+
+  self.define = (depsNames, factory) => {
+    const uri =
+      nextDefineUri ||
+      ("document" in self ? document.currentScript.src : "") ||
+      location.href;
+
+    if (registry[uri]) return;
+
+    let exports = {};
+    const require = depUri => singleRequire(depUri, uri);
+
+    const specialDeps = {
+      module: { uri },
+      exports,
+      require,
+    };
+
+    registry[uri] = Promise.all(
+      depsNames.map(dep => specialDeps[dep] || require(dep))
+    ).then(deps => {
+      factory(...deps);
+      return exports;
+    });
+  };
+}
+
+// Main Workbox logic
+define(["./workbox-5a5d9309"], function (workbox) {
+  "use strict";
+
+  self.skipWaiting();
+  workbox.clientsClaim();
+
+  // Precache files
+  workbox.precacheAndRoute([
+    {
+      url: "index.html",
+      revision: "0.2oote1ulhi",
+    },
+  ]);
+
+  // Clean old caches
   workbox.cleanupOutdatedCaches();
-  workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {
-    allowlist: [/^\/$/]
-  }));
+
+  // SPA routing
+  workbox.registerRoute(
+    new workbox.NavigationRoute(
+      workbox.createHandlerBoundToURL("index.html"),
+      {
+        allowlist: [/^\/$/],
+      }
+    )
+  );
+});
 
 }));

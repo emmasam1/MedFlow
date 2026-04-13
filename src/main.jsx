@@ -17,7 +17,14 @@ import { BrowserRouter } from "react-router-dom";
 
 import { registerSW } from "virtual:pwa-register";
 
-registerSW({ immediate: true });
+registerSW({
+  onNeedRefresh() {
+    console.log("New version available");
+  },
+  onOfflineReady() {
+    console.log("App ready offline");
+  },
+});
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
