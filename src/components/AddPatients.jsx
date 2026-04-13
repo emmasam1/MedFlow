@@ -8,7 +8,7 @@ import {
   RiImageAddLine,
 } from "react-icons/ri";
 import { useAppStore } from "../store/useAppStore";
-import { ToastContainer, toast, Slide } from "react-toastify";
+import { ToastContainer, toast, Bounce } from "react-toastify";
 
 const generateCardNumber = (type) => {
   const prefixes = {
@@ -18,14 +18,13 @@ const generateCardNumber = (type) => {
     kachma: "KCH",
   };
 
-
   const prefix = prefixes[type] || "GEN";
 
   return `${prefix}-${Math.floor(100000 + Math.random() * 900000)}`;
 };
 
 const AddPatients = ({ onSuccess }) => {
-  const { darkMode, addPatient } = useAppStore();
+  const { darkMode, registerPatient } = useAppStore();
   const [currentStep, setCurrentStep] = useState(1);
   const [photo, setPhoto] = useState(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -83,10 +82,23 @@ const AddPatients = ({ onSuccess }) => {
   const capturePhoto = () => {
     const canvas = canvasRef.current;
     const video = videoRef.current;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext("2d").drawImage(video, 0, 0);
-    setPhoto(canvas.toDataURL("image/png"));
+
+    // FIX: Force a smaller size (e.g., 400px width) instead of the full video resolution
+    const scale = 400 / video.videoWidth;
+    canvas.width = 400;
+    canvas.height = video.videoHeight * scale;
+
+    const ctx = canvas.getContext("2d");
+
+    // Optional: Flip the image horizontally so it's not mirrored
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Use 0.4 quality. This will make the file roughly 30KB - 50KB
+    const compressedBase64 = canvas.toDataURL("image/jpeg", 0.4);
+    setPhoto(compressedBase64);
     stopCamera();
   };
 
@@ -119,16 +131,15 @@ const AddPatients = ({ onSuccess }) => {
   ];
 
   const getStatus = (type) => {
-  const statuses = {
-    single: "Private",
-    family: "Regular",
-    nhis: "Insurance",
-    kachma: "Insurance",
+    const statuses = {
+      single: "Private",
+      family: "Regular",
+      nhis: "Insurance",
+      kachma: "Insurance",
+    };
+
+    return statuses[type] || "Regular";
   };
-
-  return statuses[type] || "Regular";
-};
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -190,7 +201,7 @@ const AddPatients = ({ onSuccess }) => {
         regDate: new Date().toISOString().split("T")[0],
       };
 
-      await addPatient(newPatient);
+      await registerPatient(newPatient);
 
       toast.success("Patient registered successfully!");
 
@@ -232,7 +243,19 @@ const AddPatients = ({ onSuccess }) => {
 
   return (
     <div className="w-full max-h-[85vh]">
-      <ToastContainer transition={Slide} />
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
       {/* Progress Bar - More Compact */}
       <div className="flex items-center justify-between mb-4 max-w-xs mx-auto">
         {[1, 2, 3].map((step) => (
