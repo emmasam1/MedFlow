@@ -15,6 +15,7 @@ export const useAppStore = create((set) => ({
   user: getInitialUser(),
   loading: false,
   notifications: [],
+  patients: [],
 
   login: async (identifier, password) => {
     set({ loading: true });
@@ -37,32 +38,34 @@ export const useAppStore = create((set) => ({
     }
   },
 
-  registerStaff: async (staffData) => {
-    set({ loading: true });
-    try {
-      const formData = new FormData();
+registerStaff: async (staffData) => {
+  console.log(staffData)
+  set({ loading: true });
+  try {
+    const formData = new FormData();
 
-      Object.keys(staffData).forEach((key) => {
-        // Only append if the value actually exists to avoid sending "undefined" strings
-        if (staffData[key] !== undefined && staffData[key] !== null) {
-          formData.append(key, staffData[key]);
-        }
-      });
+    Object.keys(staffData).forEach((key) => {
+      // Logic to ensure the File object (avatar) is appended correctly
+      if (staffData[key] !== undefined && staffData[key] !== null) {
+        formData.append(key, staffData[key]);
+      }
+    });
 
-      const response = await api.post("/auth/register-staff", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+    const response = await api.post("/auth/register-staff", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
-      set({ loading: false });
-      return response.data; // Ensure this contains the new user object in .data
-    } catch (error) {
-      set({ loading: false });
-      const message = error.response?.data?.message || "Registration failed";
-      throw new Error(message);
-    }
-  },
+    console.log(response)
+
+    set({ loading: false });
+    return response.data;
+  } catch (error) {
+    set({ loading: false });
+    throw new Error(error.response?.data?.message || "Registration failed");
+  }
+},
 
   getStaff: async () => {
     try {
@@ -84,9 +87,49 @@ export const useAppStore = create((set) => ({
     set({ user: null, notifications: [] });
   },
 
+  getPatients: async () => {
+    set({ loading: true });
+    try {
+      const response = await api.get("/patient");
+      const data = response.data.data;
+      set({ patients: data, loading: false }); // Save to state!
+      return data;
+    } catch (error) {
+      set({ loading: false });
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch patients",
+      );
+    }
+  },
+
+  registerPatient: async (patientData) => {
+    console.log(patientData);
+    set({ loading: true });
+    try {
+      const response = await api.post("/patient/register", patientData);
+      const newPatient = response.data.data;
+
+      console.log(response);
+
+      // Update local state so the UI adds the patient immediately
+      set((state) => ({
+        patients: [newPatient, ...state.patients],
+        loading: false,
+      }));
+
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      set({ loading: false });
+      throw new Error(
+        error.response?.data?.message || "Patient registration failed",
+      );
+    }
+  },
+
   // getAllLabResults: () => {
   //   const { patients } = get();
-  
+
   //   const results = patients.flatMap((p) =>
   //     (p.labHistory || []).map((lab) => ({
   //       ...lab,
@@ -95,10 +138,9 @@ export const useAppStore = create((set) => ({
   //       patientCode: p.patientId,
   //     }))
   //   );
-  
+
   //   return results.sort(
   //     (a, b) => new Date(b.date) - new Date(a.date)
   //   );
   // },
-    
 }));
