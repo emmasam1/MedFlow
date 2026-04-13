@@ -363,7 +363,7 @@ const User = () => {
           >
             User Management
           </h2>
-          <p className="text-xs text-gray-400 mt-1 flex items-center gap-2">
+           <p className="text-sm text-slate-500">
             Configure staff access and system permissions
           </p>
         </div>

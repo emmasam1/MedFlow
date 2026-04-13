@@ -8,12 +8,14 @@ import {
   RiSettings4Line,
   RiUser3Line,
   RiReceiptLine,
+  RiStackLine
 } from "react-icons/ri";
 import { FaUserClock } from "react-icons/fa";
 import { useAppStore } from "../store/useAppStore";
 
 const Sidebar = () => {
-  const { isSidebarOpen, toggleSidebar, sidebarTheme, isRTL, darkMode } = useStore();
+  const { isSidebarOpen, toggleSidebar, sidebarTheme, isRTL, darkMode } =
+    useStore();
 
   const user = useAppStore((state) => state.user);
 
@@ -33,12 +35,26 @@ const Sidebar = () => {
       to: "/dashboard",
       icon: <RiDashboardLine size={22} />,
       label: "Dashboard",
-      roles: ["doctor", "record_officer", "finance_officer", "specialist","lab_officer", "nurse", "admin"],
+      roles: [
+        "doctor",
+        "record_officer",
+        "finance_officer",
+        "specialist",
+        "lab_officer",
+        "nurse",
+        "admin",
+      ],
     },
     {
       to: "/dashboard/users",
       icon: <RiUserHeartLine size={22} />,
       label: "Users",
+      roles: ["admin"],
+    },
+    {
+      to: "/dashboard/departments",
+      icon: <RiStackLine size={22} />, // Clean, organized, and structural
+      label: "Departments",
       roles: ["admin"],
     },
     {
