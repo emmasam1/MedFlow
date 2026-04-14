@@ -103,7 +103,7 @@ registerStaff: async (staffData) => {
   },
 
   registerPatient: async (patientData) => {
-    // console.log(patientData);
+    console.log(patientData);
     set({ loading: true });
     
     // Get the token from sessionStorage

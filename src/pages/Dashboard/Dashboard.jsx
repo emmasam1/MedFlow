@@ -49,6 +49,7 @@ const Dashboard = () => {
   const {
     patients,
     appointments,
+    getPatients,
     fetchPatients,
     fetchAppointments,
     queue,
@@ -176,7 +177,7 @@ const Dashboard = () => {
         const staffArray = response?.staffMembers || [];
         setUsers(staffArray);
       } catch (err) {
-        toast.error("Could not load staff list");
+        {user?.role !== "admin" ? "" : toast.error("Could not load staff list");}
         setUsers([]); // Fallback to empty array
       } finally {
         setIsLoading(false);
@@ -184,6 +185,10 @@ const Dashboard = () => {
     };
     fetchStaff();
   }, [getStaff]);
+
+  useEffect(() => {
+    getPatients()
+  },[getPatients])
 
   const StatSkeleton = () => (
     <Card className="w-full">
