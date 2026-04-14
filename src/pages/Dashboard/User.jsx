@@ -315,7 +315,7 @@ const User = () => {
           }}
           className={buttonStyle}
         >
-          <AiOutlineUserAdd size={18} /> Add New Staff
+          <AiOutlineUserAdd size={18} /> Add New Staff test
         </motion.button>
       </div>
 
