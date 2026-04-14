@@ -23,6 +23,7 @@ import Transactions from "./pages/Dashboard/Transactions";
 import User from "./pages/Dashboard/User";
 import ShiftManagement from "./pages/Dashboard/ShiftManagement";
 import Departments from "./pages/Dashboard/Departments";
+import InstallPWA from "./components/InstallPWA";
 
 const App = () => {
   // Common list for all authorized dashboard users
@@ -31,6 +32,7 @@ const App = () => {
   return (
     <>
       <ScrollToTop />
+      <InstallPWA />
       <Routes>
         {/* Public Route */}
         <Route path="/" element={<Login />} />
