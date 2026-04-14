@@ -90,7 +90,7 @@ registerStaff: async (staffData) => {
   getPatients: async () => {
     set({ loading: true });
     try {
-      const response = await api.get("/patient");
+      const response = await api.get("/patients");
       const data = response.data.data;
       set({ patients: data, loading: false }); // Save to state!
       return data;
@@ -103,15 +103,21 @@ registerStaff: async (staffData) => {
   },
 
   registerPatient: async (patientData) => {
-    console.log(patientData);
+    // console.log(patientData);
     set({ loading: true });
+    
+    // Get the token from sessionStorage
+    const token = sessionStorage.getItem("bearerToken");
+
     try {
-      const response = await api.post("/patient/register", patientData);
+      const response = await api.post("/patients/register", patientData, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Inject token here
+        },
+      });
+      
       const newPatient = response.data.data;
 
-      console.log(response);
-
-      // Update local state so the UI adds the patient immediately
       set((state) => ({
         patients: [newPatient, ...state.patients],
         loading: false,
@@ -119,13 +125,37 @@ registerStaff: async (staffData) => {
 
       return response.data;
     } catch (error) {
-      console.log(error);
       set({ loading: false });
       throw new Error(
         error.response?.data?.message || "Patient registration failed",
       );
     }
   },
+
+  // registerPatient: async (patientData) => {
+  //   console.log(patientData);
+  //   set({ loading: true });
+  //   try {
+  //     const response = await api.post("/patients/register", patientData);
+  //     const newPatient = response.data.data;
+
+  //     console.log(response);
+
+  //     // Update local state so the UI adds the patient immediately
+  //     set((state) => ({
+  //       patients: [newPatient, ...state.patients],
+  //       loading: false,
+  //     }));
+
+  //     return response.data;
+  //   } catch (error) {
+  //     console.log(error);
+  //     set({ loading: false });
+  //     throw new Error(
+  //       error.response?.data?.message || "Patient registration failed",
+  //     );
+  //   }
+  // },
 
   // getAllLabResults: () => {
   //   const { patients } = get();

@@ -21,11 +21,13 @@ const Patients = () => {
   const [printPatient, setPrintPatient] = useState(null);
   const printRef = useRef();
 
-  const { fetchPatients, patients, updatePatient } = useAppStore();
+  const { getPatients, patients, updatePatient } = useAppStore();
 
   useEffect(() => {
-    fetchPatients();
-  }, [fetchPatients]);
+    getPatients();
+  }, [getPatients]);
+
+  console.log(patients)
 
   const columns = [
     { title: "Card No", key: "cardNumber", sortable: true },
