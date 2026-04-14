@@ -9,6 +9,9 @@ import {
   RiDeleteBin7Line,
   RiEyeLine,
   RiEyeOffLine,
+  RiUserStarLine,
+  RiMore2Fill,
+  RiShieldCheckLine,
 } from "react-icons/ri";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import StatCard from "../../components/StatCard";
@@ -21,6 +24,9 @@ import { ToastContainer, toast, Bounce } from "react-toastify";
 const User = () => {
   const [users, setUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHodModalOpen, setIsHodModalOpen] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState(null);
+  const [selectedDeptId, setSelectedDeptId] = useState("");
   const [searchText, setSearchText] = useState("");
   const { darkMode } = useStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,6 +50,14 @@ const User = () => {
     licenseNumber: "",
     phoneNumber: "",
   });
+
+  const dummyDepartments = [
+    { id: 1, name: "Emergency Unit" },
+    { id: 2, name: "Cardiology" },
+    { id: 3, name: "Diagnostic Lab" },
+    { id: 4, name: "Pediatrics" },
+    { id: 5, name: "Neurology" },
+  ];
 
   // Helper to handle input changes
   const handleInputChange = (e) => {
@@ -188,82 +202,6 @@ const User = () => {
     });
   };
 
-  // --- Handlers ---
-  // const handleAddUser = async (e) => {
-  //   // 1. STOP THE RELOAD
-  //   e.preventDefault();
-
-  //   setIsSubmitting(true);
-  //   console.log("Registration started...");
-
-  //   // 2. Extract data from the form
-  //   const formData = new FormData(e.currentTarget);
-  //   const values = Object.fromEntries(formData.entries());
-  //   const file = fileInputRef.current?.files[0];
-
-  //   const submissionData = {
-  //     ...values,
-  //     avatar: file,
-  //   };
-
-  //   // Log the data being sent (Note: FormData is hard to view, so we log the object)
-  //   // console.log("Submitting Data:", submissionData);
-
-  //   try {
-  //     const response = await registerStaff(submissionData);
-
-  //     // LOG SUCCESS
-  //     // console.log("Registration Success Response:", response);
-  //     toast.success("Staff registered successfully!");
-
-  //     // 3. Update local UI state so the new user appears in the table immediately
-  //     if (response?.data) {
-  //       // Use the spread operator only if you're sure prev is an array
-  //       setUsers((prev) => [
-  //         response.data,
-  //         ...(Array.isArray(prev) ? prev : []),
-  //       ]);
-  //     }
-
-  //     handleClose();
-  //   } catch (err) {
-  //     // LOG ERROR
-  //     console.error("Registration Error:", err.message);
-  //     toast.error(err.message);
-  //   } finally {
-  //     setIsSubmitting(false);
-  //   }
-  // };
-  // const handleAddUser = async (e) => {
-  //   e.preventDefault();
-  //   setIsSubmitting(true);
-
-  //   // Combine your text fields and the file into one plain object
-  //   const dataToSend = {
-  //     ...formData,
-  //     avatar: fileInputRef.current?.files[0], // Add the file here
-  //   };
-
-  //   try {
-  //     if (editingUser) {
-  //       // For updates, you might still want to use FormData if your updateStaff
-  //       // expects it, or update updateStaff to match this pattern.
-  //       await updateStaff(editingUser._id, dataToSend);
-  //       toast.success("Staff updated successfully!");
-  //     } else {
-  //       // Pass the plain object
-  //       await registerStaff(dataToSend);
-  //       toast.success("Staff registered successfully!");
-  //     }
-  //     getStaff();
-  //     handleClose();
-  //   } catch (err) {
-  //     toast.error(err.message);
-  //   } finally {
-  //     setIsSubmitting(false);
-  //   }
-  // };
-
   const handleAddUser = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -363,7 +301,7 @@ const User = () => {
           >
             User Management
           </h2>
-           <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500">
             Configure staff access and system permissions
           </p>
         </div>
@@ -452,7 +390,7 @@ const User = () => {
                 <th className="px-6 py-4 text-[11px] uppercase tracking-widest border-b border-gray-100 font-bold text-slate-400">
                   Status
                 </th>
-                <th className="px-6 py-4 text-right text-[11px] uppercase tracking-widest border-b border-gray-100 font-bold text-slate-400">
+                <th className="px-6 text-center py-4 text-[11px] uppercase tracking-widest border-b border-gray-100 font-bold text-slate-400">
                   Action
                 </th>
               </tr>
@@ -529,6 +467,17 @@ const User = () => {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-1">
+                        <Tooltip title="Assign as HOD" placement="top">
+                          <button
+                            onClick={() => {
+                              setSelectedStaff(user);
+                              setIsHodModalOpen(true);
+                            }}
+                            className="p-2 cursor-pointer hover:bg-amber-50 rounded-lg transition-colors group/btn"
+                          >
+                            <RiUserStarLine className="text-lg text-slate-400 group-hover/btn:text-amber-500" />
+                          </button>
+                        </Tooltip>
                         <Tooltip title="Reset Password" placement="top">
                           <button className="p-2 cursor-pointer hover:bg-yellow-50 rounded-lg transition-colors group/btn">
                             <RiKey2Line className="text-lg text-slate-400 group-hover/btn:text-yellow-500" />
@@ -938,6 +887,116 @@ const User = () => {
             </button>
           </div>
         </form>
+      </Modal>
+
+      {/* Make User HOD Modal */}
+      <Modal
+        title={`Appoint ${selectedStaff?.firstName || "Staff"} as HOD`}
+        isOpen={isHodModalOpen}
+        onClose={() => {
+          setIsHodModalOpen(false);
+          setSelectedStaff(null);
+          setSelectedDeptId("");
+        }}
+      >
+        <div className="p-4">
+          {/* Staff Identity Card */}
+          <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl mb-6 border border-slate-100">
+            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm text-blue-600 font-black border border-slate-100 uppercase">
+              {selectedStaff?.firstName?.charAt(0) || "U"}
+            </div>
+            <div>
+              <p className="text-sm font-black text-slate-800">
+                {selectedStaff?.firstName} {selectedStaff?.lastName}
+              </p>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+              {selectedStaff?.department || "EMP-000"} •{" "}
+                {selectedStaff?.role || "Staff"}
+              </p>
+            </div>
+          </div>
+
+          {/* Department Selection */}
+          <div className="space-y-4 mb-8">
+            <div className="flex flex-col gap-2">
+              <label className="text-[11px] font-black text-slate-500 uppercase ml-1 tracking-widest">
+                Assign to Department
+              </label>
+              <div className="relative group">
+                <select
+                  value={selectedDeptId}
+                  onChange={(e) => setSelectedDeptId(e.target.value)}
+                  className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all cursor-pointer appearance-none"
+                >
+                  <option value="" disabled>
+                    Select Department...
+                  </option>
+                  {/* Dummy Data mapping */}
+                  {[
+                    { id: "1", name: "Emergency Unit" },
+                    { id: "2", name: "Cardiology" },
+                    { id: "3", name: "Diagnostic Lab" },
+                    { id: "4", name: "Pediatrics" },
+                  ].map((dept) => (
+                    <option key={dept.id} value={dept.id}>
+                      {dept.name}
+                    </option>
+                  ))}
+                </select>
+
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                  <RiMore2Fill size={16} className="rotate-90" />
+                </div>
+              </div>
+            </div>
+
+            {/* Warning Box */}
+            <div className="p-3 bg-amber-50 rounded-xl border border-amber-100 flex gap-3">
+              <RiShieldCheckLine
+                className="text-amber-500 shrink-0"
+                size={20}
+              />
+              <div>
+                <p className="text-[11px] text-amber-800 font-black uppercase tracking-tight">
+                  Access Upgrade
+                </p>
+                <p className="text-[10px] text-amber-700 leading-tight font-medium mt-0.5">
+                  This will grant the user permission to edit rosters and manage
+                  unit staff.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          
+
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => setIsHodModalOpen(false)}
+              className="py-3 px-4 rounded-xl font-bold text-slate-400 hover:bg-slate-100 transition-colors cursor-pointer text-xs"
+            >
+              Cancel
+            </button>
+            <button
+              disabled={!selectedDeptId}
+              onClick={() => {
+                console.log(
+                  `Promoting ${selectedStaff?.firstName} to HOD of Dept ID: ${selectedDeptId}`,
+                );
+                setIsHodModalOpen(false);
+              }}
+              className={`py-3 px-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-xs shadow-lg ${
+                selectedDeptId
+                  ? "bg-slate-900 hover:bg-black text-white shadow-slate-200 cursor-pointer"
+                  : "bg-slate-100 text-slate-300 cursor-not-allowed shadow-none"
+              }`}
+            >
+              <RiUserStarLine size={16} />
+              Confirm Appointment
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   );
