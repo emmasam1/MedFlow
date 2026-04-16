@@ -177,7 +177,11 @@ const Dashboard = () => {
         const staffArray = response?.staffMembers || [];
         setUsers(staffArray);
       } catch (err) {
-        {user?.role !== "admin" ? "" : toast.error("Could not load staff list");}
+        {
+          user?.role !== "admin"
+            ? ""
+            : toast.error("Could not load staff list");
+        }
         setUsers([]); // Fallback to empty array
       } finally {
         setIsLoading(false);
@@ -187,8 +191,8 @@ const Dashboard = () => {
   }, [getStaff]);
 
   useEffect(() => {
-    getPatients()
-  },[getPatients])
+    getPatients();
+  }, [getPatients]);
 
   const StatSkeleton = () => (
     <Card className="w-full">
@@ -405,22 +409,38 @@ const Dashboard = () => {
           {/* RECORD OFFICER VIEW (Uses Toggle Logic) */}
           {role === "record_officer" && (
             <div className="col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              <StatCard
-                title="Total Patients"
-                value={totalPatients}
-                color="blue"
-              />
-              <StatCard title="New Today" value={newPatients} color="green" />
-              <StatCard
-                title="Appointments"
-                value={totalAppointments}
-                color="purple"
-              />
-              <StatCard
-                title="Active Queue"
-                value={waitingQueue}
-                color="orange"
-              />
+              {isLoading ? (
+                Array(4)
+                  .fill(0)
+                  .map((_, index) => (
+                    <Col xs={24} sm={12} lg={24} key={`skeleton-${index}`}>
+                      <StatSkeleton />
+                    </Col>
+                  ))
+              ) : (
+                <>
+                  <StatCard
+                    title="Total Patients"
+                    value={totalPatients}
+                    color="blue"
+                  />
+                  <StatCard
+                    title="New Today"
+                    value={newPatients}
+                    color="green"
+                  />
+                  <StatCard
+                    title="Appointments"
+                    value={totalAppointments}
+                    color="purple"
+                  />
+                  <StatCard
+                    title="Active Queue"
+                    value={waitingQueue}
+                    color="orange"
+                  />
+                </>
+              )}
             </div>
           )}
         </div>
