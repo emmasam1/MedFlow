@@ -283,28 +283,67 @@ const Topbar = () => {
 
   // Detect if the app is running as an installed PWA
   const [isStandalone, setIsStandalone] = useState(false);
+  const [canGoBack, setCanGoBack] = useState(false);
 
   useEffect(() => {
     const checkStandalone = () => {
       const isPWA =
         window.matchMedia("(display-mode: standalone)").matches ||
-        window.navigator.standalone === true; // iOS support
+        window.navigator.standalone === true;
 
       setIsStandalone(isPWA);
+      setCanGoBack(window.history.length > 1);
     };
 
     checkStandalone();
 
-    // Listen for changes (important for dev/testing)
     const mediaQuery = window.matchMedia("(display-mode: standalone)");
     mediaQuery.addEventListener("change", checkStandalone);
 
+    window.addEventListener("popstate", checkStandalone);
+
     return () => {
       mediaQuery.removeEventListener("change", checkStandalone);
+      window.removeEventListener("popstate", checkStandalone);
     };
   }, []);
 
-  const canGoBack = window.history.length > 1;
+  useEffect(() => {
+    let startX = 0;
+
+    const handleTouchStart = (e) => {
+      startX = e.touches[0].clientX;
+    };
+
+    const handleTouchEnd = (e) => {
+      const endX = e.changedTouches[0].clientX;
+
+      // Swipe from left edge
+      if (startX < 50 && endX - startX > 100) {
+        if (window.history.length > 1) {
+          navigate(-1);
+        }
+      }
+    };
+
+    window.addEventListener("touchstart", handleTouchStart);
+    window.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [navigate]);
+
+  const handleRefresh = () => {
+    // soft reload effect
+    document.body.style.opacity = "0.6";
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 300);
+  };
+
   const role = user?.role;
 
   useEffect(() => {
@@ -387,6 +426,7 @@ const Topbar = () => {
       {/* Left side: Navigation & Brand */}
       <div className="flex items-center gap-4">
         {/* PWA Back Button: Only visible when installed */}
+
         {isStandalone && (
           <button
             onClick={() => {
@@ -427,12 +467,14 @@ const Topbar = () => {
       <div className="flex items-center gap-4 sm:gap-6">
         {/* PWA Reload Button: Only visible when installed */}
         {isStandalone && (
-          <button
-            onClick={() => window.location.href = window.location.href}
-            className="p-2 hover:bg-blue-50 rounded-full text-blue-500 transition-all hover:rotate-180 duration-500"
+          <motion.button
+            onClick={handleRefresh}
+            whileTap={{ scale: 0.85 }}
+            whileHover={{ rotate: 180 }}
+            className="p-2 bg-blue-50 rounded-full text-blue-600 shadow-sm"
           >
             <RiRefreshLine size={20} />
-          </button>
+          </motion.button>
         )}
 
         <RiExpandDiagonalLine
