@@ -19,9 +19,9 @@ const DoctorsAppointment = ({ onSuccess }) => {
 
   const users = useAppStore((s) => s.users) || [];
 
-  useEffect(() => {
-    getUsers();
-  }, []);
+  // useEffect(() => {
+  //   getUsers();
+  // }, []);
 
   const doctors = users.filter((user) => user.role === "specialist");
 
@@ -66,7 +66,7 @@ const DoctorsAppointment = ({ onSuccess }) => {
   /* -------------------- SEARCH -------------------- */
 
   const filteredPatients = (patients || []).filter((p) =>
-    p.fullName.toLowerCase().includes(search.toLowerCase()),
+    p.fullName?.toLowerCase().includes(search?.toLowerCase()),
   );
 
   const handleSelectPatient = (patient) => {

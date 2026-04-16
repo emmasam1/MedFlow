@@ -23,6 +23,8 @@ const EditPatientModal = ({ patient, onClose, onSave }) => {
   const capitalizeFirstLetter = (str) =>
     str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "";
 
+  // console.log(patient)
+
   useEffect(() => {
     if (patient) {
       setFormData({
@@ -108,7 +110,7 @@ const EditPatientModal = ({ patient, onClose, onSave }) => {
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-semibold">Edit Patient</h2> -
-            <p className="font-bold capitalize">{formData.fullName}</p>
+            <p className="font-bold capitalize">{formData.firstName} {formData.lastName}</p>
           </div>
 
           <button
@@ -129,7 +131,7 @@ const EditPatientModal = ({ patient, onClose, onSave }) => {
               <label className="text-sm font-medium">Card Number</label>
               <input
                 type="text"
-                value={formData.cardNumber}
+                value={formData.patientId}
                 disabled
                 className={`${
                   darkMode
@@ -209,7 +211,7 @@ const EditPatientModal = ({ patient, onClose, onSave }) => {
               <label className="text-sm font-medium">Patient Type</label>
               <select
                 name="patientType"
-                value={formData.patientType.toLowerCase()}
+                value={formData.registrationType.toLowerCase()}
                 onChange={handleChange}
                 className={`${
                   darkMode
@@ -306,8 +308,8 @@ const EditPatientModal = ({ patient, onClose, onSave }) => {
               <label className="text-sm font-medium">Phone</label>
               <input
                 type="text"
-                name="phone"
-                value={formData.phone}
+                name="phoneNumber"
+                value={formData.phoneNumber}
                 onChange={handleChange}
                 className={`${
                   darkMode

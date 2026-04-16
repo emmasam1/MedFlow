@@ -70,7 +70,7 @@ const StatCard = ({ title, value, color = "blue" }) => {
       </div>
 
       <div className="text-right">
-        <p className={`text-xs font-black uppercase tracking-wider ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+        <p className={`text-sm font-semibold uppercase tracking-wider ${darkMode ? "text-gray-400" : "text-black"}`}>
           {title}
         </p>
         <p className={`text-2xl font-semibold ${darkMode ? "text-white" : "text-slate-900"}`}>

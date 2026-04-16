@@ -280,7 +280,7 @@ const Patients = () => {
                 onSave={async (updatedData) => {
                   try {
                     await updatePatient(updatedData.id, updatedData); // updatePatient from useAppStore
-                    fetchPatients(); // refresh list
+                    getPatients(); // refresh list
                     setEditPatient(null); // close modal
                     alert("Patient updated successfully");
                   } catch (err) {

@@ -1,3 +1,250 @@
+// import {
+//   RiMenuFoldLine,
+//   RiMenuUnfoldLine,
+//   RiExpandDiagonalLine,
+//   RiNotification3Line,
+//   RiUserLine,
+//   RiLogoutBoxRLine,
+// } from "react-icons/ri";
+// import { Link, useNavigate } from "react-router-dom";
+// import { motion, AnimatePresence } from "framer-motion";
+// import { useState, useRef, useEffect } from "react";
+// import Notification from "./Notification";
+// import Time from "./Time";
+// import { useStore } from "../store/store";
+// import { useAppStore } from "../store/useAppStore";
+
+// const Topbar = () => {
+//   const {
+//     isSidebarOpen,
+//     toggleSidebar,
+//     topbarColor,
+//     isRTL,
+//     darkMode,
+//     markAsRead,
+//   } = useStore();
+
+//   const { notifications, user, logout, getNotifications } = useAppStore();
+
+//   const [profileDropdown, setProfileDropdown] = useState(false);
+//   const [notifDropdown, setNotifDropdown] = useState(false);
+
+//   const profileRef = useRef(null);
+//   const notifRef = useRef(null);
+//   const navigate = useNavigate();
+
+//   const role = user?.role;
+
+//   useEffect(() => {
+//     if (user?.role) getNotifications(user.role);
+//   }, [user]);
+
+//   // 🔹 Fetch notifications only once per user
+//   useEffect(() => {
+//     if (role) {
+//       getNotifications(role);
+//     }
+//   }, [getNotifications, role]);
+
+//   // 🔹 Deduplicate notifications by ID
+//   const userNotifications = notifications; // store already contains unique notifications
+//   const unreadCount = userNotifications.filter((n) => !n.isRead).length;
+
+//   // const unreadCount = userNotifications.filter((n) => !n.isRead).length;
+
+//   // Close dropdowns when clicking outside
+//   useEffect(() => {
+//     const handleClickOutside = (e) => {
+//       if (profileRef.current && !profileRef.current.contains(e.target))
+//         setProfileDropdown(false);
+//       if (notifRef.current && !notifRef.current.contains(e.target))
+//         setNotifDropdown(false);
+//     };
+
+//     document.addEventListener("mousedown", handleClickOutside);
+//     return () => document.removeEventListener("mousedown", handleClickOutside);
+//   }, []);
+
+//   const toggleFullscreen = () => {
+//     if (!document.fullscreenElement) {
+//       document.documentElement.requestFullscreen().catch(console.error);
+//     } else {
+//       document.exitFullscreen();
+//     }
+//   };
+
+//   const handleLogout = () => {
+//     setProfileDropdown(false);
+//     sessionStorage.removeItem("user");
+//     navigate("/");
+//   };
+
+//   const handleNotificationClick = (notif) => {
+//     markAsRead(notif.id);
+//     setNotifDropdown(false);
+//     navigate(`/dashboard/notifications/${notif.id}`);
+//   };
+
+//   const handleMarkAllRead = () => {
+//     userNotifications.forEach((n) => markAsRead(n.id));
+//   };
+
+//   const isLightTopbar =
+//     topbarColor === "bg-white" || topbarColor === "bg-gray-50";
+
+//   const textColor = isLightTopbar
+//     ? darkMode
+//       ? "text-white"
+//       : "text-gray-800"
+//     : "text-white";
+
+//   return (
+//     <header
+//       className={`h-15 fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 transition-all duration-300
+//         ${
+//           isRTL
+//             ? isSidebarOpen
+//               ? "lg:pr-65"
+//               : "lg:pr-20"
+//             : isSidebarOpen
+//               ? "lg:pl-65"
+//               : "lg:pl-20"
+//         }
+//         ${topbarColor} ${textColor} shadow-sm`}
+//     >
+//       {/* Left side */}
+//       <div className="flex items-center gap-5">
+//         <button
+//           onClick={toggleSidebar}
+//           className="p-2 hover:bg-black/5 rounded-lg transition-colors"
+//         >
+//           {isSidebarOpen ? (
+//             <RiMenuFoldLine size={22} />
+//           ) : (
+//             <RiMenuUnfoldLine size={22} />
+//           )}
+//         </button>
+//         <div className="hidden md:block">
+//           {user?.role === "admin" ? "" : <h1 className="text-lg font-bold">Afternoon Shift</h1>}
+//         </div>
+//       </div>
+
+//       {/* Right side */}
+//       <div className="flex items-center gap-6">
+//         <RiExpandDiagonalLine
+//           size={20}
+//           className="cursor-pointer hidden sm:block hover:opacity-80 transition-opacity"
+//           onClick={toggleFullscreen}
+//         />
+
+//         <Time />
+
+//         {/* Notifications */}
+//         <div className="relative" ref={notifRef}>
+//           <button
+//             className="relative p-2 rounded-full hover:bg-blue-100 transition-colors cursor-pointer"
+//             onClick={() => setNotifDropdown((prev) => !prev)}
+//             aria-label="Notifications"
+//           >
+//             <RiNotification3Line size={22} />
+//             {unreadCount > 0 && (
+//               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white font-semibold">
+//                 {unreadCount}
+//               </span>
+//             )}
+//           </button>
+
+//           <AnimatePresence>
+//             {notifDropdown && (
+//               <motion.div
+//                 initial={{ opacity: 0, y: -15 }}
+//                 animate={{ opacity: 1, y: 0 }}
+//                 exit={{ opacity: 0, y: -15 }}
+//                 transition={{ duration: 0.25 }}
+//                 className="absolute right-0 mt-2 w-96 bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl z-50 ring-1 ring-gray-100"
+//               >
+//                 {userNotifications.length === 0 ? (
+//                   <p className="p-4 text-gray-500 text-sm text-center">
+//                     No notifications
+//                   </p>
+//                 ) : (
+//                   <div className="flex flex-col max-h-[60vh] overflow-y-auto">
+//                     {userNotifications.map((notif) => (
+//                       <Notification
+//                         key={notif.id}
+//                         notif={notif}
+//                         onClick={() => handleNotificationClick(notif)}
+//                       />
+//                     ))}
+
+//                     <button
+//                       onClick={handleMarkAllRead}
+//                       className="w-full py-3 text-center text-blue-600 font-bold hover:bg-blue-50 transition-colors rounded-b-2xl"
+//                     >
+//                       Mark all as read
+//                     </button>
+//                   </div>
+//                 )}
+//               </motion.div>
+//             )}
+//           </AnimatePresence>
+//         </div>
+
+//         {/* Profile */}
+//         <div className="relative" ref={profileRef}>
+//           <motion.div
+//             whileHover={{ backgroundColor: "#9DCEF8", color: "#000" }}
+//             transition={{ duration: 0.3 }}
+//             onClick={() => setProfileDropdown((prev) => !prev)}
+//             className="flex items-center gap-3 cursor-pointer py-1 px-3 rounded-full"
+//           >
+//             <p className="text-sm font-bold hidden md:block">
+//               {user?.firstName || "User"}
+//             </p>
+//             <img
+//               src={user?.avatar}
+//               alt="profile"
+//               className="w-8 h-8 rounded-full"
+//             />
+//           </motion.div>
+
+//           <AnimatePresence>
+//             {profileDropdown && (
+//               <motion.div
+//                 initial={{ opacity: 0, y: -10 }}
+//                 animate={{ opacity: 1, y: 0 }}
+//                 exit={{ opacity: 0, y: -10 }}
+//                 transition={{ duration: 0.2 }}
+//                 className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg overflow-hidden z-50 border border-gray-200"
+//               >
+//                 <Link
+//                   to="/user-profile"
+//                   onClick={() => setProfileDropdown(false)}
+//                   className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 transition text-gray-800"
+//                 >
+//                   <RiUserLine size={18} />
+//                   <span>Account</span>
+//                 </Link>
+
+//                 <button
+//                   onClick={handleLogout}
+//                   className="w-full text-left flex items-center gap-3 px-4 py-2 hover:bg-blue-50 transition text-gray-800"
+//                 >
+//                   <RiLogoutBoxRLine size={18} />
+//                   <span>Logout</span>
+//                 </button>
+//               </motion.div>
+//             )}
+//           </AnimatePresence>
+//         </div>
+//       </div>
+//     </header>
+//   );
+// };
+
+// export default Topbar;
+
+
 import {
   RiMenuFoldLine,
   RiMenuUnfoldLine,
@@ -5,6 +252,8 @@ import {
   RiNotification3Line,
   RiUserLine,
   RiLogoutBoxRLine,
+  RiArrowLeftLine,    // Added for PWA
+  RiRefreshLine,      // Added for PWA
 } from "react-icons/ri";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -33,26 +282,24 @@ const Topbar = () => {
   const notifRef = useRef(null);
   const navigate = useNavigate();
 
+  // Detect if the app is running as an installed PWA
+  const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
+
   const role = user?.role;
 
   useEffect(() => {
     if (user?.role) getNotifications(user.role);
   }, [user]);
 
-  // 🔹 Fetch notifications only once per user
   useEffect(() => {
     if (role) {
       getNotifications(role);
     }
   }, [getNotifications, role]);
 
-  // 🔹 Deduplicate notifications by ID
-  const userNotifications = notifications; // store already contains unique notifications
+  const userNotifications = notifications;
   const unreadCount = userNotifications.filter((n) => !n.isRead).length;
 
-  // const unreadCount = userNotifications.filter((n) => !n.isRead).length;
-
-  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target))
@@ -89,48 +336,66 @@ const Topbar = () => {
     userNotifications.forEach((n) => markAsRead(n.id));
   };
 
-  const isLightTopbar =
-    topbarColor === "bg-white" || topbarColor === "bg-gray-50";
+  const isLightTopbar = topbarColor === "bg-white" || topbarColor === "bg-gray-50";
 
   const textColor = isLightTopbar
-    ? darkMode
-      ? "text-white"
-      : "text-gray-800"
+    ? darkMode ? "text-white" : "text-gray-800"
     : "text-white";
 
   return (
     <header
-      className={`h-15 fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 transition-all duration-300
-        ${
-          isRTL
-            ? isSidebarOpen
-              ? "lg:pr-65"
-              : "lg:pr-20"
-            : isSidebarOpen
-              ? "lg:pl-65"
-              : "lg:pl-20"
+      className={`fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 transition-all duration-300
+        ${isRTL
+          ? isSidebarOpen ? "lg:pr-65" : "lg:pr-20"
+          : isSidebarOpen ? "lg:pl-65" : "lg:pl-20"
         }
-        ${topbarColor} ${textColor} shadow-sm`}
+        ${topbarColor} ${textColor} shadow-sm border-b border-gray-100/10`}
+      style={{ 
+        // Dynamically adjust height to accommodate mobile notches
+        height: isStandalone ? "calc(65px + env(safe-area-inset-top))" : "60px",
+        paddingTop: isStandalone ? "env(safe-area-inset-top)" : "0px"
+      }}
     >
-      {/* Left side */}
-      <div className="flex items-center gap-5">
+      {/* Left side: Navigation & Brand */}
+      <div className="flex items-center gap-4">
+        {/* PWA Back Button: Only visible when installed */}
+        {isStandalone && (
+          <button
+            onClick={() => navigate(-1)}
+            className="p-2 hover:bg-black/5 rounded-full text-blue-500 transition-all active:scale-90 border border-blue-50"
+            title="Go Back"
+          >
+            <RiArrowLeftLine size={20} />
+          </button>
+        )}
+
         <button
           onClick={toggleSidebar}
           className="p-2 hover:bg-black/5 rounded-lg transition-colors"
         >
-          {isSidebarOpen ? (
-            <RiMenuFoldLine size={22} />
-          ) : (
-            <RiMenuUnfoldLine size={22} />
-          )}
+          {isSidebarOpen ? <RiMenuFoldLine size={22} /> : <RiMenuUnfoldLine size={22} />}
         </button>
+
         <div className="hidden md:block">
-          {user?.role === "admin" ? "" : <h1 className="text-lg font-bold">Afternoon Shift</h1>}
+          {user?.role === "admin" ? null : (
+            <h1 className="text-lg font-bold tracking-tight">Afternoon Shift</h1>
+          )}
         </div>
       </div>
 
-      {/* Right side */}
-      <div className="flex items-center gap-6">
+      {/* Right side: Actions & User */}
+      <div className="flex items-center gap-4 sm:gap-6">
+        
+        {/* PWA Reload Button: Only visible when installed */}
+        {isStandalone && (
+          <button 
+            onClick={() => window.location.reload()}
+            className="p-2 hover:bg-blue-50 rounded-full text-blue-500 transition-all hover:rotate-180 duration-500"
+          >
+            <RiRefreshLine size={20} />
+          </button>
+        )}
+
         <RiExpandDiagonalLine
           size={20}
           className="cursor-pointer hidden sm:block hover:opacity-80 transition-opacity"
@@ -144,7 +409,6 @@ const Topbar = () => {
           <button
             className="relative p-2 rounded-full hover:bg-blue-100 transition-colors cursor-pointer"
             onClick={() => setNotifDropdown((prev) => !prev)}
-            aria-label="Notifications"
           >
             <RiNotification3Line size={22} />
             {unreadCount > 0 && (
@@ -160,13 +424,10 @@ const Topbar = () => {
                 initial={{ opacity: 0, y: -15 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.25 }}
-                className="absolute right-0 mt-2 w-96 bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl z-50 ring-1 ring-gray-100"
+                className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-xl z-50 ring-1 ring-gray-100"
               >
                 {userNotifications.length === 0 ? (
-                  <p className="p-4 text-gray-500 text-sm text-center">
-                    No notifications
-                  </p>
+                  <p className="p-4 text-gray-500 text-sm text-center">No notifications</p>
                 ) : (
                   <div className="flex flex-col max-h-[60vh] overflow-y-auto">
                     {userNotifications.map((notif) => (
@@ -176,7 +437,6 @@ const Topbar = () => {
                         onClick={() => handleNotificationClick(notif)}
                       />
                     ))}
-
                     <button
                       onClick={handleMarkAllRead}
                       className="w-full py-3 text-center text-blue-600 font-bold hover:bg-blue-50 transition-colors rounded-b-2xl"
@@ -193,18 +453,17 @@ const Topbar = () => {
         {/* Profile */}
         <div className="relative" ref={profileRef}>
           <motion.div
-            whileHover={{ backgroundColor: "#9DCEF8", color: "#000" }}
-            transition={{ duration: 0.3 }}
+            whileHover={{ backgroundColor: darkMode ? "#374151" : "#9DCEF8" }}
             onClick={() => setProfileDropdown((prev) => !prev)}
-            className="flex items-center gap-3 cursor-pointer py-1 px-3 rounded-full"
+            className="flex items-center gap-3 cursor-pointer py-1 px-2 sm:px-3 rounded-full transition-colors"
           >
             <p className="text-sm font-bold hidden md:block">
               {user?.firstName || "User"}
             </p>
             <img
-              src={user?.avatar}
+              src={user?.avatar || "/default-avatar.png"}
               alt="profile"
-              className="w-8 h-8 rounded-full"
+              className="w-8 h-8 rounded-full object-cover border border-gray-200"
             />
           </motion.div>
 
@@ -214,24 +473,23 @@ const Topbar = () => {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
                 className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg overflow-hidden z-50 border border-gray-200"
               >
                 <Link
                   to="/user-profile"
                   onClick={() => setProfileDropdown(false)}
-                  className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 transition text-gray-800"
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition text-gray-800"
                 >
                   <RiUserLine size={18} />
-                  <span>Account</span>
+                  <span className="text-sm font-medium">Account</span>
                 </Link>
 
                 <button
                   onClick={handleLogout}
-                  className="w-full text-left flex items-center gap-3 px-4 py-2 hover:bg-blue-50 transition text-gray-800"
+                  className="w-full text-left flex items-center gap-3 px-4 py-3 hover:bg-red-50 transition text-red-600 border-t border-gray-50"
                 >
                   <RiLogoutBoxRLine size={18} />
-                  <span>Logout</span>
+                  <span className="text-sm font-medium">Logout</span>
                 </button>
               </motion.div>
             )}
