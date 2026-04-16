@@ -485,13 +485,15 @@ const Dashboard = () => {
               <PatientChart />
               <div className="space-y-6">
                 <BookAppointment />
-                <NewPatientChart />
               </div>
               <Appointments />
             </div>
           )}
         </div>
+          <div className="px-4">
 
+          <NewPatientChart />
+          </div>
         {/* BOTTOM SECTION: DATA TABLES */}
         <div className="px-4 pb-10">
           <div className="bg-white rounded-3xl shadow-sm overflow-hidden border border-slate-100">

@@ -244,7 +244,6 @@
 
 // export default Topbar;
 
-
 import {
   RiMenuFoldLine,
   RiMenuUnfoldLine,
@@ -252,8 +251,8 @@ import {
   RiNotification3Line,
   RiUserLine,
   RiLogoutBoxRLine,
-  RiArrowLeftLine,    // Added for PWA
-  RiRefreshLine,      // Added for PWA
+  RiArrowLeftLine, // Added for PWA
+  RiRefreshLine, // Added for PWA
 } from "react-icons/ri";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -283,8 +282,29 @@ const Topbar = () => {
   const navigate = useNavigate();
 
   // Detect if the app is running as an installed PWA
-  const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
+  const [isStandalone, setIsStandalone] = useState(false);
 
+  useEffect(() => {
+    const checkStandalone = () => {
+      const isPWA =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone === true; // iOS support
+
+      setIsStandalone(isPWA);
+    };
+
+    checkStandalone();
+
+    // Listen for changes (important for dev/testing)
+    const mediaQuery = window.matchMedia("(display-mode: standalone)");
+    mediaQuery.addEventListener("change", checkStandalone);
+
+    return () => {
+      mediaQuery.removeEventListener("change", checkStandalone);
+    };
+  }, []);
+
+  const canGoBack = window.history.length > 1;
   const role = user?.role;
 
   useEffect(() => {
@@ -336,24 +356,32 @@ const Topbar = () => {
     userNotifications.forEach((n) => markAsRead(n.id));
   };
 
-  const isLightTopbar = topbarColor === "bg-white" || topbarColor === "bg-gray-50";
+  const isLightTopbar =
+    topbarColor === "bg-white" || topbarColor === "bg-gray-50";
 
   const textColor = isLightTopbar
-    ? darkMode ? "text-white" : "text-gray-800"
+    ? darkMode
+      ? "text-white"
+      : "text-gray-800"
     : "text-white";
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 transition-all duration-300
-        ${isRTL
-          ? isSidebarOpen ? "lg:pr-65" : "lg:pr-20"
-          : isSidebarOpen ? "lg:pl-65" : "lg:pl-20"
+        ${
+          isRTL
+            ? isSidebarOpen
+              ? "lg:pr-65"
+              : "lg:pr-20"
+            : isSidebarOpen
+              ? "lg:pl-65"
+              : "lg:pl-20"
         }
         ${topbarColor} ${textColor} shadow-sm border-b border-gray-100/10`}
-      style={{ 
+      style={{
         // Dynamically adjust height to accommodate mobile notches
         height: isStandalone ? "calc(65px + env(safe-area-inset-top))" : "60px",
-        paddingTop: isStandalone ? "env(safe-area-inset-top)" : "0px"
+        paddingTop: isStandalone ? "env(safe-area-inset-top)" : "0px",
       }}
     >
       {/* Left side: Navigation & Brand */}
@@ -361,7 +389,13 @@ const Topbar = () => {
         {/* PWA Back Button: Only visible when installed */}
         {isStandalone && (
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => {
+              if (window.history.length > 1) {
+                navigate(-1);
+              } else {
+                navigate("/dashboard"); // fallback
+              }
+            }}
             className="p-2 hover:bg-black/5 rounded-full text-blue-500 transition-all active:scale-90 border border-blue-50"
             title="Go Back"
           >
@@ -373,23 +407,28 @@ const Topbar = () => {
           onClick={toggleSidebar}
           className="p-2 hover:bg-black/5 rounded-lg transition-colors"
         >
-          {isSidebarOpen ? <RiMenuFoldLine size={22} /> : <RiMenuUnfoldLine size={22} />}
+          {isSidebarOpen ? (
+            <RiMenuFoldLine size={22} />
+          ) : (
+            <RiMenuUnfoldLine size={22} />
+          )}
         </button>
 
         <div className="hidden md:block">
           {user?.role === "admin" ? null : (
-            <h1 className="text-lg font-bold tracking-tight">Afternoon Shift</h1>
+            <h1 className="text-lg font-bold tracking-tight">
+              Afternoon Shift
+            </h1>
           )}
         </div>
       </div>
 
       {/* Right side: Actions & User */}
       <div className="flex items-center gap-4 sm:gap-6">
-        
         {/* PWA Reload Button: Only visible when installed */}
         {isStandalone && (
-          <button 
-            onClick={() => window.location.reload()}
+          <button
+            onClick={() => window.location.href = window.location.href}
             className="p-2 hover:bg-blue-50 rounded-full text-blue-500 transition-all hover:rotate-180 duration-500"
           >
             <RiRefreshLine size={20} />
@@ -427,7 +466,9 @@ const Topbar = () => {
                 className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-xl z-50 ring-1 ring-gray-100"
               >
                 {userNotifications.length === 0 ? (
-                  <p className="p-4 text-gray-500 text-sm text-center">No notifications</p>
+                  <p className="p-4 text-gray-500 text-sm text-center">
+                    No notifications
+                  </p>
                 ) : (
                   <div className="flex flex-col max-h-[60vh] overflow-y-auto">
                     {userNotifications.map((notif) => (
