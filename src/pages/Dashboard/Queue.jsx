@@ -36,22 +36,22 @@ const statusStyles = (darkMode) => ({
 
 const Queue = () => {
   const {
-    queue,
+    queue = [],
     getQueue,
     updateQueueStatus,
     cancelQueue,
     doctorSendPatient,
-    labTest,
-    fetchLabTests,
+    labTest = [],
+    // fetchLabTests,
   } = useAppStore();
 
-  useEffect(() => {
-    fetchLabTests();
-  }, []);
+  // useEffect(() => {
+  //   fetchLabTests();
+  // }, []);
 
   const { darkMode } = useStore();
 
-  const user = JSON.parse(sessionStorage.getItem("user"));
+  const user = useAppStore((state) => state.user);
 
   const today = dayjs();
 
@@ -86,17 +86,18 @@ const Queue = () => {
 
   const isDragging = useRef(false);
 
-  useEffect(() => {
-    getQueue();
-  }, []);
+  // useEffect(() => {
+  //   getQueue();
+  // }, []);
 
-  const filteredLabTests = useMemo(() => {
-    if (!labSearch) return labTest || [];
+ const filteredLabTests = useMemo(() => {
+  if (!labTest) return [];
+  if (!labSearch) return labTest;
 
-    return labTest.filter((t) =>
-      t.name.toLowerCase().includes(labSearch.toLowerCase()),
-    );
-  }, [labSearch, labTest]);
+  return labTest.filter((t) =>
+    t.name.toLowerCase().includes(labSearch.toLowerCase())
+  );
+}, [labSearch, labTest]);
 
   const toggleTest = (test) => {
     setSelectedTests((prev) => {
@@ -111,7 +112,7 @@ const Queue = () => {
   };
 
   const openVitalsModal = (q) => {
-    setSelectedQueue(q)
+    setSelectedQueue(q);
     // console.log(selectedQueue)
     setVitalsModalOpen(true);
   };
@@ -177,6 +178,8 @@ const Queue = () => {
   /* filter queue */
 
   const filtered = useMemo(() => {
+    if (!queue) return [];
+
     return queue
       .filter((q) => dayjs(q.timeAdded).format("YYYY-MM-DD") === selectedDate)
       .filter((q) =>
@@ -203,7 +206,7 @@ const Queue = () => {
   const dateCellRender = (value) => {
     const date = value.format("YYYY-MM-DD");
 
-    const appointments = queue.filter(
+  const appointments = (queue || []).filter(
       (q) => dayjs(q.timeAdded).format("YYYY-MM-DD") === date,
     );
 
