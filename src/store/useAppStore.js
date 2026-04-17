@@ -16,6 +16,8 @@ export const useAppStore = create((set) => ({
   loading: false,
   notifications: [],
   patients: [],
+  queue: [],
+  labTest: [],
 
   login: async (identifier, password) => {
     set({ loading: true });
@@ -38,34 +40,34 @@ export const useAppStore = create((set) => ({
     }
   },
 
-registerStaff: async (staffData) => {
-  console.log(staffData)
-  set({ loading: true });
-  try {
-    const formData = new FormData();
+  registerStaff: async (staffData) => {
+    console.log(staffData);
+    set({ loading: true });
+    try {
+      const formData = new FormData();
 
-    Object.keys(staffData).forEach((key) => {
-      // Logic to ensure the File object (avatar) is appended correctly
-      if (staffData[key] !== undefined && staffData[key] !== null) {
-        formData.append(key, staffData[key]);
-      }
-    });
+      Object.keys(staffData).forEach((key) => {
+        // Logic to ensure the File object (avatar) is appended correctly
+        if (staffData[key] !== undefined && staffData[key] !== null) {
+          formData.append(key, staffData[key]);
+        }
+      });
 
-    const response = await api.post("/auth/register-staff", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+      const response = await api.post("/auth/register-staff", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-    console.log(response)
+      console.log(response);
 
-    set({ loading: false });
-    return response.data;
-  } catch (error) {
-    set({ loading: false });
-    throw new Error(error.response?.data?.message || "Registration failed");
-  }
-},
+      set({ loading: false });
+      return response.data;
+    } catch (error) {
+      set({ loading: false });
+      throw new Error(error.response?.data?.message || "Registration failed");
+    }
+  },
 
   getStaff: async () => {
     try {
@@ -103,9 +105,9 @@ registerStaff: async (staffData) => {
   },
 
   registerPatient: async (patientData) => {
-    // console.log(patientData);
+    console.log(patientData);
     set({ loading: true });
-    
+
     // Get the token from sessionStorage
     const token = sessionStorage.getItem("bearerToken");
 
@@ -115,7 +117,7 @@ registerStaff: async (staffData) => {
           Authorization: `Bearer ${token}`, // Inject token here
         },
       });
-      
+
       const newPatient = response.data.data;
 
       set((state) => ({

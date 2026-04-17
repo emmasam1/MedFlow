@@ -27,49 +27,89 @@ const Patients = () => {
     getPatients();
   }, [getPatients]);
 
-  console.log(patients)
+  // console.log(patients);
+
+  const calculateAge = (dateOfBirth) => {
+    if (!dateOfBirth) return "—";
+    const birth = new Date(dateOfBirth);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate()))
+      age--;
+    return age;
+  };
 
   const columns = [
-    { title: "Card No", key: "cardNumber", sortable: true },
+    {
+      title: "Card No",
+      dataIndex: "patientId", // Fixed key
+      key: "patientId",
+      sortable: true,
+    },
     {
       title: "Full Name",
       key: "fullName",
-      render: (v) => <span className="capitalize!">{v}</span>,
+      // Ant Design Table uses (text, record) for render
+      render: (_, record) => (
+        <span className="capitalize font-medium">
+          {record.firstName} {record.lastName}
+        </span>
+      ),
     },
     {
       title: "Patient type",
-      key: "patientType",
-      render: (v) => <span className="capitalize">{v}</span>,
+      dataIndex: "registrationType",
+      key: "registrationType",
+      render: (v) => <span className="capitalize">{v?.toLowerCase()}</span>,
     },
     {
       title: "Gender",
+      dataIndex: "gender",
       key: "gender",
       render: (v) => {
         if (!v) return "—";
         const gender = v.toLowerCase();
-        const bgColor =
-          gender === "male"
-            ? "bg-blue-100 text-blue-600"
-            : "bg-pink-100 text-pink-600";
-        const label = gender === "male" ? "M" : "F";
+        const isMale = gender === "male";
+        const bgColor = isMale
+          ? "bg-blue-100 text-blue-600"
+          : "bg-pink-100 text-pink-600";
+        const label = isMale ? "M" : "F";
         return (
           <div className="flex justify-center items-center">
             <div
-              className={`flex justify-center items-center w-8 h-8 rounded-full ${bgColor}`}
+              className={`flex justify-center items-center w-8 h-8 rounded-full font-bold text-xs ${bgColor}`}
             >
-              <span className="m-auto">{label}</span>
+              {label}
             </div>
           </div>
         );
       },
     },
-    { title: "Age", key: "age", sortable: true },
-    { title: "Phone", key: "phone" },
+    {
+      title: "Age",
+      dataIndex: "dateOfBirth", // This must match the key in your DB object
+      key: "dateOfBirth",
+      render: (dateOfBirth) => (
+        <span className="font-medium">
+          {calculateAge(dateOfBirth)}{" "}
+          {calculateAge(dateOfBirth) !== "—" ? "yrs" : ""}
+        </span>
+      ),
+    },
+    { title: "Phone", dataIndex: "phoneNumber", key: "phoneNumber" },
     {
       title: "Status",
+      dataIndex: "status",
       key: "status",
       render: (v) => (
-        <span className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-600">
+        <span
+          className={`px-3 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider ${
+            v === "active"
+              ? "bg-green-100 text-green-600"
+              : "bg-slate-100 text-slate-500"
+          }`}
+        >
           {v}
         </span>
       ),
@@ -99,17 +139,6 @@ const Patients = () => {
     documentTitle: printPatient?.fullName || "Patient ID Card",
   });
 
-  const calculateAge = (dob) => {
-    if (!dob) return "";
-    const birth = new Date(dob);
-    const today = new Date();
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate()))
-      age--;
-    return age;
-  };
-
   return (
     <div
       className={`${darkMode ? "bg-gray-900 text-gray-100" : "bg-white text-gray-900"} p-4 min-h-screen`}
@@ -118,13 +147,10 @@ const Patients = () => {
       <div className="overflow-hidden">
         <DataTable
           columns={columns}
-          data={patients.map((p) => ({ ...p, age: calculateAge(p.dob) }))}
-          searchableKeys={["fullName", "patientId", "phone"]}
+          data={patients}
+          searchableKeys={["firstName", "lastName", "patientId", "phoneNumber"]}
           actions={(row) => (
-            <div
-              className="flex mt-2"
-              onClick={(e) => e.stopPropagation()}
-            >
+            <div className="flex mt-2" onClick={(e) => e.stopPropagation()}>
               <Link to={`/dashboard/patient-profile/${row.id}`}>
                 <div
                   className={`p-2 rounded-full cursor-pointer transition ${
@@ -133,7 +159,7 @@ const Patients = () => {
                       : "hover:bg-gray-200 text-gray-500 hover:text-black"
                   }`}
                 >
-                  <FiEye  />
+                  <FiEye />
                 </div>
               </Link>
 
@@ -145,7 +171,7 @@ const Patients = () => {
                 }`}
                 onClick={() => setEditPatient(row)}
               >
-                <FiEdit  />
+                <FiEdit />
               </div>
 
               <div
@@ -156,7 +182,7 @@ const Patients = () => {
                 }`}
                 onClick={() => confirmDelete(row)}
               >
-                <FiTrash2  />
+                <FiTrash2 />
               </div>
 
               <div
@@ -254,7 +280,7 @@ const Patients = () => {
                 onSave={async (updatedData) => {
                   try {
                     await updatePatient(updatedData.id, updatedData); // updatePatient from useAppStore
-                    fetchPatients(); // refresh list
+                    getPatients(); // refresh list
                     setEditPatient(null); // close modal
                     alert("Patient updated successfully");
                   } catch (err) {

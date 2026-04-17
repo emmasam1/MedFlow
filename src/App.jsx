@@ -2,7 +2,6 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
 
-
 // Pages
 import Login from "./pages/auth/Login";
 import Dashboard from "./pages/Dashboard/Dashboard";
@@ -27,12 +26,21 @@ import InstallPWA from "./components/InstallPWA";
 
 const App = () => {
   // Common list for all authorized dashboard users
-  const ALL_ROLES = ["doctor", "record_officer", "specialist", "finance_officer", "nurse", "lab_officer", "admin"];
+  const ALL_ROLES = [
+    "doctor",
+    "record_officer",
+    "specialist",
+    "finance_officer",
+    "nurse",
+    "lab_officer",
+    "admin",
+  ];
 
   return (
     <>
       <ScrollToTop />
       <InstallPWA />
+
       <Routes>
         {/* Public Route */}
         <Route path="/" element={<Login />} />
@@ -73,8 +81,8 @@ const App = () => {
             }
           />
 
-           {/* 2. Shift Management (Strictly Admin) */}
-           <Route
+          {/* 2. Shift Management (Strictly Admin) */}
+          <Route
             path="/dashboard/shifts"
             element={
               <ProtectedRoute allowedRoles={["admin"]}>
@@ -87,7 +95,9 @@ const App = () => {
           <Route
             path="/dashboard/appointment"
             element={
-              <ProtectedRoute allowedRoles={["record_officer", "specialist", "admin"]}>
+              <ProtectedRoute
+                allowedRoles={["record_officer", "specialist", "admin"]}
+              >
                 <Appointment />
               </ProtectedRoute>
             }
@@ -97,7 +107,9 @@ const App = () => {
           <Route
             path="/dashboard/queue"
             element={
-              <ProtectedRoute allowedRoles={["record_officer", "doctor", "nurse", "admin"]}>
+              <ProtectedRoute
+                allowedRoles={["record_officer", "doctor", "nurse", "admin"]}
+              >
                 <Queue />
               </ProtectedRoute>
             }
@@ -126,7 +138,9 @@ const App = () => {
           <Route
             path="/dashboard/patients"
             element={
-              <ProtectedRoute allowedRoles={["record_officer", "doctor", "nurse", "admin"]}>
+              <ProtectedRoute
+                allowedRoles={["record_officer", "doctor", "nurse", "admin"]}
+              >
                 <Patients />
               </ProtectedRoute>
             }
@@ -136,7 +150,9 @@ const App = () => {
           <Route
             path="/dashboard/patient-profile/:id"
             element={
-              <ProtectedRoute allowedRoles={["record_officer", "doctor", "nurse", "admin"]}>
+              <ProtectedRoute
+                allowedRoles={["record_officer", "doctor", "nurse", "admin"]}
+              >
                 <PatientProfile />
               </ProtectedRoute>
             }

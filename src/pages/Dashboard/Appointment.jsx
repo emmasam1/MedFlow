@@ -23,7 +23,12 @@ const statusStyles = (darkMode) => ({
 });
 
 const Appointment = () => {
-  const { appointments, fetchAppointments, updateApptStatus } = useAppStore();
+ const {
+  appointments = [],
+  fetchAppointments,
+  updateApptStatus,
+} = useAppStore();
+
   const { darkMode } = useStore();
   const today = dayjs();
 
@@ -35,8 +40,7 @@ const Appointment = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const isDragging = useRef(false);
-
-  const user = JSON.parse(sessionStorage.getItem("user"));
+const user = useAppStore((state) => state.user);
 
   const [selectedAppt, setSelectedAppt] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -52,7 +56,7 @@ const Appointment = () => {
   };
 
   useEffect(() => {
-    fetchAppointments();
+    // fetchAppointments();
   }, []);
 
   // Resizer handlers
@@ -85,21 +89,23 @@ const Appointment = () => {
   };
 
   const filtered = useMemo(() => {
-    return appointments
-      .filter((a) => a.date === selectedDate)
-      .filter((a) =>
-        (a.patient || a.patientName || "")
-          .toLowerCase()
-          .includes(search.toLowerCase()),
-      )
-      .filter((a) =>
-        statusFilter === "All"
-          ? true
-          : a.status?.toLowerCase() === statusFilter.toLowerCase(),
-      );
-  }, [appointments, selectedDate, search, statusFilter]);
+  if (!appointments) return [];
 
-  const paginatedData = filtered.slice(
+  return appointments
+    .filter((a) => a.date === selectedDate)
+    .filter((a) =>
+      (a.patient || a.patientName || "")
+        .toLowerCase()
+        .includes(search.toLowerCase())
+    )
+    .filter((a) =>
+      statusFilter === "All"
+        ? true
+        : a.status?.toLowerCase() === statusFilter.toLowerCase()
+    );
+}, [appointments, selectedDate, search, statusFilter]);
+
+  const paginatedData = filtered?.slice(
     (currentPage - 1) * PER_PAGE,
     currentPage * PER_PAGE,
   );
@@ -238,21 +244,25 @@ const Appointment = () => {
               {dayjs(selectedDate).format("MMMM D, YYYY")}
             </p>
             <p className="text-2xl font-semibold mt-1">
-              {totalForDay} Appointments
+              {/* {totalForDay}  */}
+              Appointments
             </p>
             <div className="flex gap-4 mt-3 text-sm">
               <span
                 className={`${darkMode ? "text-emerald-400" : "text-emerald-600"}`}
               >
-                {confirmed} Confirmed
+                {/* {confirmed}  */}
+                Confirmed
               </span>
               <span
                 className={`${darkMode ? "text-amber-400" : "text-amber-600"}`}
               >
-                {pending} Pending
+                {/* {pending}  */}
+                Pending
               </span>
               <span className={`${darkMode ? "text-red-400" : "text-red-600"}`}>
-                {cancelled} Cancelled
+                {/* {cancelled}  */}
+                Cancelled
               </span>
             </div>
           </div>

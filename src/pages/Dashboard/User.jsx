@@ -910,7 +910,7 @@ const User = () => {
                 {selectedStaff?.firstName} {selectedStaff?.lastName}
               </p>
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-              {selectedStaff?.department || "EMP-000"} •{" "}
+                {selectedStaff?.department || "EMP-000"} •{" "}
                 {selectedStaff?.role || "Staff"}
               </p>
             </div>
@@ -969,7 +969,6 @@ const User = () => {
           </div>
 
           {/* Action Buttons */}
-          
 
           <div className="grid grid-cols-2 gap-3">
             <button

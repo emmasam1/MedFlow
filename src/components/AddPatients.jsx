@@ -37,12 +37,14 @@ const AddPatients = ({ onSuccess }) => {
     firstName: "",
     lastName: "",
     phone: "",
+    email: "",
     address: "",
     dob: "",
     gender: "",
     type: "",
-    cardNumber: "",
+    // cardNumber: "",
     status: "",
+    registrationType: "",
     insuranceNumber: "",
     maritalStatus: "",
     stateOfOrigin: "",
@@ -117,7 +119,7 @@ const AddPatients = ({ onSuccess }) => {
     }
   };
 
-  const patientTypes = ["Single", "Family", "NHIS", "KACHMA"];
+  const patientTypes = ["SINGLE", "FAMILY", "NHIS", "KACHMA"];
 
   const relationshipTypes = [
     "Spouse",
@@ -180,14 +182,14 @@ const AddPatients = ({ onSuccess }) => {
         // patientId: `PT-${Math.floor(1000 + Math.random() * 9000)}`,
         firstName: formData.firstName,
         lastName: formData.lastName,
-        // fullName: `${formData.firstName} ${formData.lastName}`,
         gender: formData.gender,
         dateOfBirth: formData.dob,
         phoneNumber: formData.phone,
+        email: formData.email,
         address: formData.address,
         // bloodGroup: "N/A",
-        patientType: formData.type,
-        cardNumber: formData.cardNumber,
+        registrationType: formData.registrationType,
+        // cardNumber: formData.cardNumber,
         // status: "Active",
         photo: photo || "",
         maritalStatus: formData.maritalStatus,
@@ -212,10 +214,11 @@ const AddPatients = ({ onSuccess }) => {
         firstName: "",
         lastName: "",
         phoneNumber: "",
+        email: "",
         address: "",
         dateOfBirth: "",
         gender: "",
-        type: "",
+        registrationType: "",
         cardNumber: "",
         status: "",
         insuranceNumber: "",
@@ -409,16 +412,16 @@ const AddPatients = ({ onSuccess }) => {
                   </select>
                 </div>
                 <div>
-                  <label className={labelClass}>Type</label>
+                  <label className={labelClass}>Registration Type</label>
                   <select
-                    name="type"
-                    value={formData.type}
+                    name="registrationType"
+                    value={formData.registrationType}
                     onChange={handleChange}
                     className={inputClass}
                   >
                     <option>Select</option>
                     {patientTypes.map((type) => (
-                      <option key={type} value={type.toLowerCase()}>
+                      <option key={type} value={type}>
                         {type}
                       </option>
                     ))}
@@ -427,26 +430,38 @@ const AddPatients = ({ onSuccess }) => {
 
                 {/* Card Number & Status directly under Gender & Type */}
                 <div>
-                  <label className={labelClass}>Card Number</label>
+                  <label className={labelClass}>Email</label>
                   <input
-                    name="cardNumber"
-                    value={formData.cardNumber}
+                    name="email"
+                    value={formData.email}
+                     onChange={handleChange}
                     className={`${inputClass} opacity-60 bg-transparent`}
-                    disabled
+                    // disabled
                   />
                 </div>
                 <div>
                   <label className={labelClass}>Status</label>
-                  <input
-                    name="status"
-                    value={formData.status}
-                    className={`${inputClass} opacity-60 bg-transparent`}
-                    disabled
-                  />
+                 <select
+                    name="bloodGroup"
+                    value={formData.bloodGroup}
+                    onChange={handleChange}
+                    className={inputClass}
+                  >
+                    <option>Select Blood Group</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">A+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB-">AB+</option>
+                    <option value="AB-">AB-</option>
+                                   
+                  </select>
                 </div>
 
                 {/* Insurance Number (optional) */}
-                {formData.type === "nhis" && (
+                {/* {formData.tyregistrationTypepe === "nhis" && (
                   <div className="col-span-2">
                     <label className={labelClass}>Insurance #</label>
                     <input
@@ -456,7 +471,7 @@ const AddPatients = ({ onSuccess }) => {
                       className={inputClass}
                     />
                   </div>
-                )}
+                )} */}
               </div>
 
               <div className="col-span-3 flex justify-end mt-2">

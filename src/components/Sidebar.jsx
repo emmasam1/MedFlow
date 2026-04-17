@@ -152,11 +152,12 @@ const Sidebar = () => {
         className={`flex flex-col items-center py-10 px-6 ${window.innerWidth >= 1024 && !isSidebarOpen && "py-8 px-2"}`}
       >
         <motion.div
+        className="rounded-full overflow-hidden "
           animate={{
             width: isSidebarOpen || window.innerWidth < 1024 ? 85 : 50,
             height: isSidebarOpen || window.innerWidth < 1024 ? 85 : 50,
             borderRadius:
-              isSidebarOpen || window.innerWidth < 1024 ? "1.25rem" : "0.75rem",
+              isSidebarOpen || window.innerWidth < 1024 ? "5rem" : "5rem",
           }}
           // className="overflow-hidden border-4 border-slate-50 dark:border-gray-800 shadow-xl mb-4"
         >

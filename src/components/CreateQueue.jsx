@@ -16,9 +16,9 @@ const CreateQueue = ({ onSuccess }) => {
 
   const users = useAppStore((s) => s.users) || [];
 
-  useEffect(() => {
-    getUsers();
-  }, []);
+  // useEffect(() => {
+  //   getUsers();
+  // }, []);
 
   const scannerRef = useRef(null);
   const [scanSuccess, setScanSuccess] = useState(false);
@@ -52,9 +52,9 @@ const CreateQueue = ({ onSuccess }) => {
 
   /* ---------------- SEARCH ---------------- */
 
-  const filteredPatients = (patients || []).filter((p) =>
-    p.fullName.toLowerCase().includes(search.toLowerCase()),
-  );
+  // const filteredPatients = (patients || []).filter((p) =>
+  //   p.fullName.toLowerCase().includes(search.toLowerCase()),
+  // );
 
   const handleSelectPatient = (patient) => {
     setSelectedPatient(patient);
