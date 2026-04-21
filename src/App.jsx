@@ -18,6 +18,7 @@ import DashboardLayout from "./layout/DashboardLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FinancePayments from "./pages/Dashboard/FinancePayments";
 import Transactions from "./pages/Dashboard/Transactions";
+import FinanceAdmin from "./pages/Dashboard/FinanceAdmin";
 // import LabRequest from "./pages/Dashboard/LabRequest";
 import User from "./pages/Dashboard/User";
 import ShiftManagement from "./pages/Dashboard/ShiftManagement";
@@ -87,6 +88,16 @@ const App = () => {
             element={
               <ProtectedRoute allowedRoles={["admin"]}>
                 <ShiftManagement />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Finance Admin */}
+          <Route
+            path="/dashboard/finance-admin"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <FinanceAdmin/>
               </ProtectedRoute>
             }
           />
