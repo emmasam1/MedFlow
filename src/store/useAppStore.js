@@ -134,6 +134,69 @@ export const useAppStore = create((set) => ({
     }
   },
 
+
+  // --- QUEUE ACTIONS ---
+  
+  getQueue: async () => {
+    set({ loading: true });
+    try {
+      const response = await api.get("/queue");
+      set({ queue: response.data.data || [], loading: false });
+    } catch (error) {
+      set({ loading: false, queue: [] }); // Set to empty array on error to prevent .filter crashes
+      console.error("Fetch queue failed", error);
+    }
+  },
+
+  addToQueue: async (queueData) => {
+    console.log(queueData);
+    set({ loading: true });   
+    // 1. Get and Decrypt token (matching your login storage logic)
+    const encryptedToken = sessionStorage.getItem("token");
+    if (!encryptedToken) throw new Error("No authentication token found");
+    const token = decryptData(encryptedToken);
+
+    try {
+      const response = await api.post("/queue/initiate", queueData, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Inject Bearer token
+        },
+      });
+
+      const newItem = response.data.data;
+
+      // 2. Update local state immediately for a smooth UI
+      set((state) => ({
+        queue: [newItem, ...state.queue],
+        loading: false,
+      }));
+
+      return response.data;
+    } catch (error) {
+      set({ loading: false });
+      throw new Error(
+        error.response?.data?.message || "Failed to add to queue"
+      );
+    }
+  },
+
+  // Use this for when a doctor or nurse "calls" a patient
+  updateQueueStatus: async (queueId, status) => {
+    try {
+      const response = await api.patch(`/queue/status/${queueId}`, { status });
+      
+      set((state) => ({
+        queue: state.queue.map((item) =>
+          item.id === queueId ? { ...item, status } : item
+        ),
+      }));
+      
+      return response.data;
+    } catch (error) {
+      throw new Error("Failed to update status");
+    }
+  },
+
   // registerPatient: async (patientData) => {
   //   console.log(patientData);
   //   set({ loading: true });

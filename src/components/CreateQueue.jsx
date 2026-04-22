@@ -1,13 +1,22 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaCheckCircle } from "react-icons/fa";
-import { ToastContainer, toast, Slide } from "react-toastify";
+import { ToastContainer, toast, Bounce } from "react-toastify";
 import Modal from "./Modal";
 import { useAppStore } from "../store/useAppStore";
 
 const CreateQueue = ({ onSuccess }) => {
-  const { patients, getUsers, createQueue, createNotification } = useAppStore();
+  const {
+    patients,
+    getUsers,
+    createQueue,
+    createNotification,
+    addToQueue,
+    getPatients,
+    getQueue,
+    queue
+  } = useAppStore();
 
   const [search, setSearch] = useState("");
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -16,13 +25,25 @@ const CreateQueue = ({ onSuccess }) => {
 
   const users = useAppStore((s) => s.users) || [];
 
-  // useEffect(() => {
-  //   getUsers();
-  // }, []);
+  useEffect(() => {
+    getPatients();
+      getQueue();
+  }, [getPatients, getQueue]);
+
+  console.log("trying to get all patients", queue);
 
   const scannerRef = useRef(null);
   const [scanSuccess, setScanSuccess] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+
+  const [formData, setFormData] = useState({
+    fullName: "",
+    cardNumber: "",
+    department: "",
+    priority: "Normal",
+    reasonForVisit: "", // Matches Postman: "reasonForVisit"
+    clericalNote: "", // Matches Postman: "clericalNote"
+  });
 
   const playBeep = () => {
     const audio = new Audio(
@@ -41,44 +62,47 @@ const CreateQueue = ({ onSuccess }) => {
     }
   };
 
-  const [formData, setFormData] = useState({
-    fullName: "",
-    cardNumber: "",
-    department: "",
-    priority: "Normal",
-    reason: "",
-    notes: "",
-  });
-
   /* ---------------- SEARCH ---------------- */
 
   // const filteredPatients = (patients || []).filter((p) =>
   //   p.fullName.toLowerCase().includes(search.toLowerCase()),
   // );
 
+  // Updated filter to handle firstName/lastName from register-staff/patient schema
+  const filteredPatients = useMemo(() => {
+    return (patients || [])
+      .map((p) => ({
+        ...p,
+        fullName: `${p.firstName || ""} ${p.lastName || ""}`.trim(),
+        displayId: p.patientId || p.id, // Postman shows "patientId": "MAH-2026-0001"
+      }))
+      .filter(
+        (p) =>
+          p.fullName.toLowerCase().includes(search.toLowerCase()) ||
+          p.displayId.toLowerCase().includes(search.toLowerCase()),
+      );
+  }, [patients, search]);
+
   const handleSelectPatient = (patient) => {
     setSelectedPatient(patient);
-
     setFormData((prev) => ({
       ...prev,
       fullName: patient.fullName,
-      cardNumber: patient.cardNumber,
+      cardNumber: patient.displayId,
     }));
-
     setSearch(patient.fullName);
   };
 
   const clearPatient = () => {
     setSelectedPatient(null);
     setSearch("");
-
     setFormData({
       fullName: "",
       cardNumber: "",
       department: "",
       priority: "Normal",
-      reason: "",
-      notes: "",
+      reasonForVisit: "",
+      clericalNote: "",
     });
   };
 
@@ -164,53 +188,56 @@ const CreateQueue = ({ onSuccess }) => {
   /* ---------------- SUBMIT ---------------- */
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
+    if (!formData.cardNumber) {
+      toast.error("Please select a patient");
+      return;
+    }
 
-  if (!formData.cardNumber) {
-    toast.error("Select patient");
-    return;
-  }
+    try {
+      setIsSubmitting(true);
 
-  try {
-    setIsSubmitting(true);
+      // Payload structure matches your Postman "initiate queue" request
+      const payload = {
+        patientId: selectedPatient.displayId,
+        reasonForVisit: formData.reasonForVisit,
+        clericalNote: formData.clericalNote,
+      };
 
-    const newQueue = {
-      patientId: selectedPatient.id,
-      patientName: formData.fullName,
-      reason: formData.reason,
-      priority: formData.priority,
-      notes: formData.notes,
-    };
-
-    await createQueue(newQueue);
-
-    toast.success("Patient added to queue");
-
-    clearPatient();
-    onSuccess?.();
-
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to create queue");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+      await addToQueue(payload);
+      toast.success("Patient added to queue");
+      clearPatient();
+      onSuccess?.();
+    } catch (err) {
+      toast.error(err.message || "Failed to initiate queue");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
       <ToastContainer
-        transition={Slide}
-        autoClose={3000} // 3 seconds
+        position="top-right"
+        autoClose={5000}
         hideProgressBar={false}
         newestOnTop={false}
-        closeOnClick
-        pauseOnHover
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
         draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
       />
 
       {/* Scan card */}
-      <div className="flex justify-end">
+       <div className="flex justify-between items-start">
+         <div>
+          <h2 className="text-lg font-bold text-gray-800">Add to Queue</h2>
+          <p className="text-sm text-gray-500">Record Officer: {useAppStore.getState().user?.firstName}</p>
+        </div>
+        <div className="flex justify-end">
         {!selectedPatient ? (
           <div
             onClick={() => setIsScanOpen(true)}
@@ -229,6 +256,8 @@ const CreateQueue = ({ onSuccess }) => {
           </div>
         )}
       </div>
+       </div>
+      
 
       {/* Search */}
       <div className="relative">
@@ -240,7 +269,7 @@ const CreateQueue = ({ onSuccess }) => {
           disabled={selectedPatient}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search patient..."
-          className="w-full px-3 py-2 border rounded-lg border-gray-300"
+          className="w-full px-3 py-2 border rounded-lg border-gray-300 capitalize"
         />
 
         {selectedPatient && (
@@ -262,9 +291,11 @@ const CreateQueue = ({ onSuccess }) => {
                   onClick={() => handleSelectPatient(p)}
                   className="p-3 cursor-pointer hover:bg-gray-100"
                 >
-                  <p className="font-medium">{p.fullName}</p>
-                  <p className="text-sm text-gray-500">
-                    {p.cardNumber} • {p.phone}
+                  <p className="font-bold text-gray-900 capitalize">
+                    {p.fullName}
+                  </p>
+                  <p className="text-xs text-gray-500 font-mono mt-1">
+                    ID: {p.displayId} • {p.phoneNumber}
                   </p>
                 </div>
               ))
@@ -318,6 +349,7 @@ const CreateQueue = ({ onSuccess }) => {
 
         <select
           value={formData.priority}
+          value={formData.priority}
           onChange={(e) =>
             setFormData({ ...formData, priority: e.target.value })
           }
@@ -330,17 +362,21 @@ const CreateQueue = ({ onSuccess }) => {
 
         <textarea
           rows="3"
-          placeholder="Reason"
-          value={formData.reason}
-          onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+          placeholder="e.g. Chronic headache, Fever..."
+          value={formData.reasonForVisit}
+          onChange={(e) =>
+            setFormData({ ...formData, reasonForVisit: e.target.value })
+          }
           className="md:col-span-2 px-3 py-2 border rounded-lg resize-none border-gray-300"
         />
 
         <textarea
           rows="2"
-          placeholder="Notes"
-          value={formData.notes}
-          onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+          placeholder="Additional instructions for nursing/doctor..."
+          value={formData.clericalNote}
+          onChange={(e) =>
+            setFormData({ ...formData, clericalNote: e.target.value })
+          }
           className="md:col-span-2 px-3 py-2 border rounded-lg resize-none border-gray-300"
         />
 
