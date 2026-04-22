@@ -64,6 +64,12 @@ const Sidebar = () => {
       roles: ["admin"],
     },
     {
+      to: "/dashboard/finance-admin",
+      icon: <FaUserClock size={22} />,
+      label: "Finance",
+      roles: ["admin"],
+    },
+    {
       to: "/dashboard/appointment",
       icon: <RiCalendarCheckLine size={22} />,
       label: "Appointment",
