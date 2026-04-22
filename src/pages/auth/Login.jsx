@@ -17,11 +17,13 @@ const onFinish = async (values) => {
     
     // Role-based navigation logic
     // Your log shows role: "admin"
-    if (user?.role === "admin" || user?.role === "record_officer") {
+    if (user?.role === "admin" || user?.role === "record_officer" || user?.role === "doctor") {
       navigate("/dashboard");
-    } else if (user?.role === "doctor") {
-      navigate("/doctor-dashboard");
-    } else if (user?.role === "lab") {
+    } 
+    // else if (user?.role === "doctor") {
+    //   navigate("/doctor-dashboard");
+    // } 
+    else if (user?.role === "lab") {
       navigate("/lab-dashboard");
     } else {
       navigate("/dashboard");

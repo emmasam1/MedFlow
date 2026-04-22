@@ -18,6 +18,7 @@ export const useAppStore = create((set) => ({
   patients: [],
   queue: [],
   labTest: [],
+  patientSummary: null,
 
   login: async (identifier, password) => {
     set({ loading: true });
@@ -27,6 +28,7 @@ export const useAppStore = create((set) => ({
         : { staffId: identifier, password };
 
       const response = await api.post("/auth/login", payload);
+      console.log(response);
       const { user, token } = response.data.data;
 
       sessionStorage.setItem("token", encryptData(token));
@@ -134,23 +136,236 @@ export const useAppStore = create((set) => ({
     }
   },
 
-
   // --- QUEUE ACTIONS ---
-  
-  getQueue: async () => {
+
+  // --- Inside useAppStore ---
+
+  // getQueue: async (role, date) => {
+  //   console.log(role)
+  //   if (!role) return;
+
+  //   set({ loading: true });
+
+  //   const roleMapper = {
+  //     finance_officer: "FINANCE",
+  //     record_officer: "RECORD",
+  //     doctor: "DOCTOR",
+  //     nurse: "TRIAGE",
+  //     admin: "ADMIN",
+  //   };
+
+  //   const apiRole = roleMapper[role] || role.toUpperCase();
+
+  //   try {
+  //     // Pass the date as a query parameter (?date=2026-04-22)
+  //     // This assumes your backend is set up to handle date filtering
+  //     const response = await api.get(`/queue/screens/${apiRole}`, {
+  //       params: { date },
+  //     });
+
+  //     set({
+  //       queue: response.data.data || [],
+  //       loading: false,
+  //     });
+  //   } catch (error) {
+  //     set({ loading: false, queue: [] });
+  //     console.error(`Fetch queue failed for role: ${apiRole}`, error);
+  //   }
+  // },
+
+  getQueue: async (passedRole, date) => {
+    // 1. Try to get role from: 1. Function argument, 2. Current state, 3. SessionStorage
+    let role = passedRole;
+    console.log(role, "passed role in getQueue");
+
+    if (!role) {
+      const currentState = useAppStore.getState();
+      role = currentState.user?.role;
+    }
+
+    if (!role) {
+      try {
+        const encryptedUser = sessionStorage.getItem("user");
+        const decryptedUser = decryptData(encryptedUser);
+        role = decryptedUser?.role;
+      } catch (err) {
+        console.error("Failed to decrypt user from session storage", err);
+      }
+    }
+
+    // Final check
+    if (!role) {
+      console.warn(
+        "getQueue: No role found in arguments, state, or session storage.",
+      );
+      return;
+    }
+
+    set({ loading: true });
+
+    const roleMapper = {
+      finance_officer: "FINANCE",
+      record_officer: "RECORD",
+      doctor: "DOCTOR",
+      nurse: "TRIAGE",
+      admin: "ADMIN",
+    };
+
+    const apiRole = roleMapper[role] || role.toUpperCase();
+
+    try {
+      const response = await api.get(`/queue/screens/${apiRole}`, {
+        params: { date },
+      });
+
+      set({
+        queue: response.data.data || [],
+        loading: false,
+      });
+    } catch (error) {
+      set({ loading: false, queue: [] });
+      console.error(`Fetch queue failed for role: ${apiRole}`, error);
+    }
+  },
+
+  processPayment: async (queueId, paymentMethod) => {
     set({ loading: true });
     try {
-      const response = await api.get("/queue");
-      set({ queue: response.data.data || [], loading: false });
+      // The payload as per your requirement
+      const payload = {
+        queueId: queueId, // e.g., "MFQ-20260421-0001"
+        paymentMethod: paymentMethod.toUpperCase(), // e.g., "WALLET"
+      };
+
+      const response = await api.patch("/queue/pay", payload);
+
+      // Update the local state to remove or update the paid item
+      set((state) => ({
+        queue: state.queue.map((item) =>
+          item.queueId === queueId
+            ? { ...item, status: "completed", paymentStatus: "paid" }
+            : item,
+        ),
+        loading: false,
+      }));
+
+      return response.data;
     } catch (error) {
-      set({ loading: false, queue: [] }); // Set to empty array on error to prevent .filter crashes
-      console.error("Fetch queue failed", error);
+      set({ loading: false });
+      const errorMsg =
+        error.response?.data?.message || "Payment processing failed";
+      console.error("Payment Error:", errorMsg);
+      throw new Error(errorMsg);
+    }
+  },
+
+  takeVitals: async (queueId, payload) => {
+    set({ loading: true });
+
+    try {
+      // ✅ get token (same pattern you already use)
+      const encryptedToken = sessionStorage.getItem("token");
+      if (!encryptedToken) throw new Error("No authentication token found");
+
+      const token = decryptData(encryptedToken);
+
+      // ✅ API CALL
+      const response = await api.post("/vitals", payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const updatedQueueItem = response.data.data;
+
+      // ✅ update local queue state
+      set((state) => ({
+        queue: state.queue.map((item) =>
+          item.id === queueId
+            ? {
+                ...item,
+                vitals: payload,
+                currentStage: "DOCTOR", // 👈 move patient forward
+                status: "ready-for-doctor",
+              }
+            : item,
+        ),
+        loading: false,
+      }));
+
+      return response.data;
+    } catch (error) {
+      set({ loading: false });
+
+      const errorMsg = error.response?.data?.message || "Failed to take vitals";
+
+      console.error("Take Vitals Error:", errorMsg);
+      throw new Error(errorMsg);
+    }
+  },
+
+ submitConsultation: async (queueId, payload) => {
+  try {
+    const token = sessionStorage.getItem("token");
+    if (!token) throw new Error("No auth token found");
+
+    const response = await api.patch(
+      `/queue/consultation/${queueId}`,
+      payload, // ✅ send payload here
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data; // ✅ axios already parses JSON
+  } catch (error) {
+    console.error("❌ Consultation Error:", error);
+
+    // Optional: better error handling
+    throw error?.response?.data || error.message;
+  }
+},
+
+  getPatientSummary: async (queueId) => {
+    set({ loading: true });
+
+    try {
+      // token (same pattern you already use)
+      const encryptedToken = sessionStorage.getItem("token");
+      if (!encryptedToken) throw new Error("No auth token found");
+
+      const token = decryptData(encryptedToken);
+
+      const response = await api.get(`/doctor/patient-summary/${queueId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const summary = response.data.data;
+
+      set({
+        patientSummary: summary,
+        loading: false,
+      });
+
+      return summary;
+    } catch (error) {
+      set({ loading: false });
+
+      const msg =
+        error.response?.data?.message || "Failed to fetch patient summary";
+
+      console.error("Patient Summary Error:", msg);
+      throw new Error(msg);
     }
   },
 
   addToQueue: async (queueData) => {
     console.log(queueData);
-    set({ loading: true });   
+    set({ loading: true });
     // 1. Get and Decrypt token (matching your login storage logic)
     const encryptedToken = sessionStorage.getItem("token");
     if (!encryptedToken) throw new Error("No authentication token found");
@@ -175,7 +390,7 @@ export const useAppStore = create((set) => ({
     } catch (error) {
       set({ loading: false });
       throw new Error(
-        error.response?.data?.message || "Failed to add to queue"
+        error.response?.data?.message || "Failed to add to queue",
       );
     }
   },
@@ -184,58 +399,16 @@ export const useAppStore = create((set) => ({
   updateQueueStatus: async (queueId, status) => {
     try {
       const response = await api.patch(`/queue/status/${queueId}`, { status });
-      
+
       set((state) => ({
         queue: state.queue.map((item) =>
-          item.id === queueId ? { ...item, status } : item
+          item.id === queueId ? { ...item, status } : item,
         ),
       }));
-      
+
       return response.data;
     } catch (error) {
       throw new Error("Failed to update status");
     }
   },
-
-  // registerPatient: async (patientData) => {
-  //   console.log(patientData);
-  //   set({ loading: true });
-  //   try {
-  //     const response = await api.post("/patients/register", patientData);
-  //     const newPatient = response.data.data;
-
-  //     console.log(response);
-
-  //     // Update local state so the UI adds the patient immediately
-  //     set((state) => ({
-  //       patients: [newPatient, ...state.patients],
-  //       loading: false,
-  //     }));
-
-  //     return response.data;
-  //   } catch (error) {
-  //     console.log(error);
-  //     set({ loading: false });
-  //     throw new Error(
-  //       error.response?.data?.message || "Patient registration failed",
-  //     );
-  //   }
-  // },
-
-  // getAllLabResults: () => {
-  //   const { patients } = get();
-
-  //   const results = patients.flatMap((p) =>
-  //     (p.labHistory || []).map((lab) => ({
-  //       ...lab,
-  //       patientId: p.id,
-  //       patientName: p.fullName,
-  //       patientCode: p.patientId,
-  //     }))
-  //   );
-
-  //   return results.sort(
-  //     (a, b) => new Date(b.date) - new Date(a.date)
-  //   );
-  // },
 }));

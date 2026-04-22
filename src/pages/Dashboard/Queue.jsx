@@ -1,8 +1,15 @@
-import React, { useState, useMemo, useRef, useEffect } from "react";
-import { Calendar, ConfigProvider, theme } from "antd";
+import React, { useState, useMemo, useEffect, useRef } from "react";
+import {
+  Skeleton,
+  Calendar,
+  ConfigProvider,
+  theme,
+  Tabs,
+  Collapse,
+} from "antd";
 import { motion, AnimatePresence } from "framer-motion";
 import dayjs from "dayjs";
-import { HiSearch, HiChevronDown } from "react-icons/hi";
+import { HiSearch, HiCalendar } from "react-icons/hi";
 import { FaPaperPlane } from "react-icons/fa";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import Modal from "../../components/Modal";
@@ -14,110 +21,274 @@ import VitalsModal from "../../components/VitalsModal";
 
 const PER_PAGE = 10;
 
-const statusStyles = (darkMode) => ({
-  waiting: darkMode ? "bg-amber-700 text-white" : "bg-amber-100 text-amber-700",
-  "ready-for-doctor": darkMode
-    ? "bg-indigo-700 text-white"
-    : "bg-indigo-100 text-indigo-700",
-  "in-progress": darkMode
-    ? "bg-blue-700 text-white"
-    : "bg-blue-100 text-blue-700",
-  done: darkMode
-    ? "bg-emerald-700 text-white"
-    : "bg-emerald-100 text-emerald-700",
-  cancelled: darkMode ? "bg-red-700 text-white" : "bg-red-100 text-red-700",
-  "awaiting-payment": darkMode
-    ? "bg-purple-700 text-white"
-    : "bg-purple-100 text-purple-700",
-  "partial-payment": darkMode
-    ? "bg-yellow-700 text-white"
-    : "bg-yellow-100 text-yellow-700",
-});
-
 const Queue = () => {
   const {
     queue = [],
     getQueue,
     updateQueueStatus,
     cancelQueue,
-    doctorSendPatient,
-    labTest = [],
-    // fetchLabTests,
+    takeVitals,
+    getPatientSummary,
+    submitConsultation,
   } = useAppStore();
 
-  // useEffect(() => {
-  //   fetchLabTests();
-  // }, []);
-
   const { darkMode } = useStore();
-
   const user = useAppStore((state) => state.user);
 
-  const today = dayjs();
-
-  const [selectedDate, setSelectedDate] = useState(today.format("YYYY-MM-DD"));
+  // Default to today's date in YYYY-MM-DD format
+  const [selectedDate, setSelectedDate] = useState(
+    dayjs().format("YYYY-MM-DD"),
+  );
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
-  const [leftWidth, setLeftWidth] = useState(380);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
   const [vitalsModalOpen, setVitalsModalOpen] = useState(false);
-
-  /* doctor modal */
-
-  const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
+  const [summaryData, setSummaryData] = useState(null);
+  const [summaryOpen, setSummaryOpen] = useState(false);
+  const [pdfOpen, setPdfOpen] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState(null);
   const [selectedQueue, setSelectedQueue] = useState(null);
+  const [localLoading, setLocalLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [labSearch, setLabSearch] = useState("");
-  const [selectedTests, setSelectedTests] = useState([]);
+  const [openConsultation, setOpenConsultation] = useState(false);
+  const [clinicalNotes, setClinicalNotes] = useState("");
+  const [diagnosis, setDiagnosis] = useState("");
 
-  const [department, setDepartment] = useState("");
-  const [doctorNotes, setDoctorNotes] = useState("");
-  const [reason, setReason] = useState("");
+  const [labAddons, setLabAddons] = useState([]);
+  const [drugAddons, setDrugAddons] = useState([]);
 
-  const departments = [
-    "lab",
-    "pharmacy",
-    "radiology",
-    "cardiology",
-    "physiotherapy",
-    "admission",
-  ];
+  const [labQuery, setLabQuery] = useState("");
+  const [drugQuery, setDrugQuery] = useState("");
+
+  const [showLabDropdown, setShowLabDropdown] = useState(false);
+  const [showDrugDropdown, setShowDrugDropdown] = useState(false);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isDragging = useRef(false);
 
-  // useEffect(() => {
-  //   getQueue();
-  // }, []);
+  const [isQueueId, setIsQueueId] = useState(null);
 
- const filteredLabTests = useMemo(() => {
-  if (!labTest) return [];
-  if (!labSearch) return labTest;
+  const statusStyles = (darkMode) => ({
+    waiting: darkMode
+      ? "bg-amber-700 text-white"
+      : "bg-amber-100 text-amber-700",
+    "ready-for-doctor": darkMode
+      ? "bg-indigo-700 text-white"
+      : "bg-indigo-100 text-indigo-700",
+    "in-progress": darkMode
+      ? "bg-blue-700 text-white"
+      : "bg-blue-100 text-blue-700",
+    done: darkMode
+      ? "bg-emerald-700 text-white"
+      : "bg-emerald-100 text-emerald-700",
+    cancelled: darkMode ? "bg-red-700 text-white" : "bg-red-100 text-red-700",
+    "awaiting-payment": darkMode
+      ? "bg-purple-700 text-white"
+      : "bg-purple-100 text-purple-700",
+    "partial-payment": darkMode
+      ? "bg-yellow-700 text-white"
+      : "bg-yellow-100 text-yellow-700",
+  });
 
-  return labTest.filter((t) =>
-    t.name.toLowerCase().includes(labSearch.toLowerCase())
-  );
-}, [labSearch, labTest]);
+  const LAB_OPTIONS = [
+    { name: "Malaria RDT", amount: 5500 },
+    { name: "Full Blood Count (FBC)", amount: 4000 },
+    { name: "Urinalysis", amount: 2500 },
+    { name: "Liver Function Test", amount: 8000 },
+    { name: "Kidney Function Test", amount: 7500 },
+    { name: "Blood Glucose (FBS)", amount: 2000 },
+    { name: "HIV Test", amount: 3000 },
+    { name: "Pregnancy Test", amount: 1500 },
+    { name: "Typhoid Test (Widal)", amount: 3000 },
+    { name: "Lipid Profile", amount: 9000 },
+    { name: "Electrolyte Panel", amount: 8500 },
+    { name: "HbA1c", amount: 7000 },
+  ];
 
-  const toggleTest = (test) => {
-    setSelectedTests((prev) => {
-      const exists = prev.find((t) => t.id === test.id);
+  const DRUG_OPTIONS = [
+    { name: "Paracetamol", amount: 1200 },
+    { name: "Ibuprofen", amount: 1500 },
+    { name: "Amoxicillin", amount: 2500 },
+    { name: "Ciprofloxacin", amount: 3000 },
+    { name: "Metronidazole", amount: 2000 },
+    { name: "Artemether/Lumefantrine", amount: 3500 },
+    { name: "Azithromycin", amount: 3500 },
+    { name: "Diclofenac", amount: 1800 },
+    { name: "Omeprazole", amount: 2200 },
+    { name: "ORS", amount: 800 },
+    { name: "Vitamin C", amount: 1000 },
+  ];
 
-      if (exists) {
-        return prev.filter((t) => t.id !== test.id);
-      }
-
-      return [...prev, test];
+  const addLab = (item) => {
+    setLabAddons((prev) => {
+      if (prev.find((x) => x.name === item.name)) return prev;
+      return [...prev, { ...item, category: "LABORATORY" }];
     });
+  };
+
+  const addDrug = (item) => {
+    setDrugAddons((prev) => {
+      if (prev.find((x) => x.name === item.name)) return prev;
+      return [...prev, { ...item, category: "PHARMACY" }];
+    });
+  };
+
+  const removeLab = (name) => {
+    setLabAddons((prev) => prev.filter((x) => x.name !== name));
+  };
+
+  const filteredLabs = LAB_OPTIONS.filter((l) =>
+    l.name.toLowerCase().includes(labQuery.toLowerCase()),
+  );
+
+  const filteredDrugs = DRUG_OPTIONS.filter((d) =>
+    d.name.toLowerCase().includes(drugQuery.toLowerCase()),
+  );
+  const removeDrug = (name) => {
+    setDrugAddons((prev) => prev.filter((x) => x.name !== name));
+  };
+
+  const buildPayload = () => ({
+    clinicalNotes,
+    diagnosis,
+    addons: [...labAddons, ...drugAddons],
+  });
+
+  /**
+   * ✅ FETCH QUEUE
+   * Triggered when: Role loads, Date changes, or component mounts
+   */
+  useEffect(() => {
+    const fetchData = async () => {
+      setLocalLoading(true);
+      // We pass user?.role or fallback to what is in sessionStorage inside the store
+      await getQueue(user?.role, selectedDate);
+      setLocalLoading(false);
+    };
+
+    fetchData();
+  }, [getQueue, selectedDate, user?.role]);
+
+  const getPatientName = (q) => {
+    if (q.patientName) return q.patientName;
+    if (q.patientId) {
+      return `${q.patientId.firstName} ${q.patientId.lastName}`;
+    }
+    return "Unknown";
   };
 
   const openVitalsModal = (q) => {
     setSelectedQueue(q);
-    // console.log(selectedQueue)
     setVitalsModalOpen(true);
   };
 
-  /* resizer */
+  // console.log(queue)
+
+  const getPatientVital = async (q) => {
+    setIsLoading(true);
+
+    if (!q) {
+      console.warn("⚠️ No queue item provided");
+      return;
+    }
+
+    try {
+      // const queueId = q.queueId ;
+
+      // console.log("🟡 Extracted queueId:", q);
+
+      const summary = await getPatientSummary(q);
+
+      // console.log("🟢 Raw Patient Summary Response:", summary);
+
+      // console.log("🟢 Vitals Data Only:", summary?.vitals || summary);
+
+      setSelectedQueue(q);
+      setSummaryData(summary);
+      setSummaryOpen(true);
+    } catch (error) {
+      console.error("🔴 Failed to fetch patient vitals:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const startConsultation = (q) => {
+    // set selected patient/queue
+    setIsQueueId(q);
+
+    // reset form
+    setClinicalNotes("");
+    setDiagnosis("");
+    setLabAddons([]);
+    setDrugAddons([]);
+
+    // open modal
+    setOpenConsultation(true);
+  };
+
+  const handleSubmitConsultation = async () => {
+    setIsSubmitting(true);
+    try {
+      if (!isQueueId) {
+        console.error("❌ Missing queueId");
+        return;
+      }
+
+      const payload = {
+        clinicalNotes,
+        diagnosis,
+        addons: [...labAddons, ...drugAddons],
+      };
+
+      // console.log("🚀 Sending:", payload);
+
+      // ✅ send to backend
+      await submitConsultation(isQueueId, payload);
+
+      toast.success("Consultation submitted successfully!");
+
+      // ✅ refresh queue (optional but recommended)
+      await getQueue(user?.role, selectedDate);
+
+      // close modal
+      setOpenConsultation(false);
+    } catch (error) {
+      toast.error(error.message || "Failed to submit consultation");
+      console.error("❌ Submit failed:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const openPdf = (url) => {
+    setPdfUrl(url);
+    setPdfOpen(true);
+  };
+  // console.log(queue);
+
+  const handleDateSelect = (value) => {
+    setSelectedDate(value.format("YYYY-MM-DD"));
+    setCurrentPage(1);
+  };
+
+  const filtered = useMemo(() => {
+    if (!queue) return [];
+
+    return queue
+      .filter((q) => dayjs(q.timeAdded).format("YYYY-MM-DD") === selectedDate)
+      .filter((q) =>
+        q.patientName?.toLowerCase().includes(search.toLowerCase()),
+      )
+      .filter((q) =>
+        statusFilter === "All"
+          ? true
+          : q.status?.toLowerCase() === statusFilter.toLowerCase(),
+      );
+  }, [queue, selectedDate, search, statusFilter]);
 
   const handleMouseDown = () => {
     if (window.innerWidth >= 1024) isDragging.current = true;
@@ -142,60 +313,10 @@ const Queue = () => {
     };
   }, []);
 
-  const handleDateSelect = (value) => {
-    setSelectedDate(value.format("YYYY-MM-DD"));
-    setCurrentPage(1);
-  };
-
-  /* doctor modal */
-
-  const openDoctorModal = (queueItem) => {
-    setSelectedQueue(queueItem);
-    setIsDoctorModalOpen(true);
-
-    setSelectedTests([]);
-    setLabSearch("");
-  };
-
-  const handleSendPatient = async () => {
-    if (!department) return alert("Select department");
-
-    await doctorSendPatient(
-      selectedQueue.id,
-      department,
-      doctorNotes,
-      reason,
-      selectedTests,
-    );
-
-    setIsDoctorModalOpen(false);
-    setDoctorNotes("");
-    setReason("");
-    setDepartment("");
-    setSelectedTests([]);
-  };
-
-  /* filter queue */
-
-  const filtered = useMemo(() => {
-    if (!queue) return [];
-
-    return queue
-      .filter((q) => dayjs(q.timeAdded).format("YYYY-MM-DD") === selectedDate)
-      .filter((q) =>
-        q.patientName?.toLowerCase().includes(search.toLowerCase()),
-      )
-      .filter((q) =>
-        statusFilter === "All"
-          ? true
-          : q.status?.toLowerCase() === statusFilter.toLowerCase(),
-      );
-  }, [queue, selectedDate, search, statusFilter]);
-
-  const paginatedData = filtered.slice(
-    (currentPage - 1) * PER_PAGE,
-    currentPage * PER_PAGE,
-  );
+  // const handleDateSelect = (value) => {
+  //   setSelectedDate(value.format("YYYY-MM-DD"));
+  //   setCurrentPage(1);
+  // };
 
   const totalForDay = filtered.length;
   const waiting = filtered.filter((q) => q.status === "waiting").length;
@@ -203,70 +324,102 @@ const Queue = () => {
   const done = filtered.filter((q) => q.status === "done").length;
   const cancelled = filtered.filter((q) => q.status === "cancelled").length;
 
-  const dateCellRender = (value) => {
-    const date = value.format("YYYY-MM-DD");
+  /**
+   * ✅ FILTER LOGIC
+   * Matches date, role permissions, search string, and status
+   */
+  const filteredData = useMemo(() => {
+    if (!Array.isArray(queue)) return [];
 
-  const appointments = (queue || []).filter(
-      (q) => dayjs(q.timeAdded).format("YYYY-MM-DD") === date,
-    );
+    return queue
+      .filter((q) => dayjs(q.createdAt).format("YYYY-MM-DD") === selectedDate)
+      .filter((q) => {
+        if (user?.role === "nurse") {
+          return q.currentStage === "TRIAGE" || !q.currentStage;
+        }
+        return true;
+      })
+      .filter((q) =>
+        getPatientName(q).toLowerCase().includes(search.toLowerCase()),
+      )
+      .filter((q) =>
+        statusFilter === "All"
+          ? true
+          : q.status?.toLowerCase() === statusFilter.toLowerCase(),
+      );
+  }, [queue, selectedDate, search, statusFilter, user?.role]);
 
-    if (!appointments.length) return null;
-
-    return (
-      <motion.div
-        whileHover={{ scale: 1.1 }}
-        className="flex justify-center mt-1"
-      >
-        <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-gray-700 shadow-sm border border-blue-100 dark:border-gray-600">
-          {/* dots */}
-          {appointments.slice(0, 3).map((_, i) => (
-            <span
-              key={i}
-              className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"
-            />
-          ))}
-
-          {/* extra count */}
-          {appointments.length > 3 && (
-            <span className="text-[10px] font-semibold text-blue-600 dark:text-blue-300">
-              +{appointments.length - 3}
-            </span>
-          )}
-        </div>
-      </motion.div>
-    );
-  };
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * PER_PAGE,
+    currentPage * PER_PAGE,
+  );
 
   return (
     <div
-      className={`${
-        darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
-      } rounded-2xl shadow-sm overflow-hidden`}
+      className={`${darkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"} rounded-2xl shadow-md min-h-[85vh]`}
     >
       <ToastContainer />
 
-      {/* header */}
+      {/* TOPBAR / HEADER */}
+      <div
+        className={`p-5 border-b ${darkMode ? "border-gray-800" : "border-gray-100"} flex flex-col md:flex-row justify-between items-start md:items-center gap-4`}
+      >
+        <div>
+          <h2 className="text-xl font-bold">Patient Queue</h2>
+          <p className="text-xs text-gray-500">Manage and track patient flow</p>
+        </div>
 
-      <div className="flex justify-between items-center p-3">
-        <span className="font-semibold">Queue</span>
-
-        {user?.role !== "doctor" && user?.role !== "nurse" && (
-          <motion.button
-            onClick={() => setIsQueueOpen(true)}
-            whileHover={{ scale: 1.05 }}
-            className="px-2 py-1 rounded-full text-[#005CBB] font-semibold flex items-center gap-1 hover:bg-[#9DCEF8]"
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          {/* DATE SELECTOR */}
+          <div
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl border ${darkMode ? "bg-gray-800 border-gray-700" : "bg-gray-50 border-gray-200"}`}
           >
-            <PlusCircleIcon className="w-5 h-5" /> Queue
-          </motion.button>
-        )}
+            <HiCalendar className="text-blue-500" />
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="bg-transparent text-sm outline-none cursor-pointer"
+            />
+          </div>
+
+          {user?.role === "record_officer" && (
+            <button
+              onClick={() => setIsQueueOpen(true)}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all"
+            >
+              <PlusCircleIcon className="w-5 h-5" />
+              <span>Add Patient</span>
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-140px)]">
+      {/* SEARCH BAR */}
+      <div className="p-5">
+        <div className="relative max-w-md">
+          <HiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search by name or queue ID..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className={`w-full pl-10 pr-4 py-2.5 rounded-xl border ${darkMode ? "bg-gray-800 border-gray-700" : "bg-gray-50 border-gray-200"} focus:ring-2 focus:ring-blue-500 outline-none`}
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-140px)] gap-4">
         {/* calendar */}
 
-        <div
-          style={{ width: window.innerWidth < 1024 ? "100%" : leftWidth }}
+        {/* <div
+          // style={{ width: window.innerWidth < 1024 ? "100%" : leftWidth }}
           className={`${darkMode ? "bg-gray-800" : "bg-white"} p-4 overflow-y-auto`}
+        > */}
+        <div
+          className={`w-full lg:w-95 shrink-0 ${
+            darkMode ? "bg-gray-800" : "bg-white"
+          } p-4 rounded-xl overflow-y-auto`}
         >
           <ConfigProvider
             theme={{
@@ -353,295 +506,486 @@ const Queue = () => {
           className="hidden lg:block w-1 bg-slate-200 hover:bg-blue-400 cursor-col-resize"
         />
 
-        {/* right panel */}
-
-        <div className="flex-1 p-4 flex flex-col">
-          {/* search */}
-
-          <div className="flex gap-4 mb-6">
-            <div className="relative w-72">
-              <input
-                type="text"
-                placeholder="Search patient..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-10 py-2 rounded-xl border"
-              />
-
-              <HiSearch
-                size={16}
-                className="absolute left-3 top-1/2 -translate-y-1/2"
-              />
+        {/* QUEUE LISTING */}
+        <div className="flex-1 px-5 pb-5 space-y-3 flex flex-col overflow-y-auto max-h-[calc(100vh-140px)]">
+          {localLoading ? (
+            /* ✅ ANTD SKELETON LOADERS */
+            [1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className={`p-6 rounded-2xl border ${darkMode ? "bg-gray-800 border-gray-700" : "bg-gray-50 border-gray-100"}`}
+              >
+                <Skeleton active avatar paragraph={{ rows: 1 }} />
+              </div>
+            ))
+          ) : paginatedData.length === 0 ? (
+            /* ✅ EMPTY STATE */
+            <div className="py-20 text-center">
+              <HiCalendar size={50} className="mx-auto text-gray-300 mb-3" />
+              <p className="text-gray-500">
+                No patients found for{" "}
+                {dayjs(selectedDate).format("DD MMM YYYY")}
+              </p>
             </div>
-
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="border rounded-xl px-4 py-2"
-            >
-              <option value="All">All Status</option>
-              <option value="waiting">Waiting</option>
-              <option value="in-progress">In Progress</option>
-              <option value="done">Done</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
-
-          {/* queue list */}
-
-          <div className="flex-1 overflow-y-auto space-y-4">
+          ) : (
             <AnimatePresence>
-              {paginatedData.map((q) => {
-                const displayStatus =
-                  q.status === "done"
-                    ? "done"
-                    : q.paymentStatus === "unpaid" &&
-                        q.currentDepartment === "finance"
-                      ? "awaiting-payment"
-                      : q.paymentStatus === "partial"
-                        ? "partial-payment"
-                        : q.status;
-
-                return (
-                  <motion.div
-                    key={q.id}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    className={`${
-                      darkMode ? "bg-gray-800" : "bg-gray-100"
-                    } px-4 py-2 rounded-xl`}
-                  >
-                    <div className="flex justify-end mb-2">
-                      <div>
+              {paginatedData.map((q) => (
+                <motion.div
+                  key={q._id || q.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className={`p-4 rounded-2xl border flex flex-col md:flex-row justify-between items-center gap-4 ${
+                    darkMode
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-gray-200"
+                  }`}
+                >
+                  <div className="flex items-center gap-4 w-full md:w-auto">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
+                      {getPatientName(q).charAt(0)}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
                         <span
-                          className={`px-3 py-1 text-xs rounded-full ${
-                            statusStyles(darkMode)[displayStatus]
+                          className={`text-[9px] px-2 py-0.5 font-bold uppercase ${
+                            q.status === "active"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-gray-100 text-gray-600"
                           }`}
                         >
-                          {displayStatus === "done"
-                            ? "Done"
-                            : displayStatus === "awaiting-payment"
-                              ? "Awaiting payment"
-                              : displayStatus}
+                          {q.status}
+                        </span>
+
+                        <span className="text-[9px] font-bold uppercase px-2 py-0.5  bg-blue-50 text-blue-600">
+                          {q.currentStage || "RECEPTION"}
                         </span>
                       </div>
+                      <h4 className="font-semibold capitalize text-sm">
+                        {getPatientName(q)}
+                      </h4>
+                      <p className="text-xs text-gray-500">
+                        {q.reasonForVisit || "General Consultation"}
+                      </p>
                     </div>
+                  </div>
 
-                    <div className="mb-2">
-                      <p className="font-medium">{q.patientName}</p>
+                  <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+                    {/* NURSE ACTION */}
+                    {user?.role === "nurse" && q.currentStage === "TRIAGE" && (
+                      <button
+                        onClick={() => openVitalsModal(q)}
+                        className="text-xs font-bold px-4 bg-green-600 text-white hover:bg-green-700"
+                      >
+                        Process Vitals
+                      </button>
+                    )}
 
-                      <p className="text-sm text-slate-400">{q.reason}</p>
-                      {q.nextDepartment && (
-                        <p className="text-xs text-blue-500">
-                          Sent to: {q.nextDepartment}
-                        </p>
-                      )}
-
-                      {user?.role === "doctor" &&
-                        q.currentDepartment !== "doctor" && (
-                          <p className="text-xs text-gray-400">
-                            Now at:{" "}
-                            <span className="capitalize">
-                              {q.currentDepartment}
-                            </span>
-                          </p>
-                        )}
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                      {user?.role === "nurse" && q.status === "waiting" && (
-                        <button
-                          onClick={() => openVitalsModal(q)}
-                          className="text-xs px-3 py-1 bg-green-100 text-green-700 rounded-lg cursor-pointer"
-                        >
-                          Take Vitals
-                        </button>
-                      )}
-                      {user?.role === "doctor" &&
-                        q.currentDepartment === "doctor" && (
-                          <>
-                            {/* START → only if not started */}
-
-                            {q.status === "waiting" && (
-                              <button
-                                onClick={() =>
-                                  updateQueueStatus(q.id, "in-progress")
-                                }
-                                className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded-lg cursor-pointer"
-                              >
-                                Start
-                              </button>
-                            )}
-
-                            {/* SEND → only when in progress */}
-                            {q.status === "in-progress" && (
-                              <button
-                                onClick={() => openDoctorModal(q)}
-                                className="text-xs px-3 py-1 bg-purple-100 text-purple-700 rounded-lg flex items-center gap-1 cursor-pointer"
-                              >
-                                <FaPaperPlane size={12} />
-                                Send
-                              </button>
-                            )}
-                          </>
-                        )}
-
-                      {user?.role === "record_officer" &&
-                        q.paymentStatus === "unpaid" && (
+                    {/* DOCTOR ACTION */}
+                    {user?.role === "doctor" && (
+                      <div className="flex gap-2">
+                        {q.status === "active" && (
                           <button
-                            onClick={() => {
-                              if (confirm("Cancel this queue?")) {
-                                cancelQueue(q.id);
-                              }
-                            }}
-                            className="text-xs px-3 py-1 bg-red-100 text-red-700 rounded-lg"
+                            onClick={() => startConsultation(q.queueId)}
+                            className="text-xs font-bold px-4 bg-blue-600 text-white py-2 cursor-pointer"
                           >
-                            Cancel
+                            Start Consultation
                           </button>
                         )}
-                    </div>
-                  </motion.div>
-                );
-              })}
+                        {/* {q.status === "active" && (
+                        <button className="text-xs font-bold px-4 py-2 bg-purple-600 text-white rounded-lg flex items-center gap-2">
+                          <FaPaperPlane /> Consult
+                        </button>
+                      )} */}
+                        {q.status === "active" && (
+                          <button
+                            onClick={() => {
+                              getPatientVital(q.queueId);
+                            }}
+                            className="text-xs font-bold px-4 py-2 bg-purple-600 text-white cursor-pointer"
+                          >
+                            {isLoading ? "Loading..." : "View Summary"}
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
             </AnimatePresence>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* {vital modal} */}
+      {/* MODALS */}
       <Modal
         isOpen={vitalsModalOpen}
         onClose={() => setVitalsModalOpen(false)}
-        title={`Clinical Assessment: ${selectedQueue?.patientName}`}
-        size="lg"
+        title={
+          <span className="capitalize">
+            Patient Assessment: {selectedQueue?.patientId?.firstName || ""}
+            &nbsp;
+            {selectedQueue?.patientId?.lastName || ""}
+          </span>
+        }
       >
         <VitalsModal
           queueItem={selectedQueue}
+          takeVitals={takeVitals}
           onClose={() => setVitalsModalOpen(false)}
         />
       </Modal>
 
-      {/* create queue modal */}
-
       <Modal
         isOpen={isQueueOpen}
         onClose={() => setIsQueueOpen(false)}
-        title="Add Patient to Queue"
-        size="3xl"
+        title="New Queue Entry"
       >
         <CreateQueue onSuccess={() => setIsQueueOpen(false)} />
       </Modal>
 
-      {/* doctor modal */}
+      <Modal
+        isOpen={summaryOpen}
+        onClose={() => setSummaryOpen(false)}
+        title="Patient Summary"
+      >
+        {summaryData && (
+          <Tabs
+            defaultActiveKey="1"
+            items={[
+              // ================= VITALS =================
+              {
+                key: "1",
+                label: "Vitals",
+                children: (
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    {/* TEMPERATURE */}
+                    <div
+                      className={`p-3 rounded-lg ${
+                        summaryData.currentVitals.temperature.value >= 38
+                          ? "bg-red-100 text-red-700"
+                          : summaryData.currentVitals.temperature.value >= 37
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-green-100 text-green-700"
+                      }`}
+                    >
+                      <p className="text-xs">Temperature</p>
+                      <p className="font-bold">
+                        {summaryData.currentVitals.temperature.value}°C
+                      </p>
+                    </div>
+
+                    {/* BP */}
+                    <div className="p-3 rounded-lg bg-blue-100 text-blue-700">
+                      <p className="text-xs">Blood Pressure</p>
+                      <p className="font-bold">
+                        {summaryData.currentVitals.bloodPressure.systolic}/
+                        {summaryData.currentVitals.bloodPressure.diastolic}
+                      </p>
+                    </div>
+
+                    {/* HEART RATE */}
+                    <div
+                      className={`p-3 rounded-lg ${
+                        summaryData.currentVitals.heartRate.value < 60 ||
+                        summaryData.currentVitals.heartRate.value > 100
+                          ? "bg-red-100 text-red-700"
+                          : "bg-green-100 text-green-700"
+                      }`}
+                    >
+                      <p className="text-xs">Heart Rate</p>
+                      <p className="font-bold">
+                        {summaryData.currentVitals.heartRate.value} bpm
+                      </p>
+                    </div>
+
+                    {/* SPO2 */}
+                    <div
+                      className={`p-3 rounded-lg ${
+                        summaryData.currentVitals.oxygenSaturation.value < 95
+                          ? "bg-red-100 text-red-700"
+                          : "bg-green-100 text-green-700"
+                      }`}
+                    >
+                      <p className="text-xs">SpO2</p>
+                      <p className="font-bold">
+                        {summaryData.currentVitals.oxygenSaturation.value}%
+                      </p>
+                    </div>
+
+                    {/* BMI */}
+                    <div className="p-3 rounded-lg bg-purple-100 text-purple-700 col-span-2">
+                      <p className="text-xs">BMI</p>
+                      <p className="font-bold">
+                        {summaryData.currentVitals.bmi}
+                      </p>
+                    </div>
+
+                    {/* COMMENT */}
+                    <div className="p-3 rounded-lg bg-gray-100 col-span-2">
+                      <p className="text-xs text-gray-500">Doctor Comment</p>
+                      <p className="font-semibold">
+                        {summaryData.currentVitals.comment}
+                      </p>
+                    </div>
+                  </div>
+                ),
+              },
+
+              // ================= LAB RESULTS =================
+              {
+                key: "2",
+                label: "Lab Results",
+                children: (
+                  <>
+                    <Collapse
+                      bordered={false}
+                      items={summaryData.pastLabResults.map((lab, i) => ({
+                        key: i,
+                        label: (
+                          <div className="flex justify-between items-center w-full">
+                            <span className="font-medium">{lab.testName}</span>
+
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500">
+                                {new Date(lab.createdAt).toLocaleDateString()}
+                              </span>
+
+                              {lab.fileUrl ? (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    openPdf(lab.fileUrl);
+                                  }}
+                                  className="text-blue-600 hover:text-blue-800"
+                                >
+                                  📄
+                                </button>
+                              ) : (
+                                <span className="text-xs text-gray-400">
+                                  No file
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ),
+
+                        children: (
+                          <div className="text-sm space-y-1 bg-gray-50 p-3 rounded-lg">
+                            <p>
+                              <span className="text-gray-500">Status:</span>{" "}
+                              <span className="font-medium">{lab.status}</span>
+                            </p>
+
+                            <p>
+                              <span className="text-gray-500">Result:</span>{" "}
+                              <span className="font-semibold">
+                                {lab.resultNote}
+                              </span>
+                            </p>
+
+                            <p>
+                              <span className="text-gray-500">Date:</span>{" "}
+                              {new Date(lab.createdAt).toLocaleString()}
+                            </p>
+                          </div>
+                        ),
+                      }))}
+                    />
+
+                    {/* PDF PREVIEW MODAL */}
+                    <Modal
+                      isOpen={pdfOpen}
+                      onClose={() => setPdfOpen(false)}
+                      title="Lab Result Preview"
+                    >
+                      {pdfUrl ? (
+                        <iframe
+                          src={pdfUrl}
+                          className="w-full h-[80vh] rounded-lg border"
+                        />
+                      ) : (
+                        <p>No file available</p>
+                      )}
+                    </Modal>
+                  </>
+                ),
+              },
+            ]}
+          />
+        )}
+      </Modal>
 
       <Modal
-        isOpen={isDoctorModalOpen}
-        onClose={() => setIsDoctorModalOpen(false)}
-        title="Send Patient"
-        size="lg"
+        isOpen={openConsultation}
+        onClose={() => setOpenConsultation(false)}
+        title="Submit Consultation"
       >
-        <div className="space-y-4">
-          <select
-            value={department}
-            onChange={(e) => setDepartment(e.target.value)}
-            className="w-full border rounded-lg p-2"
-          >
-            <option value="">Select Department</option>
+        <div className="space-y-5">
+          {/* CLINICAL NOTES */}
+          <div>
+            <label className="text-sm font-semibold">Clinical Notes</label>
+            <textarea
+              value={clinicalNotes}
+              onChange={(e) => setClinicalNotes(e.target.value)}
+              rows={3}
+              className="w-full px-3 py-2 border rounded-lg resize-none border-gray-300"
+              placeholder="Write clinical notes..."
+            />
+          </div>
 
-            {departments.map((dep) => (
-              <option key={dep} value={dep}>
-                {dep}
+          {/* DIAGNOSIS */}
+          <div>
+            <label className="text-sm font-semibold">Diagnosis</label>
+            <input
+              value={diagnosis}
+              rows={2}
+              onChange={(e) => setDiagnosis(e.target.value)}
+              className="w-full mt-1 px-3 py-2 border rounded-lg resize-none border-gray-300"
+              placeholder="Enter diagnosis"
+            />
+          </div>
+
+          {/* LAB TESTS */}
+          <div>
+            <h3 className="text-sm font-semibold mb-2">Lab Tests</h3>
+
+            <select
+              onChange={(e) => {
+                const selected = LAB_OPTIONS.find(
+                  (l) => l.name === e.target.value,
+                );
+                if (selected) addLab(selected);
+                e.target.value = ""; // reset after select
+              }}
+              className="w-full px-3 py-2 border rounded-lg border-gray-300 bg-white"
+              defaultValue=""
+            >
+              <option value="" disabled>
+                Select lab test...
               </option>
-            ))}
-          </select>
 
-          {department === "lab" && (
-            <div className="space-y-3">
-              {/* SEARCH */}
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search lab test..."
-                  value={labSearch}
-                  onChange={(e) => setLabSearch(e.target.value)}
-                  className="w-full border rounded-lg p-2 pl-9"
-                />
+              {LAB_OPTIONS.map((lab) => (
+                <option key={lab.name} value={lab.name}>
+                  {lab.name} - ₦{lab.amount}
+                </option>
+              ))}
+            </select>
 
-                <HiSearch
-                  size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                />
-              </div>
-
-              {/* LAB LIST */}
-              <div
-                className={`max-h-52 overflow-y-auto border rounded-lg ${
-                  darkMode ? "bg-gray-800 border-gray-700" : "bg-white"
-                }`}
-              >
-                {filteredLabTests.map((test) => {
-                  const selected = selectedTests.some((t) => t.id === test.id);
-
-                  return (
-                    <div
-                      key={test.id}
-                      onClick={() => toggleTest(test)}
-                      className={`flex justify-between px-3 py-2 cursor-pointer text-sm
-            ${
-              selected
-                ? darkMode
-                  ? "bg-blue-700 text-white"
-                  : "bg-blue-100"
-                : darkMode
-                  ? "hover:bg-gray-700"
-                  : "hover:bg-gray-100"
-            }`}
-                    >
-                      <span>{test.name}</span>
-                      <span>₦{test.amount}</span>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* SELECTED TESTS */}
-              {selectedTests.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {selectedTests.map((t) => (
-                    <span
-                      key={t.id}
-                      className="px-2 py-1 bg-blue-600 text-white rounded text-xs"
-                    >
-                      {t.name}
-                    </span>
-                  ))}
+            <div className="mt-3 space-y-2">
+              {labAddons.map((item) => (
+                <div
+                  key={item.name}
+                  className="flex justify-between items-center bg-blue-50 p-2 rounded-lg text-sm"
+                >
+                  <span>
+                    {item.name} - ₦{item.amount}
+                  </span>
+                  <button
+                    onClick={() => removeLab(item.name)}
+                    className="text-red-500"
+                  >
+                    ✕
+                  </button>
                 </div>
-              )}
+              ))}
             </div>
-          )}
+          </div>
 
-          <input
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder="Reason"
-            className="w-full border rounded-lg p-2"
-          />
+          {/* DRUGS */}
+          <div>
+            <h3 className="text-sm font-semibold mb-2">Drugs</h3>
 
-          <textarea
-            value={doctorNotes}
-            onChange={(e) => setDoctorNotes(e.target.value)}
-            placeholder="Doctor notes..."
-            rows={3}
-            className="w-full border rounded-lg p-2"
-          />
+            <select
+              onChange={(e) => {
+                const selected = DRUG_OPTIONS.find(
+                  (d) => d.name === e.target.value,
+                );
+                if (selected) addDrug(selected);
+                e.target.value = ""; // reset
+              }}
+              className="w-full px-3 py-2 border rounded-lg border-gray-300 bg-white"
+              defaultValue=""
+            >
+              <option value="" disabled>
+                Select drug...
+              </option>
 
-          <button
-            onClick={handleSendPatient}
-            className="w-full bg-blue-600 text-white py-2 rounded-lg"
-          >
-            Send Patient
-          </button>
+              {DRUG_OPTIONS.map((drug) => (
+                <option key={drug.name} value={drug.name}>
+                  {drug.name} - ₦{drug.amount}
+                </option>
+              ))}
+            </select>
+
+            <div className="mt-3 space-y-2">
+              {drugAddons.map((item) => (
+                <div
+                  key={item.name}
+                  className="flex justify-between items-center bg-purple-50 p-2 rounded-lg text-sm"
+                >
+                  <span>
+                    {item.name} - ₦{item.amount}
+                  </span>
+                  <button
+                    onClick={() => removeDrug(item.name)}
+                    className="text-red-500"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* TOTAL */}
+          <div className="text-sm font-semibold flex justify-between border-gray-200 border-t pt-3">
+            <span>Total</span>
+            <span>
+              ₦
+              {[...labAddons, ...drugAddons].reduce(
+                (sum, i) => sum + i.amount,
+                0,
+              )}
+            </span>
+          </div>
+
+          {/* SUBMIT */}
+
+          <div className="md:col-span-2 mt-4">
+            <button
+              type="submit"
+              onClick={handleSubmitConsultation}
+              disabled={isSubmitting}
+              className={`bg-blue-600 text-white py-2 px-3 cursor-pointer rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg flex items-center justify-center gap-2 ${
+                isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+              }`}
+            >
+              {isSubmitting && (
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"
+                  ></path>
+                </svg>
+              )}
+              {isSubmitting ? "Submitting..." : "Submit Consultation"}
+            </button>
+          </div>
         </div>
       </Modal>
     </div>
