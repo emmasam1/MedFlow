@@ -173,8 +173,7 @@ export const useAppStore = create((set) => ({
   //   }
   // },
 
-  getQueue: async (passedRole, date) => {
-    // 1. Try to get role from: 1. Function argument, 2. Current state, 3. SessionStorage
+  getQueue: async (passedRole, date = null) => {
     let role = passedRole;
     console.log(role, "passed role in getQueue");
 
@@ -193,11 +192,8 @@ export const useAppStore = create((set) => ({
       }
     }
 
-    // Final check
     if (!role) {
-      console.warn(
-        "getQueue: No role found in arguments, state, or session storage.",
-      );
+      console.warn("getQueue: No role found.");
       return;
     }
 
@@ -209,13 +205,14 @@ export const useAppStore = create((set) => ({
       doctor: "DOCTOR",
       nurse: "TRIAGE",
       admin: "ADMIN",
+      lab_officer: "LABORATORY",
     };
 
     const apiRole = roleMapper[role] || role.toUpperCase();
 
     try {
       const response = await api.get(`/queue/screens/${apiRole}`, {
-        params: { date },
+        params: date ? { date } : {}, // ✅ only send date if exists
       });
 
       set({
@@ -304,29 +301,29 @@ export const useAppStore = create((set) => ({
     }
   },
 
- submitConsultation: async (queueId, payload) => {
-  try {
-    const token = sessionStorage.getItem("token");
-    if (!token) throw new Error("No auth token found");
+  submitConsultation: async (queueId, payload) => {
+    try {
+      const token = sessionStorage.getItem("token");
+      if (!token) throw new Error("No auth token found");
 
-    const response = await api.patch(
-      `/queue/consultation/${queueId}`,
-      payload, // ✅ send payload here
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await api.patch(
+        `/queue/consultation/${queueId}`,
+        payload, // ✅ send payload here
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      }
-    );
+      );
 
-    return response.data; // ✅ axios already parses JSON
-  } catch (error) {
-    console.error("❌ Consultation Error:", error);
+      return response.data; // ✅ axios already parses JSON
+    } catch (error) {
+      console.error("❌ Consultation Error:", error);
 
-    // Optional: better error handling
-    throw error?.response?.data || error.message;
-  }
-},
+      // Optional: better error handling
+      throw error?.response?.data || error.message;
+    }
+  },
 
   getPatientSummary: async (queueId) => {
     set({ loading: true });

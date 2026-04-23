@@ -15,7 +15,7 @@ import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import Modal from "../../components/Modal";
 import { useAppStore } from "../../store/useAppStore";
 import { useStore } from "../../store/store";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import CreateQueue from "../../components/CreateQueue";
 import VitalsModal from "../../components/VitalsModal";
 
@@ -25,7 +25,6 @@ const Queue = () => {
   const {
     queue = [],
     getQueue,
-    updateQueueStatus,
     cancelQueue,
     takeVitals,
     getPatientSummary,
@@ -71,8 +70,10 @@ const Queue = () => {
 
   const [isQueueId, setIsQueueId] = useState(null);
 
+  const [viewMode, setViewMode] = useState("today"); // "today" | "all"
+
   const statusStyles = (darkMode) => ({
-    waiting: darkMode
+    triage: darkMode
       ? "bg-amber-700 text-white"
       : "bg-amber-100 text-amber-700",
     "ready-for-doctor": darkMode
@@ -165,12 +166,22 @@ const Queue = () => {
     const fetchData = async () => {
       setLocalLoading(true);
       // We pass user?.role or fallback to what is in sessionStorage inside the store
-      await getQueue(user?.role, selectedDate);
+      await getQueue(user?.role);
       setLocalLoading(false);
     };
 
     fetchData();
   }, [getQueue, selectedDate, user?.role]);
+
+  const handleViewAll = async () => {
+    setViewMode("all");
+    await getQueue(user?.role); // ✅ no date at all
+  };
+
+  const handleToday = async () => {
+    setViewMode("today");
+    await getQueue(user?.role, selectedDate);
+  };
 
   const getPatientName = (q) => {
     if (q.patientName) return q.patientName;
@@ -275,20 +286,56 @@ const Queue = () => {
     setCurrentPage(1);
   };
 
-  const filtered = useMemo(() => {
-    if (!queue) return [];
+  const filteredData = useMemo(() => {
+    if (!Array.isArray(queue)) return [];
 
     return queue
-      .filter((q) => dayjs(q.timeAdded).format("YYYY-MM-DD") === selectedDate)
       .filter((q) =>
-        q.patientName?.toLowerCase().includes(search.toLowerCase()),
+        viewMode === "all"
+          ? true
+          : dayjs(q.createdAt).format("YYYY-MM-DD") === selectedDate,
+      )
+      .filter((q) => {
+        if (user?.role === "nurse") {
+          return q.currentStage === "TRIAGE" || !q.currentStage;
+        }
+        return true;
+      })
+      .filter((q) =>
+        getPatientName(q).toLowerCase().includes(search.toLowerCase()),
       )
       .filter((q) =>
         statusFilter === "All"
           ? true
           : q.status?.toLowerCase() === statusFilter.toLowerCase(),
       );
-  }, [queue, selectedDate, search, statusFilter]);
+  }, [queue, selectedDate, search, statusFilter, user?.role, viewMode]);
+
+  // const filteredData = useMemo(() => {
+  //     if (!Array.isArray(queue)) return [];
+
+  //     return queue
+  //       .filter((q) => dayjs(q.createdAt).format("YYYY-MM-DD") === selectedDate)
+  //       .filter((q) => {
+  //         if (user?.role === "nurse") {
+  //           return q.currentStage === "TRIAGE" || !q.currentStage;
+  //         }
+  //         return true;
+  //       })
+  //       .filter((q) =>
+  //         getPatientName(q).toLowerCase().includes(search.toLowerCase()),
+  //       )
+  //       .filter((q) =>
+  //         statusFilter === "All"
+  //           ? true
+  //           : q.status?.toLowerCase() === statusFilter.toLowerCase(),
+  //       );
+  //   }, [queue, selectedDate, search, statusFilter, user?.role]);
+
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * PER_PAGE,
+    currentPage * PER_PAGE,
+  );
 
   const handleMouseDown = () => {
     if (window.innerWidth >= 1024) isDragging.current = true;
@@ -318,41 +365,31 @@ const Queue = () => {
   //   setCurrentPage(1);
   // };
 
-  const totalForDay = filtered.length;
-  const waiting = filtered.filter((q) => q.status === "waiting").length;
-  const progress = filtered.filter((q) => q.status === "in-progress").length;
-  const done = filtered.filter((q) => q.status === "done").length;
-  const cancelled = filtered.filter((q) => q.status === "cancelled").length;
+  const totalForDay = filteredData.length;
+  const triage = filteredData.filter((q) => q.currentStage === "TRIAGE").length;
+  const consultation = filteredData.filter(
+    (q) => q.currentStage === "CONSULTATION",
+  ).length;
+  const laboratory = filteredData.filter(
+    (q) => q.currentStage === "LABORATORY",
+  ).length;
+  const finance = filteredData.filter(
+    (q) => q.currentStage === "FINANCE",
+  ).length;
 
   /**
    * ✅ FILTER LOGIC
    * Matches date, role permissions, search string, and status
    */
-  const filteredData = useMemo(() => {
-    if (!Array.isArray(queue)) return [];
 
-    return queue
-      .filter((q) => dayjs(q.createdAt).format("YYYY-MM-DD") === selectedDate)
-      .filter((q) => {
-        if (user?.role === "nurse") {
-          return q.currentStage === "TRIAGE" || !q.currentStage;
-        }
-        return true;
-      })
-      .filter((q) =>
-        getPatientName(q).toLowerCase().includes(search.toLowerCase()),
-      )
-      .filter((q) =>
-        statusFilter === "All"
-          ? true
-          : q.status?.toLowerCase() === statusFilter.toLowerCase(),
-      );
-  }, [queue, selectedDate, search, statusFilter, user?.role]);
+  const buttonMotion = {
+    whileHover: { scale: 1.05, y: -2 },
+    whileTap: { scale: 0.97 },
+    transition: { type: "spring", stiffness: 300 },
+  };
 
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * PER_PAGE,
-    currentPage * PER_PAGE,
-  );
+  const buttonStyle =
+    "hover:bg-[#9DCEF8] px-4 py-2 rounded-full text-[#005CBB] font-bold flex items-center gap-2 transition-colors duration-300 text-sm cursor-pointer border-none shadow-sm bg-white";
 
   return (
     <div
@@ -362,7 +399,9 @@ const Queue = () => {
 
       {/* TOPBAR / HEADER */}
       <div
-        className={`p-5 border-b ${darkMode ? "border-gray-800" : "border-gray-100"} flex flex-col md:flex-row justify-between items-start md:items-center gap-4`}
+        className={`p-5 border-b ${
+          darkMode ? "border-gray-800" : "border-gray-100"
+        } flex flex-col md:flex-row justify-between items-start md:items-center gap-4`}
       >
         <div>
           <h2 className="text-xl font-bold">Patient Queue</h2>
@@ -372,15 +411,47 @@ const Queue = () => {
         <div className="flex items-center gap-3 w-full md:w-auto">
           {/* DATE SELECTOR */}
           <div
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl border ${darkMode ? "bg-gray-800 border-gray-700" : "bg-gray-50 border-gray-200"}`}
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl border ${
+              darkMode
+                ? "bg-gray-800 border-gray-700"
+                : "bg-gray-50 border-gray-200"
+            }`}
           >
             <HiCalendar className="text-blue-500" />
             <input
               type="date"
               value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
+              onChange={(e) => {
+                setSelectedDate(e.target.value);
+                handleToday(); // ✅ auto refresh when date changes
+              }}
               className="bg-transparent text-sm outline-none cursor-pointer"
             />
+          </div>
+
+          {/* VIEW MODE BUTTONS */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleViewAll}
+              className={`px-3 py-2 text-xs cursor-pointer font-medium transition ${
+                viewMode === "all"
+                  ? "bg-gray-900 text-white"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+            >
+              View All
+            </button>
+
+            <button
+              onClick={handleToday}
+              className={`px-3 py-2 text-xs cursor-pointer font-medium transition ${
+                viewMode === "today"
+                  ? "bg-blue-600 text-white"
+                  : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+              }`}
+            >
+              Today
+            </button>
           </div>
 
           {user?.role === "record_officer" && (
@@ -396,15 +467,40 @@ const Queue = () => {
       </div>
 
       {/* SEARCH BAR */}
-      <div className="p-5">
-        <div className="relative max-w-md">
+      <div className="p-5 flex justify-end">
+        {user.role === "doctor" && (
+       <div className="flex items-center gap-3 mr-5">
+           <motion.button
+            {...buttonMotion}
+            // onClick={() => setIsAddModalOpen(true)}
+            className={buttonStyle}
+          >
+            Awaiting Attention
+          </motion.button>
+          <motion.button
+            {...buttonMotion}
+            // onClick={() => setIsAddModalOpen(true)}
+            className={buttonStyle}
+          >
+            Attended To Today
+          </motion.button>
+          <motion.button
+            {...buttonMotion}
+            // onClick={() => setIsAddModalOpen(true)}
+            className={buttonStyle}
+          >
+            Currently In Lab
+          </motion.button>
+       </div>
+        )}
+        <div className="relative max-w-lg">
           <HiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             placeholder="Search by name or queue ID..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className={`w-full pl-10 pr-4 py-2.5 rounded-xl border ${darkMode ? "bg-gray-800 border-gray-700" : "bg-gray-50 border-gray-200"} focus:ring-2 focus:ring-blue-500 outline-none`}
+            className={`w-[500px] pl-10 pr-4 py-2.5 rounded-xl border ${darkMode ? "bg-gray-800 border-gray-700" : "bg-gray-50 border-gray-200"} focus:ring-2 focus:ring-blue-500 outline-none`}
           />
         </div>
       </div>
@@ -492,10 +588,10 @@ const Queue = () => {
             </p>
             <p className="text-2xl font-semibold mt-1">{totalForDay} Queue</p>
             <div className="flex flex-wrap gap-3 mt-3 text-sm">
-              <span className="text-amber-500">{waiting} Waiting</span>
-              <span className="text-blue-500">{progress} In Progress</span>
-              <span className="text-emerald-500">{done} Done</span>
-              <span className="text-red-500">{cancelled} Cancelled</span>
+              <span className="text-amber-500">{triage} Triage</span>
+              <span className="text-blue-500">{consultation} Consultation</span>
+              <span className="text-emerald-500">{laboratory} Laboratory</span>
+              <span className="text-red-500">{finance} Finance</span>
             </div>
           </div>
         </div>
@@ -575,7 +671,7 @@ const Queue = () => {
                     {user?.role === "nurse" && q.currentStage === "TRIAGE" && (
                       <button
                         onClick={() => openVitalsModal(q)}
-                        className="text-xs font-bold px-4 bg-green-600 text-white hover:bg-green-700"
+                        className="text-xs font-bold px-4 py-2 bg-green-600 text-white hover:bg-green-700"
                       >
                         Process Vitals
                       </button>
@@ -746,27 +842,9 @@ const Queue = () => {
                           <div className="flex justify-between items-center w-full">
                             <span className="font-medium">{lab.testName}</span>
 
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-500">
-                                {new Date(lab.createdAt).toLocaleDateString()}
-                              </span>
-
-                              {lab.fileUrl ? (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    openPdf(lab.fileUrl);
-                                  }}
-                                  className="text-blue-600 hover:text-blue-800"
-                                >
-                                  📄
-                                </button>
-                              ) : (
-                                <span className="text-xs text-gray-400">
-                                  No file
-                                </span>
-                              )}
-                            </div>
+                            <span className="text-xs text-gray-500">
+                              {new Date(lab.createdAt).toLocaleDateString()}
+                            </span>
                           </div>
                         ),
 
@@ -788,6 +866,26 @@ const Queue = () => {
                               <span className="text-gray-500">Date:</span>{" "}
                               {new Date(lab.createdAt).toLocaleString()}
                             </p>
+
+                            {lab.fileUrl ? (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openPdf(lab.fileUrl);
+                                }}
+                                className="text-blue-600 hover:text-blue-800 cursor-pointer mt-2 p-0 -ml-1"
+                              >
+                                <img
+                                  src="/assets/pdf_svg.svg"
+                                  alt="PDF"
+                                  className="w-10"
+                                />
+                              </button>
+                            ) : (
+                              <span className="text-xs text-gray-400">
+                                No file
+                              </span>
+                            )}
                           </div>
                         ),
                       }))}
@@ -798,12 +896,10 @@ const Queue = () => {
                       isOpen={pdfOpen}
                       onClose={() => setPdfOpen(false)}
                       title="Lab Result Preview"
+                      size="max-w-4xl"
                     >
                       {pdfUrl ? (
-                        <iframe
-                          src={pdfUrl}
-                          className="w-full h-[80vh] rounded-lg border"
-                        />
+                        <iframe src={pdfUrl} className="w-full h-[80vh]" />
                       ) : (
                         <p>No file available</p>
                       )}

@@ -43,6 +43,7 @@ const Sidebar = () => {
         "lab_officer",
         "nurse",
         "admin",
+        "pharmacist"
       ],
     },
     {
@@ -79,7 +80,7 @@ const Sidebar = () => {
       to: "/dashboard/queue",
       icon: <RiUser3Line size={22} />,
       label: "Queue",
-      roles: ["record_officer", "doctor", "nurse"],
+      roles: ["record_officer", "doctor", "nurse", "lab_officer", "finance_officer", "pharmacist"],
     },
     {
       to: "/dashboard/patients",

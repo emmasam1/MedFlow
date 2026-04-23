@@ -432,7 +432,7 @@ const User = () => {
                           <p className="text-sm font-bold text-slate-700 truncate leading-tight">
                             {user.firstName} {user.lastName}
                           </p>
-                          <p className="text-[11px] font-medium text-slate-400 truncate mt-0.5">
+                          <p className="text-[11px] font-medium text-slate-700 truncate mt-0.5">
                             {user.email}
                           </p>
                         </div>

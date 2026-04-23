@@ -19,11 +19,11 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import FinancePayments from "./pages/Dashboard/FinancePayments";
 import Transactions from "./pages/Dashboard/Transactions";
 import FinanceAdmin from "./pages/Dashboard/FinanceAdmin";
-// import LabRequest from "./pages/Dashboard/LabRequest";
 import User from "./pages/Dashboard/User";
 import ShiftManagement from "./pages/Dashboard/ShiftManagement";
 import Departments from "./pages/Dashboard/Departments";
 import InstallPWA from "./components/InstallPWA";
+import LabRequests from "./pages/Dashboard/LabRequests";
 
 const App = () => {
   // Common list for all authorized dashboard users
@@ -35,6 +35,7 @@ const App = () => {
     "nurse",
     "lab_officer",
     "admin",
+    "pharmacist"
   ];
 
   return (
@@ -119,7 +120,7 @@ const App = () => {
             path="/dashboard/queue"
             element={
               <ProtectedRoute
-                allowedRoles={["record_officer", "doctor", "nurse", "admin"]}
+                allowedRoles={["record_officer", "doctor", "nurse", "admin", "lab_officer", "finance_officer", "pharmacist"]}
               >
                 <Queue />
               </ProtectedRoute>
@@ -170,14 +171,14 @@ const App = () => {
           />
 
           {/* 8. Lab_Officer */}
-          {/* <Route
+          <Route
             path="/dashboard/lab-requests"
             element={
               <ProtectedRoute allowedRoles={["lab_officer", "doctor", "admin"]}>
-                <LabRequest />
+                <LabRequests />
               </ProtectedRoute>
             }
-          /> */}
+          />
 
           {/* 9. Global Profile & Notifications (Everyone) */}
           <Route

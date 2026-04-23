@@ -76,7 +76,7 @@ ${vitals.allergies ? `Allergies: ${vitals.allergies}` : ""}
         comment,
       };
 
-      console.log(payload)
+      // console.log(payload)
 
       await takeVitals(queueItem.id, payload);
       toast.success("Vitals saved successfully.");
