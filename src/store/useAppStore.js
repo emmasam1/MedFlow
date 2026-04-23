@@ -17,6 +17,7 @@ export const useAppStore = create((set) => ({
   notifications: [],
   patients: [],
   queue: [],
+  doctorQueue: null,
   labTest: [],
   patientSummary: null,
 
@@ -391,6 +392,43 @@ export const useAppStore = create((set) => ({
       );
     }
   },
+
+ getDoctorWorkload: async () => {
+  try {
+    console.log("🟡 Fetching doctor workload...");
+
+    const { data } = await api.get("/doctor/workload");
+
+    console.log("🟢 Raw workload response:", data);
+
+    if (!data.success) throw new Error(data.message);
+
+    const workload = data.data;
+
+    const flatQueue = [
+      ...(workload.awaitingAttention || []),
+      ...(workload.currentlyInLab || []),
+      ...(workload.attendedToToday || []),
+    ];
+
+    console.log("🟣 Flattened queue length:", flatQueue.length);
+    console.log("🟣 Awaiting:", workload.awaitingAttention?.length);
+    console.log("🟣 Lab:", workload.currentlyInLab?.length);
+    console.log("🟣 Attended:", workload.attendedToToday?.length);
+
+    set({
+      doctorQueue: workload,
+      queue: Array.isArray(flatQueue) ? flatQueue : [],
+    });
+
+    console.log("✅ Zustand updated doctorQueue + queue");
+
+    return workload;
+  } catch (error) {
+    console.error("❌ Doctor workload error:", error);
+    return null;
+  }
+},
 
   // Use this for when a doctor or nurse "calls" a patient
   updateQueueStatus: async (queueId, status) => {
