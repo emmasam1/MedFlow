@@ -74,6 +74,7 @@ const DoctorQueue = () => {
   const [drugAddons, setDrugAddons] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isQueueId, setIsQueueId] = useState(null);
+  const [activeVitalId, setActiveVitalId] = useState(null); 
 
   const openVitalsModal = (q) => {
     setSelectedQueue(q);
@@ -103,9 +104,9 @@ const DoctorQueue = () => {
         fullName.includes(search.toLowerCase()) ||
         q.queueId?.toLowerCase().includes(search.toLowerCase());
 
-      // Filter for Triage stage if user is a nurse
+      // Filter for Consultation stage if user is a doctor
       const matchesRole =
-        user?.role === "nurse" ? q.currentStage === "TRIAGE" : true;
+        user?.role === "doctor" ? q.currentStage === "CONSULTATION" : true;
 
       return (
         matchesDate && matchesSearch && matchesRole && q.status === "active"
@@ -114,7 +115,8 @@ const DoctorQueue = () => {
   }, [queue, selectedDate, search, user?.role]);
 
   const getPatientVital = async (q) => {
-    setIsLoading(true);
+    // setIsLoading(true);
+     setActiveVitalId(q)
 
     if (!q) {
       console.warn("⚠️ No queue item provided");
@@ -138,13 +140,14 @@ const DoctorQueue = () => {
     } catch (error) {
       console.error("🔴 Failed to fetch patient vitals:", error);
     } finally {
-      setIsLoading(false);
+    //   setIsLoading(false);
+      setActiveVitalId(null);
     }
   };
 
   const stats = {
     total: filteredData.length,
-    triage: filteredData.filter((q) => q.currentStage === "TRIAGE").length,
+    consultation: filteredData.filter((q) => q.currentStage === "CONSULTATION").length,
     urgent: filteredData.filter((q) => q.isUrgent).length,
   };
 
@@ -206,7 +209,7 @@ const DoctorQueue = () => {
     const hasPending = queue.some(
       (q) =>
         dayjs(q.createdAt).format("YYYY-MM-DD") === dateStr &&
-        q.currentStage === "TRIAGE" &&
+        q.currentStage === "CONSULTATION" &&
         q.status === "active",
     );
 
@@ -294,7 +297,7 @@ const DoctorQueue = () => {
       >
         <div>
           <h2 className="text-xl font-bold">Patient Queue</h2>
-          <p className="text-xs text-gray-500">Manage and track triage flow</p>
+          <p className="text-xs text-gray-500">Manage and track consultation flow</p>
         </div>
 
         <ConfigProvider
@@ -344,11 +347,11 @@ const DoctorQueue = () => {
             <p className="text-3xl font-bold">{stats.total} Queue</p>
             <div className="mt-4 space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-gray-500 text-sm">Triage Needed</span>
+                <span className="text-gray-500 text-sm">Consultation Needed</span>
                 <span
                   className={`px-3 py-1 rounded-lg text-xs font-bold ${darkMode ? "bg-amber-900/40 text-amber-500" : "bg-amber-100 text-amber-600"}`}
                 >
-                  {stats.triage}
+                  {stats.consultation}
                 </span>
               </div>
               {stats.urgent > 0 && (
@@ -436,16 +439,14 @@ const DoctorQueue = () => {
                           <FaPaperPlane /> Consult
                         </button>
                       )} */}
-                      {q.status === "active" && (
-                        <button
-                          onClick={() => {
-                            getPatientVital(q.queueId);
-                          }}
-                          className="text-xs font-bold px-4 py-2 bg-purple-600 text-white cursor-pointer"
-                        >
-                          {isLoading ? "Loading..." : "View Summary"}
-                        </button>
-                      )}
+                      <button 
+                        onClick={() => getPatientVital(q.queueId)} 
+                        className="text-xs font-bold px-4 py-2 bg-purple-600 text-white flex items-center justify-center min-w-[110px]"
+                      >
+                        {activeVitalId === q.queueId ? (
+                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ) : "View Summary"}
+                      </button>
                     </div>
                   </motion.div>
                 ))}
