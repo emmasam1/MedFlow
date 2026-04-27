@@ -30,7 +30,7 @@ const CreateQueue = ({ onSuccess }) => {
       getQueue();
   }, [getPatients, getQueue]);
 
-  console.log("trying to get all patients", queue);
+  // console.log("trying to get all patients", queue);
 
   const scannerRef = useRef(null);
   const [scanSuccess, setScanSuccess] = useState(false);

@@ -248,19 +248,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        transition={Bounce}
-      />
+      <ToastContainer transition={Bounce} />
 
       {/* HEADER SECTION */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4 px-4">
@@ -490,10 +478,9 @@ const Dashboard = () => {
             </div>
           )}
         </div>
-          <div className="px-4">
-
+        <div className="px-4">
           <NewPatientChart />
-          </div>
+        </div>
         {/* BOTTOM SECTION: DATA TABLES */}
         <div className="px-4 pb-10">
           <div className="bg-white rounded-3xl shadow-sm overflow-hidden border border-slate-100">
