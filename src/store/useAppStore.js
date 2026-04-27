@@ -393,42 +393,83 @@ export const useAppStore = create((set) => ({
     }
   },
 
- getDoctorWorkload: async () => {
-  try {
-    console.log("🟡 Fetching doctor workload...");
+  updateLabResults: async (queueId, formData) => {
+    set({ loading: true });
 
-    const { data } = await api.get("/doctor/workload");
+    const encryptedToken = sessionStorage.getItem("token");
+    if (!encryptedToken) throw new Error("No authentication token found");
+    const token = decryptData(encryptedToken);
 
-    console.log("🟢 Raw workload response:", data);
+    try {
+      // We use multipart/form-data for the file uploads
+      const response = await api.patch(
+        `/queue/lab-update/${queueId}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
-    if (!data.success) throw new Error(data.message);
+      console.log(response);
 
-    const workload = data.data;
+      // Update the local queue state so the UI reflects the change immediately
+      set((state) => ({
+        queue: state.queue.map((q) =>
+          q.queueId === queueId ? { ...q, ...response.data.updatedQueue } : q,
+        ),
+        loading: false,
+      }));
 
-    const flatQueue = [
-      ...(workload.awaitingAttention || []),
-      ...(workload.currentlyInLab || []),
-      ...(workload.attendedToToday || []),
-    ];
+      return { success: true };
+    } catch (error) {
+      console.error("Lab update failed:", error);
+      set({ loading: false });
+      return {
+        success: false,
+        message:
+          error.response?.data?.message || "Failed to update lab results",
+      };
+    }
+  },
 
-    console.log("🟣 Flattened queue length:", flatQueue.length);
-    console.log("🟣 Awaiting:", workload.awaitingAttention?.length);
-    console.log("🟣 Lab:", workload.currentlyInLab?.length);
-    console.log("🟣 Attended:", workload.attendedToToday?.length);
+  getDoctorWorkload: async () => {
+    try {
+      console.log("🟡 Fetching doctor workload...");
 
-    set({
-      doctorQueue: workload,
-      queue: Array.isArray(flatQueue) ? flatQueue : [],
-    });
+      const { data } = await api.get("/doctor/workload");
 
-    console.log("✅ Zustand updated doctorQueue + queue");
+      console.log("🟢 Raw workload response:", data);
 
-    return workload;
-  } catch (error) {
-    console.error("❌ Doctor workload error:", error);
-    return null;
-  }
-},
+      if (!data.success) throw new Error(data.message);
+
+      const workload = data.data;
+
+      const flatQueue = [
+        ...(workload.awaitingAttention || []),
+        ...(workload.currentlyInLab || []),
+        ...(workload.attendedToToday || []),
+      ];
+
+      console.log("🟣 Flattened queue length:", flatQueue.length);
+      console.log("🟣 Awaiting:", workload.awaitingAttention?.length);
+      console.log("🟣 Lab:", workload.currentlyInLab?.length);
+      console.log("🟣 Attended:", workload.attendedToToday?.length);
+
+      set({
+        doctorQueue: workload,
+        queue: Array.isArray(flatQueue) ? flatQueue : [],
+      });
+
+      console.log("✅ Zustand updated doctorQueue + queue");
+
+      return workload;
+    } catch (error) {
+      console.error("❌ Doctor workload error:", error);
+      return null;
+    }
+  },
 
   // Use this for when a doctor or nurse "calls" a patient
   updateQueueStatus: async (queueId, status) => {

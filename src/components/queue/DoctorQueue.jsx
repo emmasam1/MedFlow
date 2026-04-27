@@ -10,7 +10,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import dayjs from "dayjs";
 import { HiSearch, HiCalendar, HiOutlineClipboardList } from "react-icons/hi";
-import { ToastContainer, Bounce } from "react-toastify";
+import { ToastContainer, Bounce, toast } from "react-toastify";
 import { useAppStore } from "../../store/useAppStore";
 import { useStore } from "../../store/store";
 import VitalsModal from "../../components/VitalsModal";
