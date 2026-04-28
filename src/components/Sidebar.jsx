@@ -12,7 +12,11 @@ import {
   RiFileList3Line, 
   RiShoppingBag3Line, 
   RiTruckLine, 
-  RiErrorWarningLine
+  RiErrorWarningLine,
+  RiCapsuleLine, 
+  RiHistoryLine, 
+  RiListCheck2, 
+  RiHandCoinLine
 } from "react-icons/ri";
 import { FaUserClock } from "react-icons/fa";
 import { useAppStore } from "../store/useAppStore";
@@ -148,6 +152,24 @@ const Sidebar = () => {
       icon: <RiErrorWarningLine size={22} />, 
       label: "Expiry Tracker",
       roles: ["store_officer", "pharmacist"],
+    },
+    {
+      to: "/dashboard/queue",
+      icon: <RiListCheck2 size={22} />,
+      label: "Dispensing Queue", // Pharmacist sees this instead of just "Queue"
+      roles: ["pharmacist"],
+    },
+    {
+      to: "/dashboard/drug-inventory",
+      icon: <RiCapsuleLine size={22} />,
+      label: "Drug Stock",
+      roles: ["pharmacist", "store_officer"],
+    },
+    {
+      to: "/dashboard/dispense-history",
+      icon: <RiHistoryLine size={22} />,
+      label: "Dispense Log",
+      roles: ["pharmacist", "admin"],
     },
   ];
 
