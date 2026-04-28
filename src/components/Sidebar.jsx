@@ -8,7 +8,11 @@ import {
   RiSettings4Line,
   RiUser3Line,
   RiReceiptLine,
-  RiStackLine
+  RiStackLine,
+  RiFileList3Line, 
+  RiShoppingBag3Line, 
+  RiTruckLine, 
+  RiErrorWarningLine
 } from "react-icons/ri";
 import { FaUserClock } from "react-icons/fa";
 import { useAppStore } from "../store/useAppStore";
@@ -30,7 +34,7 @@ const Sidebar = () => {
   };
 
   // Define role-based routes dynamically
-  const routes = [
+ const routes = [
     {
       to: "/dashboard",
       icon: <RiDashboardLine size={22} />,
@@ -43,7 +47,8 @@ const Sidebar = () => {
         "lab_officer",
         "nurse",
         "admin",
-        "pharmacist"
+        "pharmacist",
+        "store_officer" // Added store officer access
       ],
     },
     {
@@ -54,7 +59,7 @@ const Sidebar = () => {
     },
     {
       to: "/dashboard/departments",
-      icon: <RiStackLine size={22} />, // Clean, organized, and structural
+      icon: <RiStackLine size={22} />, 
       label: "Departments",
       roles: ["admin"],
     },
@@ -100,19 +105,49 @@ const Sidebar = () => {
       label: "Transactions",
       roles: ["finance_officer"],
     },
-
     {
       to: "/dashboard/lab-requests",
       icon: <RiReceiptLine size={22} />,
       label: "Requests",
       roles: ["lab_officer"],
     },
-
     {
       to: "/dashboard/lab-results",
       icon: <RiReceiptLine size={22} />,
       label: "Results",
       roles: ["lab_officer"],
+    },
+
+    // ================= STORE OFFICER ROUTES =================
+    {
+      to: "/dashboard/inventory",
+      icon: <RiStackLine size={22} />, 
+      label: "Inventory",
+      roles: ["store_officer", "admin"],
+    },
+    {
+      to: "/dashboard/stock-requests",
+      icon: <RiFileList3Line size={22} />, // Good for internal requisitions
+      label: "Stock Requests",
+      roles: ["store_officer", "nurse", "lab_officer"], // Nurse/Lab can request, Store handles
+    },
+    {
+      to: "/dashboard/procurement",
+      icon: <RiShoppingBag3Line size={22} />, 
+      label: "Procurement",
+      roles: ["store_officer", "admin"],
+    },
+    {
+      to: "/dashboard/suppliers",
+      icon: <RiTruckLine size={22} />, 
+      label: "Suppliers",
+      roles: ["store_officer"],
+    },
+    {
+      to: "/dashboard/expiry-tracker",
+      icon: <RiErrorWarningLine size={22} />, 
+      label: "Expiry Tracker",
+      roles: ["store_officer", "pharmacist"],
     },
   ];
 
