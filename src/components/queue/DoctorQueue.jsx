@@ -74,7 +74,7 @@ const DoctorQueue = () => {
   const [drugAddons, setDrugAddons] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isQueueId, setIsQueueId] = useState(null);
-  const [activeVitalId, setActiveVitalId] = useState(null); 
+  const [activeVitalId, setActiveVitalId] = useState(null);
 
   const openVitalsModal = (q) => {
     setSelectedQueue(q);
@@ -116,7 +116,7 @@ const DoctorQueue = () => {
 
   const getPatientVital = async (q) => {
     // setIsLoading(true);
-     setActiveVitalId(q)
+    setActiveVitalId(q);
 
     if (!q) {
       console.warn("⚠️ No queue item provided");
@@ -140,14 +140,15 @@ const DoctorQueue = () => {
     } catch (error) {
       console.error("🔴 Failed to fetch patient vitals:", error);
     } finally {
-    //   setIsLoading(false);
+      //   setIsLoading(false);
       setActiveVitalId(null);
     }
   };
 
   const stats = {
     total: filteredData.length,
-    consultation: filteredData.filter((q) => q.currentStage === "CONSULTATION").length,
+    consultation: filteredData.filter((q) => q.currentStage === "CONSULTATION")
+      .length,
     urgent: filteredData.filter((q) => q.isUrgent).length,
   };
 
@@ -233,58 +234,71 @@ const DoctorQueue = () => {
     );
   };
 
-   const startConsultation = (q) => {
-    // set selected patient/queue
-    setIsQueueId(q);
+  const startConsultation = (q) => {
+  // 1. Set the ID for submission
+  setIsQueueId(q.queueId);
 
-    // reset form
-    setClinicalNotes("");
-    setDiagnosis("");
-    setLabAddons([]);
-    setDrugAddons([]);
+  // 2. Pre-populate or Reset Clinical Notes
+  setClinicalNotes(q.clinicalNotes || "");
 
-    // open modal
-    setOpenConsultation(true);
+  // 3. Pre-populate or Reset Diagnosis
+  setDiagnosis(q.diagnosis || "");
+
+  // 4. Pre-populate Addons (Labs & Drugs)
+  // If the backend returns existing items in 'items' or 'addons' array
+//   if (q.items && q.items.length > 0) {
+//     // const existingLabs = q.items.filter(item => item.category === "LABORATORY");
+//     const existingDrugs = q.items.filter(item => item.category === "PHARMACY");
+    
+//     setLabAddons(existingLabs);
+//     setDrugAddons(existingDrugs);
+//   } else {
+//     setLabAddons([]);
+//     setDrugAddons([]);
+//   }
+
+  // 5. Open the modal
+  setOpenConsultation(true);
+};
+
+  const handleSubmitConsultation = async () => {
+    setIsSubmitting(true);
+    try {
+      if (!isQueueId) {
+        console.error("❌ Missing queueId");
+        return;
+      }
+
+      const payload = {
+        clinicalNotes,
+        diagnosis,
+        addons: [...labAddons, ...drugAddons],
+      };
+
+      // console.log("🚀 Sending:", payload);
+
+      // ✅ send to backend
+      await submitConsultation(isQueueId, payload);
+
+      toast.success("Consultation submitted successfully!");
+
+      // ✅ refresh queue (optional but recommended)
+      await getQueue(user?.role, selectedDate);
+
+      // close modal
+      setOpenConsultation(false);
+    } catch (error) {
+      toast.error(error.message || "Failed to submit consultation");
+      console.error("❌ Submit failed:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-   const handleSubmitConsultation = async () => {
-      setIsSubmitting(true);
-      try {
-        if (!isQueueId) {
-          console.error("❌ Missing queueId");
-          return;
-        }
-
-        const payload = {
-          clinicalNotes,
-          diagnosis,
-          addons: [...labAddons, ...drugAddons],
-        };
-
-        // console.log("🚀 Sending:", payload);
-
-        // ✅ send to backend
-        await submitConsultation(isQueueId, payload);
-
-        toast.success("Consultation submitted successfully!");
-
-        // ✅ refresh queue (optional but recommended)
-        await getQueue(user?.role, selectedDate);
-
-        // close modal
-        setOpenConsultation(false);
-      } catch (error) {
-        toast.error(error.message || "Failed to submit consultation");
-        console.error("❌ Submit failed:", error);
-      } finally {
-        setIsSubmitting(false);
-      }
-    };
-
-     const openPdf = (url) => {
-      setPdfUrl(url);
-      setPdfOpen(true);
-    };
+  const openPdf = (url) => {
+    setPdfUrl(url);
+    setPdfOpen(true);
+  };
 
   return (
     <div
@@ -297,7 +311,9 @@ const DoctorQueue = () => {
       >
         <div>
           <h2 className="text-xl font-bold">Patient Queue</h2>
-          <p className="text-xs text-gray-500">Manage and track consultation flow</p>
+          <p className="text-xs text-gray-500">
+            Manage and track consultation flow
+          </p>
         </div>
 
         <ConfigProvider
@@ -347,7 +363,9 @@ const DoctorQueue = () => {
             <p className="text-3xl font-bold">{stats.total} Queue</p>
             <div className="mt-4 space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-gray-500 text-sm">Consultation Needed</span>
+                <span className="text-gray-500 text-sm">
+                  Consultation Needed
+                </span>
                 <span
                   className={`px-3 py-1 rounded-lg text-xs font-bold ${darkMode ? "bg-amber-900/40 text-amber-500" : "bg-amber-100 text-amber-600"}`}
                 >
@@ -395,11 +413,19 @@ const DoctorQueue = () => {
                     layout
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`p-5 rounded-2xl border flex justify-between items-center transition-all hover:shadow-md ${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}
+                    className={`p-5 rounded-2xl border flex flex-col md:flex-row justify-between items-start md:items-center transition-all hover:shadow-md gap-4 ${
+                      darkMode
+                        ? "bg-gray-800 border-gray-700"
+                        : "bg-white border-gray-200"
+                    }`}
                   >
                     <div className="flex items-center gap-4">
                       <div
-                        className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${darkMode ? "bg-blue-900/40 text-blue-400" : "bg-blue-50 text-blue-600"}`}
+                        className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg shrink-0 ${
+                          darkMode
+                            ? "bg-blue-900/40 text-blue-400"
+                            : "bg-blue-50 text-blue-600"
+                        }`}
                       >
                         {q.patientId?.firstName?.charAt(0) || "P"}
                       </div>
@@ -409,7 +435,7 @@ const DoctorQueue = () => {
                             {q.patientId?.firstName} {q.patientId?.lastName}
                           </h4>
                           {q.isUrgent && (
-                            <span className="text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded font-bold uppercase">
+                            <span className="text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
                               Urgent
                             </span>
                           )}
@@ -420,32 +446,48 @@ const DoctorQueue = () => {
                             {q.queueId}
                           </span>
                         </p>
+
+                        {/* REFINED LAB RESULT NOTIFICATION */}
+                        {q?.labResults?.length > 0 && (
+                          <motion.div
+                            initial={{ opacity: 0, x: -5 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className={`mt-2 flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-lg w-fit border ${
+                              darkMode
+                                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                : "bg-emerald-50 text-emerald-600 border-emerald-100"
+                            }`}
+                          >
+                            <span className="relative flex h-2 w-2">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                            </span>
+                            Lab Results Ready • Resume Consultation
+                          </motion.div>
+                        )}
                       </div>
                     </div>
-                    {/* <span className={`text-[10px] font-extrabold px-3 py-1 rounded-full uppercase ${darkMode ? "bg-amber-900/40 text-amber-500 border border-amber-800" : "bg-amber-50 text-amber-600 border border-amber-100"}`}>
-                      {q.currentStage}
-                    </span> */}
-                    <div className="flex gap-2">
+
+                    <div className="flex gap-2 w-full md:w-auto">
                       {q.status === "active" && (
                         <button
-                          onClick={() => startConsultation(q.queueId)}
-                          className="text-xs font-bold px-4 bg-blue-600 text-white py-2 cursor-pointer"
+                          onClick={() => startConsultation(q)}
+                          className="text-xs font-bold px-4 py-2.5 bg-blue-600 text-white hover:bg-blue-700 transition-colors active:scale-95 flex-1 md:flex-none"
                         >
-                          Start Consultation
+                          {q?.labResults?.length > 0
+                            ? "Resume Consultation"
+                            : "Start Consultation"}
                         </button>
                       )}
-                      {/* {q.status === "active" && (
-                        <button className="text-xs font-bold px-4 py-2 bg-purple-600 text-white rounded-lg flex items-center gap-2">
-                          <FaPaperPlane /> Consult
-                        </button>
-                      )} */}
-                      <button 
-                        onClick={() => getPatientVital(q.queueId)} 
-                        className="text-xs font-bold px-4 py-2 bg-purple-600 text-white flex items-center justify-center min-w-[110px]"
+                      <button
+                        onClick={() => getPatientVital(q.queueId)}
+                        className="text-xs font-bold px-4 py-2.5 bg-purple-600 text-white hover:bg-purple-700 transition-colors active:scale-95 flex items-center justify-center min-w-[110px] flex-1 md:flex-none"
                       >
                         {activeVitalId === q.queueId ? (
-                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        ) : "View Summary"}
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          "View Summary"
+                        )}
                       </button>
                     </div>
                   </motion.div>
@@ -631,7 +673,7 @@ const DoctorQueue = () => {
       <Modal
         isOpen={openConsultation}
         onClose={() => setOpenConsultation(false)}
-        title="Submit Consultation"
+        title={clinicalNotes ? "Edit / Resume Consultation" : "New Consultation"}
       >
         <div className="space-y-5">
           {/* CLINICAL NOTES */}
