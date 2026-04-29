@@ -256,7 +256,7 @@ const FinanceQueue = () => {
                         >
                           <button
                             disabled={isItemProcessing}
-                            className="px-4 py-2 text-xs font-bold rounded-lg bg-purple-600 text-white hover:bg-purple-700 shadow-sm transition-all flex items-center justify-center min-w-[140px] disabled:bg-purple-400"
+                            className="px-4 py-2 text-xs font-bold  bg-purple-600 text-white hover:bg-purple-700 shadow-sm transition-all flex items-center justify-center min-w-[140px] disabled:bg-purple-400"
                           >
                             {isItemProcessing ? (
                               <div className="flex items-center gap-2">

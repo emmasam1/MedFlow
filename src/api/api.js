@@ -39,7 +39,7 @@ api.interceptors.response.use(
       // Logic for when token expires (e.g., redirect to login)
       console.warn("Session expired. Redirecting...");
       sessionStorage.clear();
-      window.location.href = '/login';
+      window.location.href = '/';
     }
     return Promise.reject(error);
   }
