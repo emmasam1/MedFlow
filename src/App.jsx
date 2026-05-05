@@ -12,6 +12,8 @@ import PatientProfile from "./pages/Dashboard/PatientProfile";
 import Notification from "./pages/Dashboard/Notification";
 import UserProfile from "./components/UserProfile";
 import Unauthorized from "./pages/Dashboard/Unauthorized";
+import Inventory from "./pages/Dashboard/Inventory";
+import StockRequest from "./pages/Dashboard/StockRequest";
 
 // Layout & Protection
 import DashboardLayout from "./layout/DashboardLayout";
@@ -35,7 +37,8 @@ const App = () => {
     "nurse",
     "lab_officer",
     "admin",
-    "pharmacist"
+    "pharmacist",
+    "store_officer"
   ];
 
   return (
@@ -176,6 +179,24 @@ const App = () => {
             element={
               <ProtectedRoute allowedRoles={["lab_officer", "doctor", "admin"]}>
                 <LabRequests />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Store_officer */}
+          <Route
+            path="/dashboard/inventory"
+            element={
+              <ProtectedRoute allowedRoles={["store_officer", "admin"]}>
+                <Inventory />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/stock-requests"
+            element={
+              <ProtectedRoute allowedRoles={["store_officer"]}>
+                <StockRequest />
               </ProtectedRoute>
             }
           />
