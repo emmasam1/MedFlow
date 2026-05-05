@@ -14,6 +14,8 @@ import UserProfile from "./components/UserProfile";
 import Unauthorized from "./pages/Dashboard/Unauthorized";
 import Inventory from "./pages/Dashboard/Inventory";
 import StockRequest from "./pages/Dashboard/StockRequest";
+import StoreOfficerRequest from "./pages/Dashboard/StoreOfficerRequest";
+import Procurement from "./pages/Dashboard/Procurement";
 
 // Layout & Protection
 import DashboardLayout from "./layout/DashboardLayout";
@@ -197,6 +199,22 @@ const App = () => {
             element={
               <ProtectedRoute allowedRoles={["store_officer"]}>
                 <StockRequest />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/requests"
+            element={
+              <ProtectedRoute allowedRoles={["store_officer"]}>
+                <StoreOfficerRequest />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/procurement"
+            element={
+              <ProtectedRoute allowedRoles={["store_officer"]}>
+                <Procurement />
               </ProtectedRoute>
             }
           />

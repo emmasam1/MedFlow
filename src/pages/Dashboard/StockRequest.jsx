@@ -142,7 +142,7 @@ const StockRequest = () => {
         columns={columns}
         data={requests}
         searchableKeys={["id", "item", "department", "requestedBy"]}
-        breadcrumb={["Inventory", "Requisition"]}
+        // breadcrumb={["Inventory", "Requisition"]}
         exportFileName="Stock_Requests"
         actions={(row) => (
           <div className="flex gap-2">

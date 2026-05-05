@@ -133,7 +133,7 @@ const Inventory = () => {
         columns={columns}
         data={displayData}
         searchableKeys={["name", "id", "category"]}
-        breadcrumb={["Dashboard", "Inventory", "Store Items"]}
+        // breadcrumb={["Dashboard", "Inventory", "Store Items"]}
         onRefresh={() => console.log("Refreshing...")}
         exportFileName="Hospital_Inventory"
         extraToolbarActions={

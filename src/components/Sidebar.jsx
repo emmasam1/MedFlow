@@ -136,6 +136,12 @@ const Sidebar = () => {
       roles: ["store_officer", "nurse", "lab_officer"], // Nurse/Lab can request, Store handles
     },
     {
+      to: "/dashboard/requests",
+      icon: <RiFileList3Line size={22} />, // Good for internal requisitions
+      label: "Requests",
+      roles: ["store_officer",  "nurse", "lab_officer"], // Nurse/Lab can request, Store handles
+    },
+    {
       to: "/dashboard/procurement",
       icon: <RiShoppingBag3Line size={22} />, 
       label: "Procurement",
