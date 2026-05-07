@@ -14,8 +14,11 @@ import UserProfile from "./components/UserProfile";
 import Unauthorized from "./pages/Dashboard/Unauthorized";
 import Inventory from "./pages/Dashboard/Inventory";
 import StockRequest from "./pages/Dashboard/StockRequest";
-import StoreOfficerRequest from "./pages/Dashboard/StoreOfficerRequest";
+import Request from "./pages/Dashboard/Request";
 import Procurement from "./pages/Dashboard/Procurement";
+import Suppliers from "./pages/Dashboard/Suppilers";
+import ExpiryTracker from "./pages/Dashboard/ExpiryTracker";
+import DispenseLog from "./pages/Dashboard/DispenseLog";
 
 // Layout & Protection
 import DashboardLayout from "./layout/DashboardLayout";
@@ -205,16 +208,40 @@ const App = () => {
           <Route
             path="/dashboard/requests"
             element={
-              <ProtectedRoute allowedRoles={["store_officer"]}>
-                <StoreOfficerRequest />
+              <ProtectedRoute allowedRoles={["store_officer", "nurse"]}>
+                <Request />
               </ProtectedRoute>
             }
           />
           <Route
             path="/dashboard/procurement"
             element={
-              <ProtectedRoute allowedRoles={["store_officer"]}>
+              <ProtectedRoute allowedRoles={["store_officer", "admin"]}>
                 <Procurement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/suppliers"
+            element={
+              <ProtectedRoute allowedRoles={["store_officer", "admin"]}>
+                <Suppliers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/expiry-tracker"
+            element={
+              <ProtectedRoute allowedRoles={["store_officer", "pharmacist", "admin", "record_officer"]}>
+                <ExpiryTracker/>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/dispense-history"
+            element={
+              <ProtectedRoute allowedRoles={["store_officer", "pharmacist", "admin", "record_officer"]}>
+                <DispenseLog />
               </ProtectedRoute>
             }
           />

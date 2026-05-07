@@ -133,7 +133,7 @@ const Sidebar = () => {
       to: "/dashboard/stock-requests",
       icon: <RiFileList3Line size={22} />, // Good for internal requisitions
       label: "Stock Requests",
-      roles: ["store_officer", "nurse", "lab_officer"], // Nurse/Lab can request, Store handles
+      roles: ["store_officer"], // Nurse/Lab can request, Store handles
     },
     {
       to: "/dashboard/requests",
@@ -151,13 +151,13 @@ const Sidebar = () => {
       to: "/dashboard/suppliers",
       icon: <RiTruckLine size={22} />, 
       label: "Suppliers",
-      roles: ["store_officer"],
+      roles: ["store_officer", "admin"],
     },
     {
       to: "/dashboard/expiry-tracker",
       icon: <RiErrorWarningLine size={22} />, 
       label: "Expiry Tracker",
-      roles: ["store_officer", "pharmacist"],
+      roles: ["store_officer", "pharmacist", "admin", "record_officer"],
     },
     {
       to: "/dashboard/queue",
@@ -165,17 +165,17 @@ const Sidebar = () => {
       label: "Dispensing Queue", // Pharmacist sees this instead of just "Queue"
       roles: ["pharmacist"],
     },
-    {
-      to: "/dashboard/drug-inventory",
-      icon: <RiCapsuleLine size={22} />,
-      label: "Drug Stock",
-      roles: ["pharmacist", "store_officer"],
-    },
+    // {
+    //   to: "/dashboard/drug-inventory",
+    //   icon: <RiCapsuleLine size={22} />,
+    //   label: "Drug Stock",
+    //   roles: ["pharmacist", "store_officer"],
+    // },
     {
       to: "/dashboard/dispense-history",
       icon: <RiHistoryLine size={22} />,
       label: "Dispense Log",
-      roles: ["pharmacist", "admin"],
+      roles: ["store_officer", "pharmacist", "admin", "record_officer"],
     },
   ];
 
@@ -255,14 +255,14 @@ const Sidebar = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 overflow-y-auto no-scrollbar">
+      <nav className="flex-1 pb-3 px-4 overflow-y-auto no-scrollbar">
         <p
           className={`text-[10px] font-bold uppercase mb-4 px-2 tracking-widest ${sidebarTheme === "dark" ? "text-gray-500" : "text-gray-400"}`}
         >
           {isSidebarOpen || window.innerWidth < 1024 ? "Main Menu" : "•••"}
         </p>
 
-        <div className="space-y-2">
+        <div className="space-y-2 ">
           {allowedRoutes.map((route) => (
             <SidebarItem
               key={route.to}

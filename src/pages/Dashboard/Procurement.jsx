@@ -18,6 +18,7 @@ import Modal from "../../components/Modal";
 import { useStore } from "../../store/store";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAppStore } from "../../store/useAppStore";
 
 const MOCK_PROCUREMENTS = [
   {
@@ -71,6 +72,11 @@ const Procurement = () => {
   const { darkMode } = useStore();
   const [orders, setOrders] = useState(MOCK_PROCUREMENTS);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const user = useAppStore((state) => state.user);
+
+  const role = user?.role?.toLowerCase();
 
   const stats = [
     {
@@ -150,10 +156,10 @@ const Procurement = () => {
     "hover:bg-[#9DCEF8] px-4 py-2 rounded-full text-[#005CBB] font-bold flex items-center gap-2 transition-colors duration-300 text-sm cursor-pointer border-none shadow-sm bg-white";
 
   return (
-    <div className="p-6">
+    <div className="">
       {/* Header */}
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+      <div className="flex items-center md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
           <h2
             className={`text-2xl font-black flex items-center gap-2 ${darkMode ? "text-white" : "text-slate-800"}`}
@@ -165,12 +171,14 @@ const Procurement = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <motion.button {...buttonMotion} className={buttonStyle}>
-            <HiOutlinePlus />
-            New Purchase Order
-          </motion.button>
-        </div>
+        {user?.role === "store_officer" && (
+          <div className="flex items-center gap-3">
+            <motion.button {...buttonMotion} className={buttonStyle}>
+              <HiOutlinePlus />
+              New Purchase Order
+            </motion.button>
+          </div>
+        )}
       </div>
 
       {/* Stats Row */}
@@ -198,7 +206,7 @@ const Procurement = () => {
       />
 
       {/* Modern Procurement Modal */}
-      <Modal isOpen={!!selectedOrder} onClose={() => setSelectedOrder(null)}>
+      <Modal title="" isOpen={!!selectedOrder} onClose={() => setSelectedOrder(null)}>
         {selectedOrder && (
           <div>
             {/* Header */}
@@ -224,9 +232,9 @@ const Procurement = () => {
               </div>
             </div>
 
-            <div className="p-8">
+            <div className="mt-4">
               {/* Progress Tracker */}
-              <div className="mb-10 px-4">
+              {/* <div className="mb-10 px-4">
                 <Steps
                   size="small"
                   current={selectedOrder.status === "Pending" ? 0 : 1}
@@ -237,22 +245,22 @@ const Procurement = () => {
                     { title: "Shipped" },
                   ]}
                 />
-              </div>
+              </div> */}
 
               {/* Order Info Cards */}
               <div className="grid grid-cols-2 gap-6 mb-8">
-                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
+                <div className="p-4 bg-slate-50">
                   <p className="text-[10px] font-black text-slate-400 uppercase mb-2">
                     Vendor Details
                   </p>
-                  <p className="font-bold text-lg m-0">
+                  <p className="font-bold  text-black text-lg m-0">
                     {selectedOrder.vendor}
                   </p>
                   <p className="text-xs text-blue-500 font-medium">
                     Verified Supplier ✅
                   </p>
                 </div>
-                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
+                <div className="p-4 bg-slate-50">
                   <p className="text-[10px] font-black text-slate-400 uppercase mb-2">
                     Order Value
                   </p>
@@ -266,40 +274,97 @@ const Procurement = () => {
               </div>
 
               {/* Items Table (Simple representation) */}
-              <div className="mb-8 border border-slate-100 dark:border-slate-700 rounded-2xl overflow-hidden">
+              <div className="mb-8">
                 <div className="bg-slate-50 dark:bg-slate-800 p-3 text-[10px] font-black text-slate-400 uppercase flex justify-between">
                   <span>Item Description</span>
-                  <span>Allocation</span>
                 </div>
-                <div className="p-4 flex justify-between items-center">
+                <div className="p flex justify-between items-center">
                   <p className="font-bold m-0">{selectedOrder.item}</p>
-                  <Tag className="font-bold rounded-lg border-none bg-blue-100 text-blue-700">
-                    Main Warehouse
-                  </Tag>
                 </div>
               </div>
 
               {/* Footer Actions */}
-              <div className="flex gap-4">
+              {user?.role === "admin" &&
+                !["Approved", "Delivered"].includes(selectedOrder?.status) && (
+                  <div className="flex gap-4 animate-in fade-in duration-300">
+                    {/* <button
+                      className="flex items-center justify-between h-14 flex-2 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-red-50 hover:text-red-600 transition-all gap-2 border-none cursor-pointer"
+                      onClick={() => {
+                        toast.error("Cancellation protocol initiated");
+                        setSelectedOrder(null);
+                      }}
+                    >
+                      <HiOutlineXCircle size="{20}" /> VOID ORDER
+                    </button> */}
+                    <button
+                      className="group flex-2 h-14 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-lg hover:bg-red-50 hover:text-red-600 transition-all flex items-center justify-center gap-2 border-none cursor-pointer"
+                      onClick={() => {
+                        toast.error("Cancellation protocol initiated");
+                        setSelectedOrder(null);
+                      }}
+                    >
+                      <HiOutlineXCircle size={22} />
+                      VOID ORDER
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleStatusUpdate(selectedReq.id, "Approved")
+                      }
+                      type="submit"
+                      disabled={isSubmitting}
+                      className={`bg-blue-600 text-white py-2 px-3 cursor-pointer rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg flex items-center justify-center gap-2 ${
+                        isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                      }`}
+                    >
+                      {isSubmitting && (
+                        <svg
+                          className="animate-spin h-5 w-5 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v8H4z"
+                          ></path>
+                        </svg>
+                      )}
+                      {/* {isSubmitting
+                                      ? "Updating..."
+                                      : "Creating..."
+                                    } */}
+                      <HiOutlineCheckCircle size={20} /> APPROVE PURCHASE
+                    </button>
+                  </div>
+                )}
+
+              {(user?.role !== "admin" ||
+                ["Delivered", "Approved", "Ordered"].includes(
+                  selectedOrder.status,
+                )) && (
                 <button
-                  className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 font-black rounded-2xl border-none cursor-pointer hover:bg-red-50 hover:text-red-600 transition-all flex items-center justify-center gap-2"
-                  onClick={() => {
-                    toast.error("Cancellation protocol initiated");
-                    setSelectedOrder(null);
-                  }}
+                  onClick={() => setSelectedOrder(null)}
+                  className="w-full py-4 text-black dark:bg-white rounded-none border-none cursor-pointer hover:bg-slate-800 hover:text-white transition-all"
                 >
-                  <HiOutlineXCircle size={20} /> VOID ORDER
+                  Close Preview
                 </button>
-                <button
-                  className="flex-[2] py-4 bg-blue-600 text-white font-black rounded-2xl border-none cursor-pointer hover:bg-blue-700 shadow-xl shadow-blue-200 dark:shadow-none transition-all flex items-center justify-center gap-2"
-                  onClick={() => {
-                    toast.success("Purchase order released to vendor");
-                    setSelectedOrder(null);
-                  }}
-                >
-                  <HiOutlineCheckCircle size={20} /> APPROVE PURCHASE
-                </button>
-              </div>
+              )}
+
+              {/* {["Approved", "Delivered"].includes(selectedOrder?.status) && (
+                <div className="w-full py-4 bg-gray-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl text-center border border-dashed border-gray-200 dark:border-slate-700 font-black opacity-90 transition-opacity uppercase tracking-widest text-xs">
+                  Order Completed
+                </div>
+              )} */}
             </div>
           </div>
         )}

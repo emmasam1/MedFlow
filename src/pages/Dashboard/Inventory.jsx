@@ -1,27 +1,61 @@
 import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import {
-  HiOutlinePlus,
-  HiOutlineClipboardList,
-} from "react-icons/hi";
+import { HiOutlinePlus, HiOutlineClipboardList } from "react-icons/hi";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import { Tag, Tooltip, Select } from "antd";
 import StatCard from "../../components/StatCard";
 import CustomTable from "../../components/CustomTable"; // Adjust path as needed
 import { useStore } from "../../store/store";
+import { useAppStore } from "../../store/useAppStore";
 
 const INITIAL_INVENTORY = [
-  { id: "INV-001", name: "Paracetamol 500mg", category: "Drugs", stock: 450, unit: "Pack", price: 12.0 },
-  { id: "INV-002", name: "Surgical Gloves (M)", category: "Medical Supplies", stock: 12, unit: "Box", price: 25.0 },
-  { id: "INV-003", name: "Digital Thermometer", category: "Equipment", stock: 0, unit: "Unit", price: 45.0 },
-  { id: "INV-004", name: "Amoxicillin Syrup", category: "Drugs", stock: 85, unit: "Bottle", price: 18.5 },
-  { id: "INV-005", name: "Face Masks (N95)", category: "Medical Supplies", stock: 500, unit: "Box", price: 60.0 },
+  {
+    id: "INV-001",
+    name: "Paracetamol 500mg",
+    category: "Drugs",
+    stock: 450,
+    unit: "Pack",
+    price: 12.0,
+  },
+  {
+    id: "INV-002",
+    name: "Surgical Gloves (M)",
+    category: "Medical Supplies",
+    stock: 12,
+    unit: "Box",
+    price: 25.0,
+  },
+  {
+    id: "INV-003",
+    name: "Digital Thermometer",
+    category: "Equipment",
+    stock: 0,
+    unit: "Unit",
+    price: 45.0,
+  },
+  {
+    id: "INV-004",
+    name: "Amoxicillin Syrup",
+    category: "Drugs",
+    stock: 85,
+    unit: "Bottle",
+    price: 18.5,
+  },
+  {
+    id: "INV-005",
+    name: "Face Masks (N95)",
+    category: "Medical Supplies",
+    stock: 500,
+    unit: "Box",
+    price: 60.0,
+  },
 ];
 
 const Inventory = () => {
   const [inventory, setInventory] = useState(INITIAL_INVENTORY);
   const [filterCategory, setFilterCategory] = useState("All");
   const { darkMode } = useStore();
+  const user = useAppStore((state) => state.user);
 
   const buttonMotion = {
     whileHover: { scale: 1.02, y: -1 },
@@ -94,9 +128,9 @@ const Inventory = () => {
 
   // Apply Category Filter before passing to table
   const displayData = useMemo(() => {
-    return filterCategory === "All" 
-      ? inventory 
-      : inventory.filter(item => item.category === filterCategory);
+    return filterCategory === "All"
+      ? inventory
+      : inventory.filter((item) => item.category === filterCategory);
   }, [inventory, filterCategory]);
 
   return (
@@ -104,7 +138,9 @@ const Inventory = () => {
       {/* HEADER SECTION */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
-          <h2 className={`text-2xl font-black flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-800'}`}>
+          <h2
+            className={`text-2xl font-black flex items-center gap-2 ${darkMode ? "text-white" : "text-slate-800"}`}
+          >
             <HiOutlineClipboardList className="text-blue-600" />
             Store Inventory
           </h2>
@@ -113,11 +149,13 @@ const Inventory = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <motion.button {...buttonMotion} className={buttonStyle}>
-            <HiOutlinePlus /> Add New Item
-          </motion.button>
-        </div>
+        {user.role === "store_officer" && (
+          <div className="flex items-center gap-3">
+            <motion.button {...buttonMotion} className={buttonStyle}>
+              <HiOutlinePlus /> Add New Item
+            </motion.button>
+          </div>
+        )}
       </div>
 
       {/* ANALYTICS PREVIEW CARDS */}
@@ -150,20 +188,24 @@ const Inventory = () => {
             ]}
           />
         }
-        actions={(row) => (
-          <div className="flex gap-2">
-            <Tooltip title="Edit">
-              <button className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition">
-                <FiEdit2 size={16} />
-              </button>
-            </Tooltip>
-            <Tooltip title="Delete">
-              <button className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition">
-                <FiTrash2 size={16} />
-              </button>
-            </Tooltip>
-          </div>
-        )}
+        actions={
+          user?.role === "store_officer"
+            ? (row) => (
+                <div className="flex gap-2">
+                  <Tooltip title="Edit">
+                    <button className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition">
+                      <FiEdit2 size={16} />
+                    </button>
+                  </Tooltip>
+                  <Tooltip title="Delete">
+                    <button className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition">
+                      <FiTrash2 size={16} />
+                    </button>
+                  </Tooltip>
+                </div>
+              )
+            : undefined
+        }
       />
     </div>
   );

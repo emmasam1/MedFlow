@@ -9,6 +9,7 @@ import {
   HiOutlineUser,
   HiOutlineClipboardList,
   HiOutlineLightningBolt,
+  HiOutlinePlus
 } from "react-icons/hi";
 import { Tag, Tooltip, Button, Input } from "antd";
 import CustomTable from "../../components/CustomTable";
@@ -16,6 +17,8 @@ import StatCard from "../../components/StatCard"; // Integrated StatCard
 import Modal from "../../components/Modal";
 import { useStore } from "../../store/store";
 import toast from "react-hot-toast";
+import { motion, AnimatePresence } from "framer-motion";
+import { useAppStore } from "../../store/useAppStore";
 
 const MOCK_DATA = [
   {
@@ -122,14 +125,17 @@ const MOCK_DATA = [
   },
 ];
 
-const StoreOfficerDashboard = () => {
-  const { darkMode, user } = useStore();
+const Request = () => {
+  const { darkMode } = useStore();
   const [requests, setRequests] = useState(MOCK_DATA);
   const [selectedReq, setSelectedReq] = useState(null);
   const [isRejecting, setIsRejecting] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const isStoreOfficer = user?.role === "store_officer";
+
+  const user = useAppStore((state) => state.user);
+  
+    const role = user?.role?.toLowerCase();
 
   // Calculate Stats for the top row
   const stats = [
@@ -233,18 +239,37 @@ const StoreOfficerDashboard = () => {
     },
   ];
 
+  const buttonMotion = {
+    whileHover: { scale: 1.02, y: -1 },
+    whileTap: { scale: 0.98 },
+  };
+
+  const buttonStyle =
+    "hover:bg-[#9DCEF8] px-4 py-2 rounded-full text-[#005CBB] font-bold flex items-center gap-2 transition-colors duration-300 text-sm cursor-pointer border-none shadow-sm bg-white";
+
+
   return (
-    <div className="p-6">
+    <div className="">
       {/* Header */}
-      <div className="mb-6">
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+
         <h1
           className={`text-2xl font-black ${darkMode ? "text-white" : "text-slate-800"}`}
         >
           Store Requisitions
         </h1>
-        <p className="text-slate-500 text-sm">
+       {user?.role !== "store_officer" ? null :  <p className="text-slate-500 text-sm">
           Overview of all department inventory requests.
-        </p>
+        </p>}
+        </div>
+        
+        {user?.role === "store_officer" ? null : <div className="flex items-center gap-3">
+                    <motion.button {...buttonMotion} className={buttonStyle}>
+                      <HiOutlinePlus />
+                      New Purchase Order
+                    </motion.button>
+                  </div>}
       </div>
 
       {/* Stat Cards Section */}
@@ -393,7 +418,7 @@ const StoreOfficerDashboard = () => {
                         </button>
 
                         <button
-                        onClick={() =>
+                          onClick={() =>
                             handleStatusUpdate(selectedReq.id, "Approved")
                           }
                           type="submit"
@@ -432,7 +457,6 @@ const StoreOfficerDashboard = () => {
                           <HiOutlineCheckCircle size={24} />
                           Approve & Release
                         </button>
-                     
                       </div>
                     ) : (
                       <div className="animate-in slide-in-from-top-4 duration-300 bg-red-50 dark:bg-red-900/10 p-5 rounded-2xl border border-red-100 dark:border-red-900/30">
@@ -524,4 +548,4 @@ const StoreOfficerDashboard = () => {
   );
 };
 
-export default StoreOfficerDashboard;
+export default Request;
