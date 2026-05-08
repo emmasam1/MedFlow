@@ -145,6 +145,7 @@ const User = () => {
       return "bg-emerald-100 text-emerald-700";
     if (roleLower.includes("finance")) return "bg-cyan-100 text-cyan-700";
     return "bg-slate-100 text-slate-700";
+    if (roleLower.includes("store")) return "bg-orange-100 text-orange-700";
   };
 
   const buttonMotion = {
@@ -320,7 +321,6 @@ const User = () => {
       </div>
 
       {/* 2. Quick Stats Section */}
-      {/* 2. Quick Stats Section */}
       <Row gutter={[16, 16]} className="mb-8">
         {isLoading
           ? // Show 4 skeletons while loading
@@ -367,6 +367,7 @@ const User = () => {
             <option value="doctor">Doctor</option>
             <option value="record_officer">Record Officer</option>
             <option value="lab_officer">Lab Scientist</option>
+            <option value="store_officer">Store Officer</option>
           </select>
         </div>
 
@@ -628,7 +629,6 @@ const User = () => {
                 </div>
               )}
 
-              {/* MOVE THIS HERE - Outside the ternary operator */}
               <input
                 ref={fileInputRef}
                 type="file"
@@ -638,16 +638,8 @@ const User = () => {
                 className="absolute inset-0 opacity-0 cursor-pointer"
               />
             </div>
-            {/* {preview && (
-                <button 
-                  type="button" 
-                  onClick={removeImage}
-                  className="text-red-500 text-[11px] font-bold mt-2 uppercase hover:underline"
-                >
-                    Remove Image
-                </button>
-            )} */}
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <input
               type="text"
@@ -657,6 +649,7 @@ const User = () => {
               placeholder="First Name"
               className="px-3 py-2 border rounded-lg border-gray-300"
             />
+
             <input
               type="text"
               name="lastName"
@@ -665,6 +658,7 @@ const User = () => {
               placeholder="Last Name"
               className="px-3 py-2 border rounded-lg border-gray-300"
             />
+
             <input
               type="text"
               name="email"
@@ -673,6 +667,7 @@ const User = () => {
               onChange={handleInputChange}
               className="px-3 py-2 border rounded-lg border-gray-300"
             />
+
             <div className="relative flex flex-col">
               <input
                 type={showPassword ? "text" : "password"}
@@ -682,14 +677,12 @@ const User = () => {
                 placeholder={
                   editingUser ? "Leave blank to keep current" : "Password"
                 }
-                // Correct way to handle conditional disabled attribute
                 disabled={!!editingUser}
                 className={`px-3 py-2 border rounded-lg border-gray-300 pr-10 ${
                   editingUser ? "bg-gray-100 cursor-not-allowed" : "bg-white"
                 }`}
               />
 
-              {/* The toggle button remains only if not disabled, or you can keep it visible */}
               {!editingUser && (
                 <button
                   type="button"
@@ -704,14 +697,15 @@ const User = () => {
                 </button>
               )}
             </div>
+
+            {/* ROLE SELECT */}
             <select
               name="role"
               value={formData.role}
               onChange={handleInputChange}
               className="px-3 py-2 border rounded-lg border-gray-300 cursor-pointer"
-              // required
             >
-              <option value="" disabled selected>
+              <option value="" disabled>
                 Select a Role
               </option>
 
@@ -728,10 +722,13 @@ const User = () => {
                 <option value="nurse">Nurse / Matron</option>
               </optgroup>
 
-              {/* Laboratory & Technical */}
-              <optgroup label="Laboratory & Diagnostics">
+              {/* Support & Logistics */}
+              <optgroup label="Support & Logistics">
                 <option value="lab_officer">Laboratory Scientist</option>
                 <option value="pharmacist">Pharmacist</option>
+
+                {/* ✅ ADDED STORE OFFICER */}
+                <option value="store_officer">Store / Inventory Officer</option>
               </optgroup>
 
               {/* Financial */}
@@ -742,18 +739,17 @@ const User = () => {
               </optgroup>
             </select>
 
+            {/* DEPARTMENT SELECT */}
             <select
               name="department"
               value={formData.department}
               onChange={handleInputChange}
               className="px-3 py-2 border rounded-lg border-gray-300 cursor-pointer"
-              // required
             >
-              <option value="" disabled selected>
+              <option value="" disabled>
                 Select Department
               </option>
 
-              {/* Clinical Departments */}
               <optgroup label="Clinical Services">
                 <option value="General Medicine">General Medicine (OPD)</option>
                 <option value="Pediatrics">Pediatrics</option>
@@ -765,15 +761,16 @@ const User = () => {
                 <option value="Emergency">Emergency / ER</option>
               </optgroup>
 
-              {/* Support Services */}
               <optgroup label="Support & Diagnostics">
                 <option value="Laboratory">Laboratory</option>
                 <option value="Pharmacy">Pharmacy</option>
                 <option value="Radiology">Radiology (X-Ray/MRI)</option>
                 <option value="Nursing">Nursing Unit</option>
+
+                {/* ✅ ADDED STORE DEPARTMENT */}
+                <option value="Store">Store / Inventory</option>
               </optgroup>
 
-              {/* Administration */}
               <optgroup label="Administrative">
                 <option value="Front Desk">Front Desk / Records</option>
                 <option value="Finance">Finance & Accounts</option>
@@ -825,15 +822,15 @@ const User = () => {
               placeholder="License Number"
               className="px-3 py-2 border rounded-lg border-gray-300"
             />
+
             <div className="flex flex-col">
               <div className="relative flex items-center">
-                {/* Country Prefix Section */}
                 <div className="absolute left-3 flex items-center gap-2 pointer-events-none border-r pr-2 border-gray-200">
                   <span className="text-xs font-bold text-gray-500">+234</span>
                 </div>
 
                 <input
-                  type="tel" // Opens numeric keypad on mobile
+                  type="tel"
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleInputChange}
@@ -841,6 +838,7 @@ const User = () => {
                   className="w-full pl-16 pr-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                 />
               </div>
+
               <span className="text-[10px] text-gray-400 mt-1 ml-1">
                 Format: 8012345678
               </span>
@@ -870,6 +868,7 @@ const User = () => {
                     stroke="currentColor"
                     strokeWidth="4"
                   ></circle>
+
                   <path
                     className="opacity-75"
                     fill="currentColor"
@@ -877,6 +876,7 @@ const User = () => {
                   ></path>
                 </svg>
               )}
+
               {isSubmitting
                 ? editingUser
                   ? "Updating..."
