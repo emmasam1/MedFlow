@@ -9,7 +9,7 @@ import {
   HiOutlineUser,
   HiOutlineClipboardList,
   HiOutlineLightningBolt,
-  HiOutlinePlus
+  HiOutlinePlus,
 } from "react-icons/hi";
 import { Tag, Tooltip, Button, Input } from "antd";
 import CustomTable from "../../components/CustomTable";
@@ -134,8 +134,8 @@ const Request = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const user = useAppStore((state) => state.user);
-  
-    const role = user?.role?.toLowerCase();
+
+  const role = user?.role?.toLowerCase();
 
   // Calculate Stats for the top row
   const stats = [
@@ -247,29 +247,31 @@ const Request = () => {
   const buttonStyle =
     "hover:bg-[#9DCEF8] px-4 py-2 rounded-full text-[#005CBB] font-bold flex items-center gap-2 transition-colors duration-300 text-sm cursor-pointer border-none shadow-sm bg-white";
 
-
   return (
     <div className="">
       {/* Header */}
       <div className="mb-6 flex justify-between items-center">
         <div>
-
-        <h1
-          className={`text-2xl font-black ${darkMode ? "text-white" : "text-slate-800"}`}
-        >
-          Store Requisitions
-        </h1>
-       {user?.role !== "store_officer" ? null :  <p className="text-slate-500 text-sm">
-          Overview of all department inventory requests.
-        </p>}
+          <h1
+            className={`text-2xl font-black ${darkMode ? "text-white" : "text-slate-800"}`}
+          >
+            Store Requisitions
+          </h1>
+          {user?.role !== "store_officer" ? null : (
+            <p className="text-slate-500 text-sm">
+              Overview of all department inventory requests.
+            </p>
+          )}
         </div>
-        
-        {user?.role === "store_officer" ? null : <div className="flex items-center gap-3">
-                    <motion.button {...buttonMotion} className={buttonStyle}>
-                      <HiOutlinePlus />
-                      New Purchase Order
-                    </motion.button>
-                  </div>}
+
+        {user?.role === "store_officer" ? null : (
+          <div className="flex items-center gap-3">
+            <motion.button {...buttonMotion} className={buttonStyle}>
+              <HiOutlinePlus />
+              New Purchase Order
+            </motion.button>
+          </div>
+        )}
       </div>
 
       {/* Stat Cards Section */}
