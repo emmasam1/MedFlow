@@ -15,7 +15,7 @@ const CreateQueue = ({ onSuccess }) => {
     addToQueue,
     getPatients,
     getQueue,
-    queue
+    queue,
   } = useAppStore();
 
   const [search, setSearch] = useState("");
@@ -27,7 +27,7 @@ const CreateQueue = ({ onSuccess }) => {
 
   useEffect(() => {
     getPatients();
-      getQueue();
+    getQueue();
   }, [getPatients, getQueue]);
 
   // console.log("trying to get all patients", queue);
@@ -232,78 +232,32 @@ const CreateQueue = ({ onSuccess }) => {
       />
 
       {/* Scan card */}
-       <div className="flex justify-between items-start">
-         <div>
+      <div className="flex justify-between items-start">
+        <div>
           <h2 className="text-lg font-bold text-gray-800">Add to Queue</h2>
-          <p className="text-sm text-gray-500">Record Officer: {useAppStore.getState().user?.firstName}</p>
+          <p className="text-sm text-gray-500">
+            Record Officer: {useAppStore.getState().user?.firstName}
+          </p>
         </div>
         <div className="flex justify-end">
-        {!selectedPatient ? (
-          <div
-            onClick={() => setIsScanOpen(true)}
-            className="h-32 w-32 bg-red-100 border-2 border-dashed border-red-400 rounded-xl flex items-center justify-center cursor-pointer"
-          >
-            <p className="text-xs text-red-600 font-semibold text-center">
-              Scan Patient Card
-            </p>
-          </div>
-        ) : (
-          <div className="h-32 w-32 overflow-hidden">
-            <img
-              src={`https://i.pravatar.cc/150?u=${selectedPatient.fullName}`}
-              className="h-full w-full object-cover"
-            />
-          </div>
-        )}
-      </div>
-       </div>
-      
-
-      {/* Search */}
-      <div className="relative">
-        <label className="block text-sm mb-2">Search Patient</label>
-
-        <input
-          type="text"
-          value={search}
-          disabled={selectedPatient}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search patient..."
-          className="w-full px-3 py-2 border rounded-lg border-gray-300 capitalize"
-        />
-
-        {selectedPatient && (
-          <button
-            type="button"
-            onClick={clearPatient}
-            className="absolute right-3 top-10 text-gray-500 hover:text-red-500"
-          >
-            <AiOutlineClose size={18} />
-          </button>
-        )}
-
-        {search && !selectedPatient && (
-          <div className="absolute z-20 w-full border rounded-lg bg-white max-h-60 overflow-y-auto shadow">
-            {filteredPatients.length > 0 ? (
-              filteredPatients.map((p) => (
-                <div
-                  key={p.id}
-                  onClick={() => handleSelectPatient(p)}
-                  className="p-3 cursor-pointer hover:bg-gray-100"
-                >
-                  <p className="font-bold text-gray-900 capitalize">
-                    {p.fullName}
-                  </p>
-                  <p className="text-xs text-gray-500 font-mono mt-1">
-                    ID: {p.displayId} • {p.phoneNumber}
-                  </p>
-                </div>
-              ))
-            ) : (
-              <p className="p-3 text-sm text-gray-500">No patient found</p>
-            )}
-          </div>
-        )}
+          {!selectedPatient ? (
+            <div
+              onClick={() => setIsScanOpen(true)}
+              className="h-32 w-32 bg-red-100 border-2 border-dashed border-red-400 rounded-xl flex items-center justify-center cursor-pointer"
+            >
+              <p className="text-xs text-red-600 font-semibold text-center">
+                Scan Patient Card
+              </p>
+            </div>
+          ) : (
+            <div className="h-32 w-32 overflow-hidden">
+              <img
+                src={`https://i.pravatar.cc/150?u=${selectedPatient.fullName}`}
+                className="h-full w-full object-cover"
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Form */}
@@ -311,6 +265,71 @@ const CreateQueue = ({ onSuccess }) => {
         onSubmit={handleSubmit}
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
       >
+        {/* Search */}
+        <div className="relative">
+          <label className="block text-sm mb-2">Search Patient</label>
+
+          <input
+            type="text"
+            value={search}
+            disabled={selectedPatient}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search patient..."
+            className="w-full px-3 py-2 border rounded-lg border-gray-300 capitalize"
+          />
+
+          {selectedPatient && (
+            <button
+              type="button"
+              onClick={clearPatient}
+              className="absolute right-3 top-10 text-gray-500 hover:text-red-500"
+            >
+              <AiOutlineClose size={18} />
+            </button>
+          )}
+
+          {search && !selectedPatient && (
+            <div className="absolute z-20 w-full border rounded-lg bg-white max-h-60 overflow-y-auto shadow">
+              {filteredPatients.length > 0 ? (
+                filteredPatients.map((p) => (
+                  <div
+                    key={p.id}
+                    onClick={() => handleSelectPatient(p)}
+                    className="p-3 cursor-pointer hover:bg-gray-100"
+                  >
+                    <p className="font-bold text-gray-900 capitalize">
+                      {p.fullName}
+                    </p>
+                    <p className="text-xs text-gray-500 font-mono mt-1">
+                      ID: {p.displayId} • {p.phoneNumber}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="p-3 text-sm text-gray-500">No patient found</p>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm mb-2">Select a Doctor</label>
+
+          <select
+            value={formData.doctor}
+            onChange={(e) =>
+              setFormData({ ...formData, doctor: e.target.value })
+            }
+            className="px-3 py-2 w-full border rounded-lg border-gray-300"
+          >
+            <option value="">Choose Doctor</option>
+            <option value="Dr. John Doe">Dr. John Doe</option>
+            <option value="Dr. Sarah Smith">Dr. Sarah Smith</option>
+            <option value="Dr. Michael Adams">Dr. Michael Adams</option>
+            <option value="Dr. Grace Wilson">Dr. Grace Wilson</option>
+          </select>
+        </div>
+
         <input
           type="text"
           value={formData.cardNumber}
