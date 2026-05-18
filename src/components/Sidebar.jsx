@@ -159,12 +159,14 @@ const Sidebar = () => {
       label: "Expiry Tracker",
       roles: ["store_officer", "pharmacist", "admin", "record_officer"],
     },
-    {
-      to: "/dashboard/queue",
-      icon: <RiListCheck2 size={22} />,
-      label: "Dispensing Queue", // Pharmacist sees this instead of just "Queue"
-      roles: ["pharmacist"],
-    },
+
+    // {
+    //   to: "/dashboard/queue",
+    //   icon: <RiListCheck2 size={22} />,
+    //   label: "Dispensing Queue", // Pharmacist sees this instead of just "Queue"
+    //   roles: ["pharmacist"],
+    // },
+
     // {
     //   to: "/dashboard/drug-inventory",
     //   icon: <RiCapsuleLine size={22} />,

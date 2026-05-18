@@ -207,6 +207,7 @@ export const useAppStore = create((set) => ({
       nurse: "TRIAGE",
       admin: "ADMIN",
       lab_officer: "LABORATORY",
+      pharmacist:"PHARMACY"
     };
 
     const apiRole = roleMapper[role] || role.toUpperCase();
