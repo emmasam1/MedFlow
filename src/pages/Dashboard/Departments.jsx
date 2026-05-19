@@ -51,7 +51,7 @@ const Departments = () => {
   };
 
   return (
-    <div className="px-4">
+    <div className="">
       <AnimatePresence mode="wait">
         {!selectedDept ? (
           /* ---------------- MAIN GRID VIEW ---------------- */

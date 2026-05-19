@@ -239,7 +239,7 @@ const ShiftManagement = () => {
 
 
     return (
-        <div className="max-w-[1600px] mx-auto px-4 min-h-screen bg-slate-50/30">
+        <div className="">
             <ToastContainer position="bottom-right" theme="dark" />
 
             <HandoverDrawer

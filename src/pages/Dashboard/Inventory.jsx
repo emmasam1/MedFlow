@@ -174,7 +174,7 @@ const Inventory = () => {
   };
 
   return (
-    <div className="px-4 pb-10">
+    <div className="">
       {/* HEADER SECTION */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>

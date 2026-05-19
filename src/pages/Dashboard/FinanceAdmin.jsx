@@ -81,7 +81,7 @@ const FinanceAdmin = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <div className="px-4 min-h-screen font-sans">
+    <div className="">
       {/* 1. Header & Quick Actions */}
       <div className="flex justify-between items-center mb-8">
         <div>
