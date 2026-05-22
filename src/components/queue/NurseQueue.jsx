@@ -7,7 +7,7 @@ import { ToastContainer, Bounce } from "react-toastify";
 import { useAppStore } from "../../store/useAppStore";
 import { useStore } from "../../store/store";
 import VitalsModal from "../../components/VitalsModal";
-import Modal from "../../components/Modal";
+import Modal from "../Modal";
 
 const EmptyQueueState = ({ date, darkMode }) => (
   <motion.div
@@ -55,7 +55,7 @@ const NurseQueue = () => {
     setVitalsModalOpen(true);
   };
 
-//   console.log("Current queue data in NurseQueue:", queue);
+  //   console.log("Current queue data in NurseQueue:", queue);
 
   useEffect(() => {
     const fetchData = async () => {

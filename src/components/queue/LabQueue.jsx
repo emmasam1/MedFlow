@@ -13,7 +13,7 @@ import {
 import { ToastContainer, Bounce, toast } from "react-toastify";
 import { useAppStore } from "../../store/useAppStore";
 import { useStore } from "../../store/store";
-import Modal from "../../components/Modal";
+import Modal from "../Modal";
 
 const EmptyQueueState = ({ date, darkMode }) => (
   <motion.div
@@ -160,7 +160,7 @@ const LabQueue = () => {
         setSelectedFiles([]);
         setLabResults({});
         setFinalSummary("");
-        getQueue()
+        getQueue();
       } else {
         console.error("❌ Backend Error:", result.message);
         toast.error(result.message || "Submission failed (500)");

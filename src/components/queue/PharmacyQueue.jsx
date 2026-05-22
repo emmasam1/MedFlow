@@ -9,13 +9,12 @@ import {
   HiBeaker,
   HiUpload,
   HiX,
-
 } from "react-icons/hi";
 import { RiCapsuleLine } from "react-icons/ri";
 import { ToastContainer, Bounce, toast } from "react-toastify";
 import { useAppStore } from "../../store/useAppStore";
 import { useStore } from "../../store/store";
-import Modal from "../../components/Modal";
+import Modal from "../Modal";
 
 const EmptyQueueState = ({ date, darkMode }) => (
   <motion.div
@@ -49,7 +48,7 @@ const EmptyQueueState = ({ date, darkMode }) => (
 const PharmacyQueue = () => {
   const { queue = [], getQueue, user, updateLabResults } = useAppStore();
   const { darkMode } = useStore();
-  console.log("user", user)
+  console.log("user", user);
 
   const [selectedDate, setSelectedDate] = useState(
     dayjs().format("YYYY-MM-DD"),
@@ -97,8 +96,6 @@ const PharmacyQueue = () => {
       );
     });
   }, [queue, selectedDate, search]);
-
-
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
@@ -165,7 +162,7 @@ const PharmacyQueue = () => {
         setSelectedFiles([]);
         setLabResults({});
         setFinalSummary("");
-        getQueue()
+        getQueue();
       } else {
         console.error("❌ Backend Error:", result.message);
         toast.error(result.message || "Submission failed (500)");
@@ -226,9 +223,6 @@ const PharmacyQueue = () => {
       </div>
     );
   };
-
-
-
 
   return (
     <div
@@ -365,7 +359,6 @@ const PharmacyQueue = () => {
         </div>
       </div>
 
-
       {/* Enterprise Pharmacy Modal */}
       <Modal
         isOpen={labModalOpen}
@@ -378,9 +371,7 @@ const PharmacyQueue = () => {
               </div>
 
               <div>
-                <h2 className="font-bold text-lg">
-                  Dispense Medication
-                </h2>
+                <h2 className="font-bold text-lg">Dispense Medication</h2>
 
                 <p className="text-xs text-gray-500">
                   Queue ID: {selectedQueue?.queueId}
@@ -402,16 +393,15 @@ const PharmacyQueue = () => {
         }
       >
         <div className="space-y-6">
-
           {/* Patient Clinical Summary */}
           <div
-            className={`rounded-2xl border p-5 ${darkMode
-              ? "bg-gray-800 border-gray-700"
-              : "bg-blue-50 border-blue-100"
-              }`}
+            className={`rounded-2xl border p-5 ${
+              darkMode
+                ? "bg-gray-800 border-gray-700"
+                : "bg-blue-50 border-blue-100"
+            }`}
           >
             <div className="grid grid-cols-2 gap-5">
-
               <div>
                 <p className="text-[10px] uppercase tracking-wider text-gray-500 font-bold mb-1">
                   Diagnosis
@@ -431,7 +421,6 @@ const PharmacyQueue = () => {
                   {selectedQueue?.clinicalNotes || "No notes"}
                 </p>
               </div>
-
             </div>
           </div>
 
@@ -444,24 +433,24 @@ const PharmacyQueue = () => {
               </h3>
 
               <div className="px-3 py-1 rounded-lg bg-emerald-100 text-emerald-600 text-xs font-bold">
-                {selectedQueue?.items?.filter(
-                  (i) => i.category === "PHARMACY"
-                ).length || 0} Items
+                {selectedQueue?.items?.filter((i) => i.category === "PHARMACY")
+                  .length || 0}{" "}
+                Items
               </div>
             </div>
 
             <div
-              className={`rounded-2xl overflow-hidden border ${darkMode
-                ? "border-gray-700"
-                : "border-gray-200"
-                }`}
+              className={`rounded-2xl overflow-hidden border ${
+                darkMode ? "border-gray-700" : "border-gray-200"
+              }`}
             >
               {/* Header */}
               <div
-                className={`grid grid-cols-12 gap-4 px-5 py-3 text-[10px] uppercase tracking-widest font-bold ${darkMode
-                  ? "bg-gray-800 text-gray-400"
-                  : "bg-gray-50 text-gray-500"
-                  }`}
+                className={`grid grid-cols-12 gap-4 px-5 py-3 text-[10px] uppercase tracking-widest font-bold ${
+                  darkMode
+                    ? "bg-gray-800 text-gray-400"
+                    : "bg-gray-50 text-gray-500"
+                }`}
               >
                 <div className="col-span-4">Medication</div>
                 <div className="col-span-2">Qty</div>
@@ -475,7 +464,6 @@ const PharmacyQueue = () => {
                 {selectedQueue?.items
                   ?.filter((i) => i.category === "PHARMACY")
                   .map((drug, idx) => {
-
                     const qty = drug.quantity || 1;
                     const price = drug.price || 2500;
                     const total = qty * price;
@@ -483,14 +471,13 @@ const PharmacyQueue = () => {
                     return (
                       <div
                         key={idx}
-                        className={`grid grid-cols-12 gap-4 px-5 py-4 items-center ${darkMode ? "bg-gray-900" : "bg-white"
-                          }`}
+                        className={`grid grid-cols-12 gap-4 px-5 py-4 items-center ${
+                          darkMode ? "bg-gray-900" : "bg-white"
+                        }`}
                       >
                         {/* Drug */}
                         <div className="col-span-4">
-                          <p className="font-semibold text-sm">
-                            {drug.name}
-                          </p>
+                          <p className="font-semibold text-sm">{drug.name}</p>
 
                           <p className="text-xs text-gray-500 mt-1">
                             Oral Medication
@@ -503,10 +490,11 @@ const PharmacyQueue = () => {
                             type="number"
                             min="1"
                             defaultValue={qty}
-                            className={`w-full px-3 py-2 rounded-lg text-sm border outline-none ${darkMode
-                              ? "bg-gray-800 border-gray-700"
-                              : "bg-gray-50 border-gray-200"
-                              }`}
+                            className={`w-full px-3 py-2 rounded-lg text-sm border outline-none ${
+                              darkMode
+                                ? "bg-gray-800 border-gray-700"
+                                : "bg-gray-50 border-gray-200"
+                            }`}
                           />
                         </div>
 
@@ -515,10 +503,11 @@ const PharmacyQueue = () => {
                           <input
                             type="number"
                             defaultValue={price}
-                            className={`w-full px-3 py-2 rounded-lg text-sm border outline-none ${darkMode
-                              ? "bg-gray-800 border-gray-700"
-                              : "bg-gray-50 border-gray-200"
-                              }`}
+                            className={`w-full px-3 py-2 rounded-lg text-sm border outline-none ${
+                              darkMode
+                                ? "bg-gray-800 border-gray-700"
+                                : "bg-gray-50 border-gray-200"
+                            }`}
                           />
                         </div>
 
@@ -532,10 +521,11 @@ const PharmacyQueue = () => {
                         {/* Availability */}
                         <div className="col-span-2">
                           <select
-                            className={`w-full px-2 py-2 rounded-lg text-xs font-semibold border outline-none ${darkMode
-                              ? "bg-gray-800 border-gray-700"
-                              : "bg-gray-50 border-gray-200"
-                              }`}
+                            className={`w-full px-2 py-2 rounded-lg text-xs font-semibold border outline-none ${
+                              darkMode
+                                ? "bg-gray-800 border-gray-700"
+                                : "bg-gray-50 border-gray-200"
+                            }`}
                           >
                             <option>Available</option>
                             <option>Low Stock</option>
@@ -551,15 +541,14 @@ const PharmacyQueue = () => {
 
           {/* Billing Summary */}
           <div
-            className={`rounded-2xl border p-5 ${darkMode
-              ? "bg-gray-800 border-gray-700"
-              : "bg-emerald-50/40 border-emerald-100"
-              }`}
+            className={`rounded-2xl border p-5 ${
+              darkMode
+                ? "bg-gray-800 border-gray-700"
+                : "bg-emerald-50/40 border-emerald-100"
+            }`}
           >
             <div className="flex justify-between items-center mb-3">
-              <p className="text-sm text-gray-500">
-                Subtotal
-              </p>
+              <p className="text-sm text-gray-500">Subtotal</p>
 
               <p className="font-semibold">
                 ₦{selectedQueue?.totalPaid?.toLocaleString() || "0"}
@@ -567,21 +556,15 @@ const PharmacyQueue = () => {
             </div>
 
             <div className="flex justify-between items-center mb-3">
-              <p className="text-sm text-gray-500">
-                Service Charge
-              </p>
+              <p className="text-sm text-gray-500">Service Charge</p>
 
-              <p className="font-semibold">
-                ₦500
-              </p>
+              <p className="font-semibold">₦500</p>
             </div>
 
             <div className="border-t border-dashed border-gray-300 my-3" />
 
             <div className="flex justify-between items-center">
-              <p className="font-bold">
-                Grand Total
-              </p>
+              <p className="font-bold">Grand Total</p>
 
               <p className="text-2xl font-black text-emerald-600">
                 ₦{((selectedQueue?.totalPaid || 0) + 500).toLocaleString()}
@@ -600,24 +583,21 @@ const PharmacyQueue = () => {
               placeholder="Medication instructions, patient counseling, stock notes..."
               value={finalSummary}
               onChange={(e) => setFinalSummary(e.target.value)}
-              className={`w-full mt-2 p-4 rounded-2xl border text-sm outline-none focus:ring-2 focus:ring-emerald-500 ${darkMode
-                ? "bg-gray-900 border-gray-700"
-                : "bg-gray-50 border-gray-200"
-                }`}
+              className={`w-full mt-2 p-4 rounded-2xl border text-sm outline-none focus:ring-2 focus:ring-emerald-500 ${
+                darkMode
+                  ? "bg-gray-900 border-gray-700"
+                  : "bg-gray-50 border-gray-200"
+              }`}
             />
           </div>
 
           {/* Footer */}
           <div className="flex justify-between items-center pt-5 border-t border-gray-100">
-
-            <button
-              className="px-5 py-2.5 rounded-xl bg-red-50 text-red-600 font-semibold text-sm hover:bg-red-100 transition"
-            >
+            <button className="px-5 py-2.5 rounded-xl bg-red-50 text-red-600 font-semibold text-sm hover:bg-red-100 transition">
               Out of Stock
             </button>
 
             <div className="flex gap-3">
-
               <button
                 onClick={() => setLabModalOpen(false)}
                 disabled={isSubmitting}
@@ -629,26 +609,20 @@ const PharmacyQueue = () => {
               <button
                 onClick={handleFinalSubmit}
                 disabled={isSubmitting}
-                className={`px-8 py-3 rounded-xl text-sm font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition-all ${isSubmitting
-                  ? "opacity-50 cursor-not-allowed"
-                  : "active:scale-95"
-                  }`}
+                className={`px-8 py-3 rounded-xl text-sm font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition-all ${
+                  isSubmitting
+                    ? "opacity-50 cursor-not-allowed"
+                    : "active:scale-95"
+                }`}
               >
-                {isSubmitting
-                  ? "Dispensing..."
-                  : "Dispense Medication"}
+                {isSubmitting ? "Dispensing..." : "Dispense Medication"}
               </button>
-
             </div>
           </div>
         </div>
-      </Modal> 
-
-
-
-
+      </Modal>
     </div>
   );
-}
+};
 
-export default PharmacyQueue    
+export default PharmacyQueue;

@@ -14,7 +14,7 @@ import { ToastContainer, Bounce, toast } from "react-toastify";
 import { useAppStore } from "../../store/useAppStore";
 import { useStore } from "../../store/store";
 import VitalsModal from "../../components/VitalsModal";
-import Modal from "../../components/Modal";
+import Modal from "../Modal";
 
 const EmptyQueueState = ({ date, darkMode }) => (
   <motion.div
@@ -235,31 +235,31 @@ const DoctorQueue = () => {
   };
 
   const startConsultation = (q) => {
-  // 1. Set the ID for submission
-  setIsQueueId(q.queueId);
+    // 1. Set the ID for submission
+    setIsQueueId(q.queueId);
 
-  // 2. Pre-populate or Reset Clinical Notes
-  setClinicalNotes(q.clinicalNotes || "");
+    // 2. Pre-populate or Reset Clinical Notes
+    setClinicalNotes(q.clinicalNotes || "");
 
-  // 3. Pre-populate or Reset Diagnosis
-  setDiagnosis(q.diagnosis || "");
+    // 3. Pre-populate or Reset Diagnosis
+    setDiagnosis(q.diagnosis || "");
 
-  // 4. Pre-populate Addons (Labs & Drugs)
-  // If the backend returns existing items in 'items' or 'addons' array
-//   if (q.items && q.items.length > 0) {
-//     // const existingLabs = q.items.filter(item => item.category === "LABORATORY");
-//     const existingDrugs = q.items.filter(item => item.category === "PHARMACY");
-    
-//     setLabAddons(existingLabs);
-//     setDrugAddons(existingDrugs);
-//   } else {
-//     setLabAddons([]);
-//     setDrugAddons([]);
-//   }
+    // 4. Pre-populate Addons (Labs & Drugs)
+    // If the backend returns existing items in 'items' or 'addons' array
+    //   if (q.items && q.items.length > 0) {
+    //     // const existingLabs = q.items.filter(item => item.category === "LABORATORY");
+    //     const existingDrugs = q.items.filter(item => item.category === "PHARMACY");
 
-  // 5. Open the modal
-  setOpenConsultation(true);
-};
+    //     setLabAddons(existingLabs);
+    //     setDrugAddons(existingDrugs);
+    //   } else {
+    //     setLabAddons([]);
+    //     setDrugAddons([]);
+    //   }
+
+    // 5. Open the modal
+    setOpenConsultation(true);
+  };
 
   const handleSubmitConsultation = async () => {
     setIsSubmitting(true);
@@ -673,7 +673,9 @@ const DoctorQueue = () => {
       <Modal
         isOpen={openConsultation}
         onClose={() => setOpenConsultation(false)}
-        title={clinicalNotes ? "Edit / Resume Consultation" : "New Consultation"}
+        title={
+          clinicalNotes ? "Edit / Resume Consultation" : "New Consultation"
+        }
       >
         <div className="space-y-5">
           {/* CLINICAL NOTES */}
