@@ -7,7 +7,7 @@ import { useAppStore } from "../../store/useAppStore";
 // import FinanceAppointment from '../../components/appointment/FinanceAppointment';
 // import RecordAppointment from '../../components/appointment/RecordAppointment';
 
-import DoctorAppointment from "../../components/appointment/DoctorAppointment";
+import SpecialistAppointment from "../../components/appointment/SpecialistAppointment";
 import FinanceAppointment from "../../components/appointment/FinanceAppointment";
 import LabAppointment from "../../components/appointment/LabAppointment";
 import NurseAppointment from "../../components/appointment/NurseAppointment";
@@ -19,7 +19,7 @@ const Appointment = () => {
   console.log(user?.role);
   return (
     <div>
-      {user.role === "doctor" && <DoctorAppoinntement />}
+      {user.role === "specialist" && <SpecialistAppointment />}
       {user.role === "nurse" && <NurseAppointment />}
       {user.role === "lab_officer" && <LabOfficerAppointment />}
       {user.role === "pharmacist" && <PharmacyAppointment />}

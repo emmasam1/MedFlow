@@ -346,9 +346,9 @@ const RecordAppointment = () => {
         </div>
 
         {/* RESIZER */}
-        <div
+          <div
           onMouseDown={handleMouseDown}
-          className="w-1 bg-slate-200 hover:bg-blue-400 cursor-col-resize"
+          className="w-1 bg-slate-100 dark:bg-gray-800 hover:bg-blue-500 cursor-col-resize transition-colors"
         />
 
         {/* RIGHT PANEL */}
@@ -363,11 +363,7 @@ const RecordAppointment = () => {
                   placeholder="Search patient..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className={`w-full pl-10 pr-10 py-2.5 rounded-xl border ${
-                    darkMode
-                      ? "border-gray-600 bg-gray-700 text-white focus:ring-blue-500"
-                      : "border-slate-200 bg-white text-gray-900"
-                  } text-sm focus:outline-none focus:ring-2`}
+                  className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 ${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-slate-200"}`}
                 />
                 <HiSearch
                   size={16}
@@ -380,7 +376,7 @@ const RecordAppointment = () => {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className={`appearance-none w-full py-2.5 px-4 pr-10 rounded-xl border text-sm cursor-pointer ${
+                  className={`appearance-none w-full py-2 px-4 pr-10 rounded-xl border text-sm cursor-pointer ${
                     darkMode
                       ? "border-gray-600 bg-gray-700 text-white"
                       : "border-slate-200 bg-white text-gray-900"

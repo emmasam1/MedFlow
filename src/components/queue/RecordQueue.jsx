@@ -67,6 +67,28 @@ const RecordQueue = () => {
     fetchData();
   }, [selectedDate, user?.role, getQueue]);
 
+
+    const filteredData = useMemo(() => {
+      if (!Array.isArray(queue)) return [];
+      return queue.filter((q) => {
+        const matchesDate =
+          dayjs(q.createdAt).format("YYYY-MM-DD") === selectedDate;
+        const patient = q.patientId || {};
+        const fullName =
+          `${patient.firstName || ""} ${patient.lastName || ""}`.toLowerCase();
+        const matchesSearch =
+          fullName.includes(search.toLowerCase()) ||
+          q.queueId?.toLowerCase().includes(search.toLowerCase());
+  
+        // Filter for Consultation stage if user is a doctor
+        const matchesRole =
+          user?.role === "doctor" ? q.currentStage === "CONSULTATION" : true;
+  
+        return (
+          matchesDate && matchesSearch && matchesRole && q.status === "active"
+        );
+      });
+    }, [queue, selectedDate, search, user?.role]);
  
 
   const stats = {
