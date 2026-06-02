@@ -70,7 +70,7 @@ const User = () => {
       setIsLoading(true);
       try {
         const response = await getStaff();
-        // console.log(response)
+        console.log(response)
         // Extract the array from the object structure: { staffMembers: [], totalStaff: 0 }
         const staffArray = response?.staffMembers || [];
         setUsers(staffArray);

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import {
   Skeleton,
   Calendar,
@@ -15,7 +15,7 @@ import { useAppStore } from "../../store/useAppStore";
 import { useStore } from "../../store/store";
 import VitalsModal from "../../components/VitalsModal";
 import Modal from "../../components/Modal";
-import PrescriptionSection from "../../components/consultation/PrescriptionSection"
+import PrescriptionSection from "../../components/consultation/PrescriptionSection";
 
 const EmptyQueueState = ({ date, darkMode }) => (
   <motion.div
@@ -74,15 +74,101 @@ const DoctorQueue = () => {
   const [labAddons, setLabAddons] = useState([]);
   const [drugAddons, setDrugAddons] = useState([]);
 
-  const [sendLab, setSendLab] = useState(false)
-  const [sendPharmacy, setSendPharmacy] = useState(false)
-  const [sendRadiology, setSendRadiology] = useState(false)
-  const [sendAdmission, setSendAdmission] = useState(false)
-  const [sendTheatre, setSendTheatre] = useState(false)
+  const [sendLab, setSendLab] = useState(false);
+  const [sendPharmacy, setSendPharmacy] = useState(false);
+  const [sendRadiology, setSendRadiology] = useState(false);
+  const [sendAdmission, setSendAdmission] = useState(false);
+  const [sendTheatre, setSendTheatre] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isQueueId, setIsQueueId] = useState(null);
   const [activeVitalId, setActiveVitalId] = useState(null);
+
+  // ... Inside your component ...
+  const [labSearchQuery, setLabSearchQuery] = useState("");
+  const [isLabDropdownOpen, setIsLabDropdownOpen] = useState(false);
+  const labDropdownRef = useRef(null);
+
+  const [admissionWard, setAdmissionWard] = useState("Medical Ward");
+const [admissionUrgency, setAdmissionUrgency] = useState("Routine");
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        labDropdownRef.current &&
+        !labDropdownRef.current.contains(event.target)
+      ) {
+        setIsLabDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const LAB_OPTIONS = [
+    { name: "Malaria RDT", amount: 5500 },
+    { name: "Full Blood Count (FBC)", amount: 4000 },
+    { name: "Urinalysis", amount: 2500 },
+    { name: "Liver Function Test", amount: 8000 },
+    { name: "Kidney Function Test", amount: 7500 },
+    { name: "Blood Glucose (FBS)", amount: 2000 },
+    { name: "HIV Test", amount: 3000 },
+    { name: "Pregnancy Test", amount: 1500 },
+    { name: "Typhoid Test (Widal)", amount: 3000 },
+    { name: "Lipid Profile", amount: 9000 },
+    { name: "Electrolyte Panel", amount: 8500 },
+    { name: "HbA1c", amount: 7000 },
+  ];
+
+  // Dynamic search filtering
+  const filteredLabOptions = LAB_OPTIONS.filter((lab) =>
+    lab.name.toLowerCase().includes(labSearchQuery.toLowerCase()),
+  );
+
+  const [radioSearchQuery, setRadioSearchQuery] = useState("");
+  const [isRadioDropdownOpen, setIsRadioDropdownOpen] = useState(false);
+  const [selectedRadioType, setSelectedRadioType] = useState("Routine"); // Default urgency
+  const radioDropdownRef = useRef(null);
+  const [radiologyAddons, setRadiologyAddons] = useState([]);
+
+  // Your options dataset
+  const RADIOLOGY_OPTIONS = [
+    { name: "X-Ray", amount: 5000 },
+    { name: "CT Scan", amount: 45000 },
+    { name: "MRI", amount: 65000 },
+    { name: "Ultrasound", amount: 8000 },
+  ];
+
+  const addRadiology = (scan) => {
+  // Check if the item is already added to avoid duplicates
+  if (!radiologyAddons.some((x) => x.name === scan.name)) {
+    setRadiologyAddons([...radiologyAddons, scan]);
+  }
+};
+
+const removeRadiology = (scanName) => {
+  // Filter out the item when the "✕" button is clicked
+  setRadiologyAddons(radiologyAddons.filter((x) => x.name !== scanName));
+};
+
+  // Click away listener to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        radioDropdownRef.current &&
+        !radioDropdownRef.current.contains(event.target)
+      ) {
+        setIsRadioDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const filteredRadioOptions = RADIOLOGY_OPTIONS.filter((item) =>
+    item.name.toLowerCase().includes(radioSearchQuery.toLowerCase()),
+  );
 
   const openVitalsModal = (q) => {
     setSelectedQueue(q);
@@ -160,35 +246,6 @@ const DoctorQueue = () => {
     urgent: filteredData.filter((q) => q.isUrgent).length,
   };
 
-  const LAB_OPTIONS = [
-    { name: "Malaria RDT", amount: 5500 },
-    { name: "Full Blood Count (FBC)", amount: 4000 },
-    { name: "Urinalysis", amount: 2500 },
-    { name: "Liver Function Test", amount: 8000 },
-    { name: "Kidney Function Test", amount: 7500 },
-    { name: "Blood Glucose (FBS)", amount: 2000 },
-    { name: "HIV Test", amount: 3000 },
-    { name: "Pregnancy Test", amount: 1500 },
-    { name: "Typhoid Test (Widal)", amount: 3000 },
-    { name: "Lipid Profile", amount: 9000 },
-    { name: "Electrolyte Panel", amount: 8500 },
-    { name: "HbA1c", amount: 7000 },
-  ];
-
-  const DRUG_OPTIONS = [
-    { name: "Paracetamol", amount: 1200 },
-    { name: "Ibuprofen", amount: 1500 },
-    { name: "Amoxicillin", amount: 2500 },
-    { name: "Ciprofloxacin", amount: 3000 },
-    { name: "Metronidazole", amount: 2000 },
-    { name: "Artemether/Lumefantrine", amount: 3500 },
-    { name: "Azithromycin", amount: 3500 },
-    { name: "Diclofenac", amount: 1800 },
-    { name: "Omeprazole", amount: 2200 },
-    { name: "ORS", amount: 800 },
-    { name: "Vitamin C", amount: 1000 },
-  ];
-
   const addLab = (item) => {
     setLabAddons((prev) => {
       if (prev.find((x) => x.name === item.name)) return prev;
@@ -227,7 +284,7 @@ const DoctorQueue = () => {
         <div
           className={`
             w-8 h-8 flex items-center justify-center rounded-full transition-all text-sm relative
-            ${isSelected ? "!bg-blue-600 !text-white shadow-md" : ""}
+            ${isSelected ? "bg-blue-600! text-white! shadow-md" : ""}
             ${!isSelected && hasPending ? "bg-amber-50 text-amber-600 border border-amber-200 font-bold" : ""}
             ${!isSelected && isToday ? "border border-blue-500 text-blue-500 font-medium" : ""}
             ${!isSelected && !isToday && !hasPending ? (darkMode ? "text-gray-400" : "text-gray-700") : ""}
@@ -345,7 +402,7 @@ const DoctorQueue = () => {
 
       <div className="flex flex-1 overflow-hidden">
         <div
-          className={`w-[400px] border-r ${darkMode ? "border-gray-800" : "border-gray-100"} p-5 hidden lg:block overflow-y-auto`}
+          className={`w-100 border-r ${darkMode ? "border-gray-800" : "border-gray-100"} p-5 hidden lg:block overflow-y-auto`}
         >
           <ConfigProvider
             theme={{
@@ -421,17 +478,19 @@ const DoctorQueue = () => {
                     layout
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`p-5 rounded-2xl border flex flex-col md:flex-row justify-between items-start md:items-center transition-all hover:shadow-md gap-4 ${darkMode
-                      ? "bg-gray-800 border-gray-700"
-                      : "bg-white border-gray-200"
-                      }`}
+                    className={`p-5 rounded-2xl border flex flex-col md:flex-row justify-between items-start md:items-center transition-all hover:shadow-md gap-4 ${
+                      darkMode
+                        ? "bg-gray-800 border-gray-700"
+                        : "bg-white border-gray-200"
+                    }`}
                   >
                     <div className="flex items-center gap-4">
                       <div
-                        className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg shrink-0 ${darkMode
-                          ? "bg-blue-900/40 text-blue-400"
-                          : "bg-blue-50 text-blue-600"
-                          }`}
+                        className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg shrink-0 ${
+                          darkMode
+                            ? "bg-blue-900/40 text-blue-400"
+                            : "bg-blue-50 text-blue-600"
+                        }`}
                       >
                         {q.patientId?.firstName?.charAt(0) || "P"}
                       </div>
@@ -458,10 +517,11 @@ const DoctorQueue = () => {
                           <motion.div
                             initial={{ opacity: 0, x: -5 }}
                             animate={{ opacity: 1, x: 0 }}
-                            className={`mt-2 flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-lg w-fit border ${darkMode
-                              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                              : "bg-emerald-50 text-emerald-600 border-emerald-100"
-                              }`}
+                            className={`mt-2 flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-lg w-fit border ${
+                              darkMode
+                                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                : "bg-emerald-50 text-emerald-600 border-emerald-100"
+                            }`}
                           >
                             <span className="relative flex h-2 w-2">
                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -520,12 +580,13 @@ const DoctorQueue = () => {
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     {/* TEMPERATURE */}
                     <div
-                      className={`p-3 rounded-lg ${summaryData.currentVitals.temperature.value >= 38
-                        ? "bg-red-100 text-red-700"
-                        : summaryData.currentVitals.temperature.value >= 37
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-green-100 text-green-700"
-                        }`}
+                      className={`p-3 rounded-lg ${
+                        summaryData.currentVitals.temperature.value >= 38
+                          ? "bg-red-100 text-red-700"
+                          : summaryData.currentVitals.temperature.value >= 37
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-green-100 text-green-700"
+                      }`}
                     >
                       <p className="text-xs">Temperature</p>
                       <p className="font-bold">
@@ -544,11 +605,12 @@ const DoctorQueue = () => {
 
                     {/* HEART RATE */}
                     <div
-                      className={`p-3 rounded-lg ${summaryData.currentVitals.heartRate.value < 60 ||
+                      className={`p-3 rounded-lg ${
+                        summaryData.currentVitals.heartRate.value < 60 ||
                         summaryData.currentVitals.heartRate.value > 100
-                        ? "bg-red-100 text-red-700"
-                        : "bg-green-100 text-green-700"
-                        }`}
+                          ? "bg-red-100 text-red-700"
+                          : "bg-green-100 text-green-700"
+                      }`}
                     >
                       <p className="text-xs">Heart Rate</p>
                       <p className="font-bold">
@@ -558,10 +620,11 @@ const DoctorQueue = () => {
 
                     {/* SPO2 */}
                     <div
-                      className={`p-3 rounded-lg ${summaryData.currentVitals.oxygenSaturation.value < 95
-                        ? "bg-red-100 text-red-700"
-                        : "bg-green-100 text-green-700"
-                        }`}
+                      className={`p-3 rounded-lg ${
+                        summaryData.currentVitals.oxygenSaturation.value < 95
+                          ? "bg-red-100 text-red-700"
+                          : "bg-green-100 text-green-700"
+                      }`}
                     >
                       <p className="text-xs">SpO2</p>
                       <p className="font-bold">
@@ -677,500 +740,447 @@ const DoctorQueue = () => {
         isOpen={openConsultation}
         onClose={() => setOpenConsultation(false)}
         title={
-          clinicalNotes
-            ? "Edit / Resume Consultation"
-            : "New Consultation"
+          clinicalNotes ? "Edit / Resume Consultation" : "New Consultation"
         }
       >
         <div className="space-y-6">
-
           {/* CLINICAL */}
 
           <div
-            className={`rounded-2xl border p-5 ${darkMode
-              ? "bg-gray-800 border-gray-700"
-              : "bg-white border-gray-200"
-              }`}
+            className={`rounded-2xl border p-5 ${
+              darkMode
+                ? "bg-gray-800 border-gray-700"
+                : "bg-white border-gray-200"
+            }`}
           >
-
-            <h3 className="font-bold mb-5">
-              Clinical Assessment
-            </h3>
+            <h3 className="font-bold mb-5">Clinical Assessment</h3>
 
             <div className="grid grid-cols-2 gap-5">
-
               <div>
-
-                <label className="text-sm font-semibold">
-                  Clinical Notes
-                </label>
+                <label className="text-sm font-semibold">Clinical Notes</label>
 
                 <textarea
                   value={clinicalNotes}
-                  onChange={(e) =>
-                    setClinicalNotes(
-                      e.target.value
-                    )
-                  }
+                  onChange={(e) => setClinicalNotes(e.target.value)}
                   rows={4}
                   placeholder="History, examination findings..."
-                  className="w-full mt-2 px-4 py-3 rounded-xl border resize-none"
+                  className="w-full mt-2 px-4 py-3 border rounded-lg resize-none border-gray-300 focus:ring-1 focus:ring-blue-500 transition-all outline-none"
                 />
-
               </div>
 
               <div>
-
-                <label className="text-sm font-semibold">
-                  Diagnosis
-                </label>
+                <label className="text-sm font-semibold">Diagnosis</label>
 
                 <textarea
                   value={diagnosis}
-                  onChange={(e) =>
-                    setDiagnosis(
-                      e.target.value
-                    )
-                  }
+                  onChange={(e) => setDiagnosis(e.target.value)}
                   rows={4}
                   placeholder=" Primary diagnosis Secondary diagnosis"
-                  className="w-full mt-2 px-4 py-3 rounded-xl border resize-none"
+                  className="w-full mt-2 px-4 py-3 border rounded-lg resize-none border-gray-300 focus:ring-1 focus:ring-blue-500 transition-all outline-none"
                 />
-
               </div>
-
             </div>
-
           </div>
-
 
           {/* ORDER DESTINATION */}
 
           <div
-            className={`rounded-2xl border p-5 ${darkMode
-              ? "bg-gray-800 border-gray-700"
-              : "bg-blue-50 border-blue-100"
-              }`}
+            className={`rounded-2xl border p-5 ${
+              darkMode
+                ? "bg-gray-800 border-gray-700"
+                : "bg-blue-50 border-blue-100"
+            }`}
           >
+            <h3 className="font-bold mb-5">Department Orders</h3>
 
-            <h3
-              className="font-bold mb-5"
-            >
-
-              Department Orders
-
-            </h3>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4"
-            >
-
-              <label
-                className="flex items-center gap-2"
-              >
-
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   checked={sendPharmacy}
-                  onChange={() =>
-                    setSendPharmacy(
-                      !sendPharmacy
-                    )
-                  }
+                  onChange={() => setSendPharmacy(!sendPharmacy)}
                 />
-
                 Pharmacy
-
               </label>
 
-
               <label className="flex items-center gap-2">
-
                 <input
                   type="checkbox"
                   checked={sendLab}
-                  onChange={() =>
-                    setSendLab(
-                      !sendLab
-                    )
-                  }
+                  onChange={() => setSendLab(!sendLab)}
                 />
-
                 Laboratory
-
               </label>
 
-
-              <label
-                className="flexitems-center gap-2"
-              >
-
+              <label className="flexitems-center gap-2">
                 <input
                   type="checkbox"
                   checked={sendRadiology}
-                  onChange={() =>
-                    setSendRadiology(
-                      !sendRadiology
-                    )
-                  }
+                  onChange={() => setSendRadiology(!sendRadiology)}
                 />
-
                 Radiology
-
               </label>
 
-
-              <label className="flex items-center gap-2"
-              >
-
+              <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   checked={sendAdmission}
-                  onChange={() =>
-                    setSendAdmission(
-                      !sendAdmission
-                    )
-                  }
+                  onChange={() => setSendAdmission(!sendAdmission)}
                 />
-
                 Admission
-
               </label>
 
-
-              <label
-                className="flex items-center gap-2"
-              >
-
+              <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   checked={sendTheatre}
-                  onChange={() =>
-                    setSendTheatre(
-                      !sendTheatre
-                    )
-                  }
+                  onChange={() => setSendTheatre(!sendTheatre)}
                 />
-
                 Theatre
-
               </label>
-
             </div>
-
           </div>
-
 
           {/* LAB */}
 
           {sendLab && (
-
-            <div className={`rounded-2xl border p-5 ${darkMode
-              ? "bg-gray-800 border-gray-700"
-              : "bg-blue-50 border-blue-100"
+            <div
+              ref={labDropdownRef}
+              className={`rounded-2xl border p-5 transition-all relative ${
+                darkMode
+                  ? "bg-gray-800 border-gray-700 text-gray-100"
+                  : "bg-blue-50 border-blue-100 text-gray-800"
               }`}
             >
+              <h3 className="font-bold mb-3 text-base">Laboratory Request</h3>
 
-              <h3 className="font-bold mb-4"
-              >
-
-                Laboratory Request
-
-              </h3>
-
-              <select
-                onChange={(e) => {
-
-                  const selected =
-                    LAB_OPTIONS.find(
-                      x => x.name ===
-                        e.target.value
-                    )
-
-                  if (selected)
-                    addLab(selected)
-
-                  e.target.value = ""
-
-                }}
-                className="w-full p-3 rounded-xl border"
-              >
-
-                <option>
-
-                  Select Lab Test
-
-                </option>
-
-                {
-                  LAB_OPTIONS.map(
-                    lab => (
-
-                      <option
-                        key={lab.name}
-                        value={lab.name}
-                      >
-
-                        {lab.name}
-
-                      </option>
-
-                    )
-                  )
-                }
-
-              </select>
-
-              <div
-                className="space-y-2 mt-4"
-              >
-
-                {
-                  labAddons.map(
-                    item => (
-
-                      <div
-                        key={item.name}
-                        className="flex justify-between bg-blue-100 rounded-xl p-3"
-                      >
-
-                        <span>
-
-                          {item.name}
-
-                        </span>
-
-                        <button
-                          onClick={() =>
-                            removeLab(
-                              item.name
-                            )
-                          }
-                        >
-
-                          ✕
-
-                        </button>
-
-                      </div>
-
-                    )
-                  )
-                }
-
+              {/* Search Input Box */}
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder={
+                    labAddons.length > 0
+                      ? "Add more lab tests..."
+                      : "Search lab test..."
+                  }
+                  value={labSearchQuery}
+                  onFocus={() => setIsLabDropdownOpen(true)}
+                  onChange={(e) => setLabSearchQuery(e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-1 focus:ring-blue-500 transition-all outline-none text-sm ${
+                    darkMode
+                      ? "bg-gray-900 border-gray-700 text-gray-100 placeholder-gray-500"
+                      : "bg-white border-gray-300 text-gray-700 placeholder-gray-400"
+                  }`}
+                />
               </div>
 
+              {/* Custom Dropdown Panels */}
+              {isLabDropdownOpen && (
+                <div
+                  className={`absolute z-50 left-5 right-5 mt-1 max-h-56 overflow-y-auto rounded-lg border shadow-lg ${
+                    darkMode
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-gray-200"
+                  }`}
+                >
+                  {filteredLabOptions.length === 0 ? (
+                    <div className="p-3 text-xs text-gray-400 text-center">
+                      No tests found
+                    </div>
+                  ) : (
+                    filteredLabOptions.map((lab) => {
+                      const isSelected = labAddons.some(
+                        (x) => x.name === lab.name,
+                      );
+
+                      return (
+                        <button
+                          key={lab.name}
+                          type="button"
+                          onClick={() => {
+                            if (isSelected) {
+                              removeLab(lab.name);
+                            } else {
+                              addLab(lab);
+                            }
+                            setLabSearchQuery(""); // clear text field on toggle
+                          }}
+                          className={`w-full flex items-center gap-2 px-4 py-2 text-sm text-left transition-colors border-b last:border-0 ${
+                            darkMode
+                              ? "hover:bg-gray-700/50 border-gray-700/50 text-gray-200"
+                              : "hover:bg-gray-50 border-gray-100 text-gray-700"
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            readOnly
+                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 pointer-events-none"
+                          />
+                          <span className={isSelected ? "font-medium" : ""}>
+                            {lab.name}
+                          </span>
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              )}
+
+              {/* Optimized Addons List: Structured Side-by-Side instead of long rows */}
+              {labAddons.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-dashed border-gray-300/40">
+                  {labAddons.map((item) => (
+                    <div
+                      key={item.name}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+                        darkMode
+                          ? "bg-gray-700/40 border-gray-600 text-gray-200"
+                          : "bg-white border-blue-200 text-blue-900"
+                      }`}
+                    >
+                      <span>{item.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeLab(item.name)}
+                        className="hover:text-red-500 transition-colors text-sm font-bold focus:outline-none ml-1 leading-none"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-
           )}
-
 
           {/* PHARMACY */}
 
           {sendPharmacy && (
-
             <div
-              className={`rounded-2xl border p-5${darkMode
-                ? "bg-gray-800 border-gray-700"
-                : "bg-emerald-50 border-emerald-100"
-                }`}
+              className={`rounded-2xl border p-5! ${
+                darkMode
+                  ? "bg-gray-800 border-gray-700"
+                  : "bg-emerald-50 border-emerald-100"
+              }`}
             >
-
-              <h3
-                className="font-bold mb-4"
-              >
-
-                Prescription
-
-              </h3>
+              <h3 className="font-bold mb-4">Prescription</h3>
 
               <PrescriptionSection />
-
             </div>
-
           )}
-
 
           {/* RADIOLOGY */}
 
           {sendRadiology && (
-
             <div
-              className="
-rounded-2xl
-border
-p-5
-"
+              ref={radioDropdownRef}
+              className={`rounded-2xl border p-5 transition-all relative ${
+                darkMode
+                  ? "bg-gray-800 border-gray-700 text-gray-100"
+                  : "bg-white border-gray-200 text-gray-800"
+              }`}
             >
+              <h3 className="font-bold mb-4 text-base">Radiology Request</h3>
 
-              <h3
-                className="
-font-bold
-mb-4
-"
-              >
+              <div className="grid grid-cols-3 gap-4 items-start">
+                {/* Search & Select Type Dropdown */}
+                <div className="col-span-2 relative">
+                  <input
+                    type="text"
+                    placeholder={
+                      radiologyAddons.length > 0
+                        ? "Add more scans..."
+                        : "Search scan type (e.g. MRI)..."
+                    }
+                    value={radioSearchQuery}
+                    onFocus={() => setIsRadioDropdownOpen(true)}
+                    onChange={(e) => setRadioSearchQuery(e.target.value)}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-1 focus:ring-blue-500 transition-all outline-none text-sm ${
+                      darkMode
+                        ? "bg-gray-900 border-gray-700 text-gray-100 placeholder-gray-500"
+                        : "bg-white border-gray-300 text-gray-700 placeholder-gray-400"
+                    }`}
+                  />
 
-                Radiology
+                  {/* Custom Dropdown List */}
+                  {isRadioDropdownOpen && (
+                    <div
+                      className={`absolute z-50 w-full mt-1 max-h-48 overflow-y-auto rounded-lg border shadow-lg ${
+                        darkMode
+                          ? "bg-gray-800 border-gray-700"
+                          : "bg-white border-gray-200"
+                      }`}
+                    >
+                      {filteredRadioOptions.length === 0 ? (
+                        <div className="p-3 text-xs text-gray-400 text-center">
+                          No scans found
+                        </div>
+                      ) : (
+                        filteredRadioOptions.map((scan) => {
+                          const isSelected = radiologyAddons.some(
+                            (x) => x.name === scan.name,
+                          );
 
-              </h3>
+                          return (
+                            <button
+                              key={scan.name}
+                              type="button"
+                              onClick={() => {
+                                if (isSelected) {
+                                  // Pass scan.name to your removal handler
+                                  removeRadiology(scan.name);
+                                } else {
+                                  // Pass scan object plus current priority choice
+                                  addRadiology({
+                                    ...scan,
+                                    priority: selectedRadioType,
+                                    category: "RADIOLOGY",
+                                  });
+                                }
+                                setRadioSearchQuery("");
+                              }}
+                              className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left transition-colors border-b last:border-0 ${
+                                darkMode
+                                  ? "hover:bg-gray-700/50 border-gray-700/50 text-gray-200"
+                                  : "hover:bg-gray-50 border-gray-100 text-gray-700"
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                readOnly
+                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 pointer-events-none"
+                              />
+                              <span className={isSelected ? "font-medium" : ""}>
+                                {scan.name}
+                              </span>
+                            </button>
+                          );
+                        })
+                      )}
+                    </div>
+                  )}
+                </div>
 
-              <div
-                className="
-grid
-grid-cols-2
-gap-4
-"
-              >
-
-                <select
-                  className="
-p-3
-border
-rounded-xl
-"
-                >
-
-                  <option>
-                    X-Ray
-                  </option>
-
-                  <option>
-                    CT Scan
-                  </option>
-
-                  <option>
-                    MRI
-                  </option>
-
-                  <option>
-                    Ultrasound
-                  </option>
-
-                </select>
-
-                <select
-                  className="
-p-3
-border
-rounded-xl
-"
-                >
-
-                  <option>
-
-                    Routine
-
-                  </option>
-
-                  <option>
-
-                    Urgent
-
-                  </option>
-
-                </select>
-
+                {/* Urgency Priority Select */}
+                <div>
+                  <select
+                    value={selectedRadioType}
+                    onChange={(e) => setSelectedRadioType(e.target.value)}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-1 focus:ring-blue-500 transition-all outline-none text-sm ${
+                      darkMode
+                        ? "bg-gray-900 border-gray-700 text-gray-100"
+                        : "bg-white border-gray-300 text-gray-700"
+                    }`}
+                  >
+                    <option value="Routine">Routine</option>
+                    <option value="Urgent">Urgent</option>
+                  </select>
+                </div>
               </div>
 
+              {/* Compact Wrap Addons Container */}
+              {radiologyAddons.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-dashed border-gray-300/40">
+                  {radiologyAddons.map((item) => (
+                    <div
+                      key={item.name}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+                        darkMode
+                          ? "bg-gray-700/40 border-gray-600 text-gray-200"
+                          : "bg-gray-50 border-gray-200 text-gray-800 shadow-sm"
+                      }`}
+                    >
+                      <span>{item.name}</span>
+                      <span
+                        className={`text-[10px] uppercase px-1.5 py-0.5 rounded font-bold ${
+                          item.priority === "Urgent"
+                            ? "bg-red-500/10 text-red-500"
+                            : "bg-gray-500/10 text-gray-500"
+                        }`}
+                      >
+                        {item.priority || "Routine"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeRadiology(item.name)}
+                        className="hover:text-red-500 transition-colors text-sm font-bold focus:outline-none ml-1 leading-none"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Clinical Indication Textarea */}
               <textarea
-                placeholder="
-Clinical indication
-"
-                rows={3}
-                className="
-w-full
-mt-4
-border
-rounded-xl
-p-3
-"
+                placeholder="Clinical indication..."
+                rows={2}
+                className={`w-full mt-4 border rounded-lg px-3 py-2 focus:ring-1 focus:ring-blue-500 transition-all outline-none text-sm resize-none ${
+                  darkMode
+                    ? "bg-gray-900 border-gray-700 text-gray-100 placeholder-gray-500"
+                    : "bg-white border-gray-300 text-gray-700 placeholder-gray-400"
+                }`}
               />
-
             </div>
-
           )}
-
 
           {/* ADMISSION */}
 
           {sendAdmission && (
+  <div
+    className={`rounded-2xl border p-5 transition-all ${
+      darkMode
+        ? "bg-gray-800 border-gray-700 text-gray-100"
+        : "bg-white border-gray-200 text-gray-800"
+    }`}
+  >
+    <h3 className="font-bold mb-4 text-base">Admission Request</h3>
 
-            <div
-              className="
-rounded-2xl
-border
-p-5
-"
-            >
+    <div className="grid grid-cols-2 gap-4">
+      {/* Ward Selection */}
+      <div>
+        <label className="text-xs font-bold uppercase text-gray-500 block mb-1">
+          Select Ward
+        </label>
+        <select
+          value={admissionWard}
+          onChange={(e) => setAdmissionWard(e.target.value)}
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-1 focus:ring-blue-500 transition-all outline-none text-sm ${
+            darkMode
+              ? "bg-gray-900 border-gray-700 text-gray-100"
+              : "bg-white border-gray-300 text-gray-700"
+          }`}
+        >
+          <option value="Medical Ward">Medical Ward</option>
+          <option value="Surgical Ward">Surgical Ward</option>
+          <option value="ICU">ICU</option>
+        </select>
+      </div>
 
-              <h3
-                className="
-font-bold
-mb-4
-"
-              >
-
-                Admission
-
-              </h3>
-
-              <div
-                className="
-grid
-grid-cols-2
-gap-4
-"
-              >
-
-                <select
-                  className="
-p-3
-border
-rounded-xl
-"
-                >
-
-                  <option>
-                    Medical Ward
-                  </option>
-
-                  <option>
-                    Surgical Ward
-                  </option>
-
-                  <option>
-                    ICU
-                  </option>
-
-                </select>
-
-                <select
-                  className="
-p-3
-border
-rounded-xl
-"
-                >
-
-                  <option>
-
-                    Routine
-
-                  </option>
-
-                  <option>
-
-                    Urgent
-
-                  </option>
-
-                </select>
-
-              </div>
-
-            </div>
-
-          )}
-
+      {/* Urgency Selection */}
+      <div>
+        <label className="text-xs font-bold uppercase text-gray-500 block mb-1">
+          Priority
+        </label>
+        <select
+          value={admissionUrgency}
+          onChange={(e) => setAdmissionUrgency(e.target.value)}
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-1 focus:ring-blue-500 transition-all outline-none text-sm ${
+            darkMode
+              ? "bg-gray-900 border-gray-700 text-gray-100"
+              : "bg-white border-gray-300 text-gray-700"
+          }`}
+        >
+          <option value="Routine">Routine</option>
+          <option value="Urgent">Urgent</option>
+        </select>
+      </div>
+    </div>
+  </div>
+)}
 
           {/* SUMMARY */}
 
@@ -1179,22 +1189,16 @@ rounded-xl
 rounded-2xl
 border
 p-5
-${darkMode
-                ? "bg-gray-800 border-gray-700"
-                : "bg-gray-50 border-gray-200"
-              }
+${darkMode ? "bg-gray-800 border-gray-700" : "bg-gray-50 border-gray-200"}
 `}
           >
-
             <h3
               className="
 font-bold
 mb-3
 "
             >
-
               Order Summary
-
             </h3>
 
             <div
@@ -1203,41 +1207,17 @@ space-y-2
 text-sm
 "
             >
+              {sendLab && <div>✓ Laboratory</div>}
 
-              {sendLab && (
-                <div>
-                  ✓ Laboratory
-                </div>
-              )}
+              {sendPharmacy && <div>✓ Pharmacy</div>}
 
-              {sendPharmacy && (
-                <div>
-                  ✓ Pharmacy
-                </div>
-              )}
+              {sendRadiology && <div>✓ Radiology</div>}
 
-              {sendRadiology && (
-                <div>
-                  ✓ Radiology
-                </div>
-              )}
+              {sendAdmission && <div>✓ Admission</div>}
 
-              {sendAdmission && (
-                <div>
-                  ✓ Admission
-                </div>
-              )}
-
-              {sendTheatre && (
-                <div>
-                  ✓ Theatre
-                </div>
-              )}
-
+              {sendTheatre && <div>✓ Theatre</div>}
             </div>
-
           </div>
-
 
           <div
             className="
@@ -1245,16 +1225,12 @@ flex
 justify-end
 pt-4
 border-t
+border-gray-200
 "
           >
-
             <button
-              onClick={
-                handleSubmitConsultation
-              }
-              disabled={
-                isSubmitting
-              }
+              onClick={handleSubmitConsultation}
+              disabled={isSubmitting}
               className="
 bg-blue-600
 hover:bg-blue-700
@@ -1265,21 +1241,10 @@ rounded-xl
 font-bold
 "
             >
-
-              {
-                isSubmitting
-                  ?
-                  "Submitting..."
-                  :
-                  "Complete Consultation"
-              }
-
+              {isSubmitting ? "Submitting..." : "Complete Consultation"}
             </button>
-
           </div>
-
         </div>
-
       </Modal>
     </div>
   );
