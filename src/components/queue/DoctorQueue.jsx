@@ -15,6 +15,7 @@ import { useAppStore } from "../../store/useAppStore";
 import { useStore } from "../../store/store";
 import VitalsModal from "../../components/VitalsModal";
 import Modal from "../../components/Modal";
+import PrescriptionSection from "../../components/consultation/PrescriptionSection"
 
 const EmptyQueueState = ({ date, darkMode }) => (
   <motion.div
@@ -72,6 +73,13 @@ const DoctorQueue = () => {
   const [diagnosis, setDiagnosis] = useState("");
   const [labAddons, setLabAddons] = useState([]);
   const [drugAddons, setDrugAddons] = useState([]);
+
+  const [sendLab, setSendLab] = useState(false)
+  const [sendPharmacy, setSendPharmacy] = useState(false)
+  const [sendRadiology, setSendRadiology] = useState(false)
+  const [sendAdmission, setSendAdmission] = useState(false)
+  const [sendTheatre, setSendTheatre] = useState(false)
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isQueueId, setIsQueueId] = useState(null);
   const [activeVitalId, setActiveVitalId] = useState(null);
@@ -235,31 +243,31 @@ const DoctorQueue = () => {
   };
 
   const startConsultation = (q) => {
-  // 1. Set the ID for submission
-  setIsQueueId(q.queueId);
+    // 1. Set the ID for submission
+    setIsQueueId(q.queueId);
 
-  // 2. Pre-populate or Reset Clinical Notes
-  setClinicalNotes(q.clinicalNotes || "");
+    // 2. Pre-populate or Reset Clinical Notes
+    setClinicalNotes(q.clinicalNotes || "");
 
-  // 3. Pre-populate or Reset Diagnosis
-  setDiagnosis(q.diagnosis || "");
+    // 3. Pre-populate or Reset Diagnosis
+    setDiagnosis(q.diagnosis || "");
 
-  // 4. Pre-populate Addons (Labs & Drugs)
-  // If the backend returns existing items in 'items' or 'addons' array
-//   if (q.items && q.items.length > 0) {
-//     // const existingLabs = q.items.filter(item => item.category === "LABORATORY");
-//     const existingDrugs = q.items.filter(item => item.category === "PHARMACY");
-    
-//     setLabAddons(existingLabs);
-//     setDrugAddons(existingDrugs);
-//   } else {
-//     setLabAddons([]);
-//     setDrugAddons([]);
-//   }
+    // 4. Pre-populate Addons (Labs & Drugs)
+    // If the backend returns existing items in 'items' or 'addons' array
+    //   if (q.items && q.items.length > 0) {
+    //     // const existingLabs = q.items.filter(item => item.category === "LABORATORY");
+    //     const existingDrugs = q.items.filter(item => item.category === "PHARMACY");
 
-  // 5. Open the modal
-  setOpenConsultation(true);
-};
+    //     setLabAddons(existingLabs);
+    //     setDrugAddons(existingDrugs);
+    //   } else {
+    //     setLabAddons([]);
+    //     setDrugAddons([]);
+    //   }
+
+    // 5. Open the modal
+    setOpenConsultation(true);
+  };
 
   const handleSubmitConsultation = async () => {
     setIsSubmitting(true);
@@ -413,19 +421,17 @@ const DoctorQueue = () => {
                     layout
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`p-5 rounded-2xl border flex flex-col md:flex-row justify-between items-start md:items-center transition-all hover:shadow-md gap-4 ${
-                      darkMode
-                        ? "bg-gray-800 border-gray-700"
-                        : "bg-white border-gray-200"
-                    }`}
+                    className={`p-5 rounded-2xl border flex flex-col md:flex-row justify-between items-start md:items-center transition-all hover:shadow-md gap-4 ${darkMode
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-gray-200"
+                      }`}
                   >
                     <div className="flex items-center gap-4">
                       <div
-                        className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg shrink-0 ${
-                          darkMode
-                            ? "bg-blue-900/40 text-blue-400"
-                            : "bg-blue-50 text-blue-600"
-                        }`}
+                        className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg shrink-0 ${darkMode
+                          ? "bg-blue-900/40 text-blue-400"
+                          : "bg-blue-50 text-blue-600"
+                          }`}
                       >
                         {q.patientId?.firstName?.charAt(0) || "P"}
                       </div>
@@ -452,11 +458,10 @@ const DoctorQueue = () => {
                           <motion.div
                             initial={{ opacity: 0, x: -5 }}
                             animate={{ opacity: 1, x: 0 }}
-                            className={`mt-2 flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-lg w-fit border ${
-                              darkMode
-                                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                                : "bg-emerald-50 text-emerald-600 border-emerald-100"
-                            }`}
+                            className={`mt-2 flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-lg w-fit border ${darkMode
+                              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                              : "bg-emerald-50 text-emerald-600 border-emerald-100"
+                              }`}
                           >
                             <span className="relative flex h-2 w-2">
                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -515,13 +520,12 @@ const DoctorQueue = () => {
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     {/* TEMPERATURE */}
                     <div
-                      className={`p-3 rounded-lg ${
-                        summaryData.currentVitals.temperature.value >= 38
-                          ? "bg-red-100 text-red-700"
-                          : summaryData.currentVitals.temperature.value >= 37
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-green-100 text-green-700"
-                      }`}
+                      className={`p-3 rounded-lg ${summaryData.currentVitals.temperature.value >= 38
+                        ? "bg-red-100 text-red-700"
+                        : summaryData.currentVitals.temperature.value >= 37
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-green-100 text-green-700"
+                        }`}
                     >
                       <p className="text-xs">Temperature</p>
                       <p className="font-bold">
@@ -540,12 +544,11 @@ const DoctorQueue = () => {
 
                     {/* HEART RATE */}
                     <div
-                      className={`p-3 rounded-lg ${
-                        summaryData.currentVitals.heartRate.value < 60 ||
+                      className={`p-3 rounded-lg ${summaryData.currentVitals.heartRate.value < 60 ||
                         summaryData.currentVitals.heartRate.value > 100
-                          ? "bg-red-100 text-red-700"
-                          : "bg-green-100 text-green-700"
-                      }`}
+                        ? "bg-red-100 text-red-700"
+                        : "bg-green-100 text-green-700"
+                        }`}
                     >
                       <p className="text-xs">Heart Rate</p>
                       <p className="font-bold">
@@ -555,11 +558,10 @@ const DoctorQueue = () => {
 
                     {/* SPO2 */}
                     <div
-                      className={`p-3 rounded-lg ${
-                        summaryData.currentVitals.oxygenSaturation.value < 95
-                          ? "bg-red-100 text-red-700"
-                          : "bg-green-100 text-green-700"
-                      }`}
+                      className={`p-3 rounded-lg ${summaryData.currentVitals.oxygenSaturation.value < 95
+                        ? "bg-red-100 text-red-700"
+                        : "bg-green-100 text-green-700"
+                        }`}
                     >
                       <p className="text-xs">SpO2</p>
                       <p className="font-bold">
@@ -671,176 +673,613 @@ const DoctorQueue = () => {
       </Modal>
 
       <Modal
+        size="5xl"
         isOpen={openConsultation}
         onClose={() => setOpenConsultation(false)}
-        title={clinicalNotes ? "Edit / Resume Consultation" : "New Consultation"}
+        title={
+          clinicalNotes
+            ? "Edit / Resume Consultation"
+            : "New Consultation"
+        }
       >
-        <div className="space-y-5">
-          {/* CLINICAL NOTES */}
-          <div>
-            <label className="text-sm font-semibold">Clinical Notes</label>
-            <textarea
-              value={clinicalNotes}
-              onChange={(e) => setClinicalNotes(e.target.value)}
-              rows={3}
-              className="w-full px-3 py-2 border rounded-lg resize-none border-gray-300"
-              placeholder="Write clinical notes..."
-            />
-          </div>
+        <div className="space-y-6">
 
-          {/* DIAGNOSIS */}
-          <div>
-            <label className="text-sm font-semibold">Diagnosis</label>
-            <input
-              value={diagnosis}
-              rows={2}
-              onChange={(e) => setDiagnosis(e.target.value)}
-              className="w-full mt-1 px-3 py-2 border rounded-lg resize-none border-gray-300"
-              placeholder="Enter diagnosis"
-            />
-          </div>
+          {/* CLINICAL */}
 
-          {/* LAB TESTS */}
-          <div>
-            <h3 className="text-sm font-semibold mb-2">Lab Tests</h3>
+          <div
+            className={`rounded-2xl border p-5 ${darkMode
+              ? "bg-gray-800 border-gray-700"
+              : "bg-white border-gray-200"
+              }`}
+          >
 
-            <select
-              onChange={(e) => {
-                const selected = LAB_OPTIONS.find(
-                  (l) => l.name === e.target.value,
-                );
-                if (selected) addLab(selected);
-                e.target.value = ""; // reset after select
-              }}
-              className="w-full px-3 py-2 border rounded-lg border-gray-300 bg-white"
-              defaultValue=""
-            >
-              <option value="" disabled>
-                Select lab test...
-              </option>
+            <h3 className="font-bold mb-5">
+              Clinical Assessment
+            </h3>
 
-              {LAB_OPTIONS.map((lab) => (
-                <option key={lab.name} value={lab.name}>
-                  {lab.name} - ₦{lab.amount}
-                </option>
-              ))}
-            </select>
+            <div className="grid grid-cols-2 gap-5">
 
-            <div className="mt-3 space-y-2">
-              {labAddons.map((item) => (
-                <div
-                  key={item.name}
-                  className="flex justify-between items-center bg-blue-50 p-2 rounded-lg text-sm"
-                >
-                  <span>
-                    {item.name} - ₦{item.amount}
-                  </span>
-                  <button
-                    onClick={() => removeLab(item.name)}
-                    className="text-red-500"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
+              <div>
+
+                <label className="text-sm font-semibold">
+                  Clinical Notes
+                </label>
+
+                <textarea
+                  value={clinicalNotes}
+                  onChange={(e) =>
+                    setClinicalNotes(
+                      e.target.value
+                    )
+                  }
+                  rows={4}
+                  placeholder="History, examination findings..."
+                  className="w-full mt-2 px-4 py-3 rounded-xl border resize-none"
+                />
+
+              </div>
+
+              <div>
+
+                <label className="text-sm font-semibold">
+                  Diagnosis
+                </label>
+
+                <textarea
+                  value={diagnosis}
+                  onChange={(e) =>
+                    setDiagnosis(
+                      e.target.value
+                    )
+                  }
+                  rows={4}
+                  placeholder=" Primary diagnosis Secondary diagnosis"
+                  className="w-full mt-2 px-4 py-3 rounded-xl border resize-none"
+                />
+
+              </div>
+
             </div>
+
           </div>
 
-          {/* DRUGS */}
-          <div>
-            <h3 className="text-sm font-semibold mb-2">Drugs</h3>
 
-            <select
-              onChange={(e) => {
-                const selected = DRUG_OPTIONS.find(
-                  (d) => d.name === e.target.value,
-                );
-                if (selected) addDrug(selected);
-                e.target.value = ""; // reset
-              }}
-              className="w-full px-3 py-2 border rounded-lg border-gray-300 bg-white"
-              defaultValue=""
+          {/* ORDER DESTINATION */}
+
+          <div
+            className={`rounded-2xl border p-5 ${darkMode
+              ? "bg-gray-800 border-gray-700"
+              : "bg-blue-50 border-blue-100"
+              }`}
+          >
+
+            <h3
+              className="font-bold mb-5"
             >
-              <option value="" disabled>
-                Select drug...
-              </option>
 
-              {DRUG_OPTIONS.map((drug) => (
-                <option key={drug.name} value={drug.name}>
-                  {drug.name} - ₦{drug.amount}
-                </option>
-              ))}
-            </select>
+              Department Orders
 
-            <div className="mt-3 space-y-2">
-              {drugAddons.map((item) => (
-                <div
-                  key={item.name}
-                  className="flex justify-between items-center bg-purple-50 p-2 rounded-lg text-sm"
-                >
-                  <span>
-                    {item.name} - ₦{item.amount}
-                  </span>
-                  <button
-                    onClick={() => removeDrug(item.name)}
-                    className="text-red-500"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
+            </h3>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4"
+            >
+
+              <label
+                className="flex items-center gap-2"
+              >
+
+                <input
+                  type="checkbox"
+                  checked={sendPharmacy}
+                  onChange={() =>
+                    setSendPharmacy(
+                      !sendPharmacy
+                    )
+                  }
+                />
+
+                Pharmacy
+
+              </label>
+
+
+              <label className="flex items-center gap-2">
+
+                <input
+                  type="checkbox"
+                  checked={sendLab}
+                  onChange={() =>
+                    setSendLab(
+                      !sendLab
+                    )
+                  }
+                />
+
+                Laboratory
+
+              </label>
+
+
+              <label
+                className="flexitems-center gap-2"
+              >
+
+                <input
+                  type="checkbox"
+                  checked={sendRadiology}
+                  onChange={() =>
+                    setSendRadiology(
+                      !sendRadiology
+                    )
+                  }
+                />
+
+                Radiology
+
+              </label>
+
+
+              <label className="flex items-center gap-2"
+              >
+
+                <input
+                  type="checkbox"
+                  checked={sendAdmission}
+                  onChange={() =>
+                    setSendAdmission(
+                      !sendAdmission
+                    )
+                  }
+                />
+
+                Admission
+
+              </label>
+
+
+              <label
+                className="flex items-center gap-2"
+              >
+
+                <input
+                  type="checkbox"
+                  checked={sendTheatre}
+                  onChange={() =>
+                    setSendTheatre(
+                      !sendTheatre
+                    )
+                  }
+                />
+
+                Theatre
+
+              </label>
+
             </div>
+
           </div>
 
-          {/* TOTAL */}
-          <div className="text-sm font-semibold flex justify-between border-gray-200 border-t pt-3">
-            <span>Total</span>
-            <span>
-              ₦
-              {[...labAddons, ...drugAddons].reduce(
-                (sum, i) => sum + i.amount,
-                0,
-              )}
-            </span>
-          </div>
 
-          {/* SUBMIT */}
+          {/* LAB */}
 
-          <div className="md:col-span-2 mt-4">
-            <button
-              type="submit"
-              onClick={handleSubmitConsultation}
-              disabled={isSubmitting}
-              className={`bg-blue-600 text-white py-2 px-3 cursor-pointer rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg flex items-center justify-center gap-2 ${
-                isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+          {sendLab && (
+
+            <div className={`rounded-2xl border p-5 ${darkMode
+              ? "bg-gray-800 border-gray-700"
+              : "bg-blue-50 border-blue-100"
               }`}
             >
-              {isSubmitting && (
-                <svg
-                  className="animate-spin h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
+
+              <h3 className="font-bold mb-4"
+              >
+
+                Laboratory Request
+
+              </h3>
+
+              <select
+                onChange={(e) => {
+
+                  const selected =
+                    LAB_OPTIONS.find(
+                      x => x.name ===
+                        e.target.value
+                    )
+
+                  if (selected)
+                    addLab(selected)
+
+                  e.target.value = ""
+
+                }}
+                className="w-full p-3 rounded-xl border"
+              >
+
+                <option>
+
+                  Select Lab Test
+
+                </option>
+
+                {
+                  LAB_OPTIONS.map(
+                    lab => (
+
+                      <option
+                        key={lab.name}
+                        value={lab.name}
+                      >
+
+                        {lab.name}
+
+                      </option>
+
+                    )
+                  )
+                }
+
+              </select>
+
+              <div
+                className="space-y-2 mt-4"
+              >
+
+                {
+                  labAddons.map(
+                    item => (
+
+                      <div
+                        key={item.name}
+                        className="flex justify-between bg-blue-100 rounded-xl p-3"
+                      >
+
+                        <span>
+
+                          {item.name}
+
+                        </span>
+
+                        <button
+                          onClick={() =>
+                            removeLab(
+                              item.name
+                            )
+                          }
+                        >
+
+                          ✕
+
+                        </button>
+
+                      </div>
+
+                    )
+                  )
+                }
+
+              </div>
+
+            </div>
+
+          )}
+
+
+          {/* PHARMACY */}
+
+          {sendPharmacy && (
+
+            <div
+              className={`rounded-2xl border p-5${darkMode
+                ? "bg-gray-800 border-gray-700"
+                : "bg-emerald-50 border-emerald-100"
+                }`}
+            >
+
+              <h3
+                className="font-bold mb-4"
+              >
+
+                Prescription
+
+              </h3>
+
+              <PrescriptionSection />
+
+            </div>
+
+          )}
+
+
+          {/* RADIOLOGY */}
+
+          {sendRadiology && (
+
+            <div
+              className="
+rounded-2xl
+border
+p-5
+"
+            >
+
+              <h3
+                className="
+font-bold
+mb-4
+"
+              >
+
+                Radiology
+
+              </h3>
+
+              <div
+                className="
+grid
+grid-cols-2
+gap-4
+"
+              >
+
+                <select
+                  className="
+p-3
+border
+rounded-xl
+"
                 >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v8H4z"
-                  ></path>
-                </svg>
+
+                  <option>
+                    X-Ray
+                  </option>
+
+                  <option>
+                    CT Scan
+                  </option>
+
+                  <option>
+                    MRI
+                  </option>
+
+                  <option>
+                    Ultrasound
+                  </option>
+
+                </select>
+
+                <select
+                  className="
+p-3
+border
+rounded-xl
+"
+                >
+
+                  <option>
+
+                    Routine
+
+                  </option>
+
+                  <option>
+
+                    Urgent
+
+                  </option>
+
+                </select>
+
+              </div>
+
+              <textarea
+                placeholder="
+Clinical indication
+"
+                rows={3}
+                className="
+w-full
+mt-4
+border
+rounded-xl
+p-3
+"
+              />
+
+            </div>
+
+          )}
+
+
+          {/* ADMISSION */}
+
+          {sendAdmission && (
+
+            <div
+              className="
+rounded-2xl
+border
+p-5
+"
+            >
+
+              <h3
+                className="
+font-bold
+mb-4
+"
+              >
+
+                Admission
+
+              </h3>
+
+              <div
+                className="
+grid
+grid-cols-2
+gap-4
+"
+              >
+
+                <select
+                  className="
+p-3
+border
+rounded-xl
+"
+                >
+
+                  <option>
+                    Medical Ward
+                  </option>
+
+                  <option>
+                    Surgical Ward
+                  </option>
+
+                  <option>
+                    ICU
+                  </option>
+
+                </select>
+
+                <select
+                  className="
+p-3
+border
+rounded-xl
+"
+                >
+
+                  <option>
+
+                    Routine
+
+                  </option>
+
+                  <option>
+
+                    Urgent
+
+                  </option>
+
+                </select>
+
+              </div>
+
+            </div>
+
+          )}
+
+
+          {/* SUMMARY */}
+
+          <div
+            className={`
+rounded-2xl
+border
+p-5
+${darkMode
+                ? "bg-gray-800 border-gray-700"
+                : "bg-gray-50 border-gray-200"
+              }
+`}
+          >
+
+            <h3
+              className="
+font-bold
+mb-3
+"
+            >
+
+              Order Summary
+
+            </h3>
+
+            <div
+              className="
+space-y-2
+text-sm
+"
+            >
+
+              {sendLab && (
+                <div>
+                  ✓ Laboratory
+                </div>
               )}
-              {isSubmitting ? "Submitting..." : "Submit Consultation"}
-            </button>
+
+              {sendPharmacy && (
+                <div>
+                  ✓ Pharmacy
+                </div>
+              )}
+
+              {sendRadiology && (
+                <div>
+                  ✓ Radiology
+                </div>
+              )}
+
+              {sendAdmission && (
+                <div>
+                  ✓ Admission
+                </div>
+              )}
+
+              {sendTheatre && (
+                <div>
+                  ✓ Theatre
+                </div>
+              )}
+
+            </div>
+
           </div>
+
+
+          <div
+            className="
+flex
+justify-end
+pt-4
+border-t
+"
+          >
+
+            <button
+              onClick={
+                handleSubmitConsultation
+              }
+              disabled={
+                isSubmitting
+              }
+              className="
+bg-blue-600
+hover:bg-blue-700
+text-white
+px-8
+py-3
+rounded-xl
+font-bold
+"
+            >
+
+              {
+                isSubmitting
+                  ?
+                  "Submitting..."
+                  :
+                  "Complete Consultation"
+              }
+
+            </button>
+
+          </div>
+
         </div>
+
       </Modal>
     </div>
   );
