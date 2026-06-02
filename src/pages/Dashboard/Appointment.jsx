@@ -1,22 +1,35 @@
-import React from 'react'
+import React from "react";
 import { useAppStore } from "../../store/useAppStore";
+// import DoctorAppoinntement from '../../components/appointment/DoctorsAppointment';
+// import NurseAppointment from '../../components/appointment/NurseAppointment';
+// import LabOfficerAppointment from '../../components/appointment/LabOfficerAppointment';
+// import PharmacistAppointment from '../../components/appointment/PharmacistAppointment';
+// import FinanceAppointment from '../../components/appointment/FinanceAppointment';
+// import RecordAppointment from '../../components/appointment/RecordAppointment';
+
+import SpecialistAppointment from "../../components/appointment/SpecialistAppointment";
+import FinanceAppointment from "../../components/appointment/FinanceAppointment";
+import LabAppointment from "../../components/appointment/LabAppointment";
+import NurseAppointment from "../../components/appointment/NurseAppointment";
+import PharmacyAppointment from "../../components/appointment/PharmacyAppointment";
+import RecordAppointment from "../../components/appointment/RecordAppointment";
 
 const Appointment = () => {
-   const user = useAppStore((state) => state.user);
-   console.log(user?.role)
+  const user = useAppStore((state) => state.user);
+  console.log(user?.role);
   return (
-    <div>Appointment</div>
-  )
-}
+    <div>
+      {user.role === "specialist" && <SpecialistAppointment />}
+      {user.role === "nurse" && <NurseAppointment />}
+      {user.role === "lab_officer" && <LabOfficerAppointment />}
+      {user.role === "pharmacist" && <PharmacyAppointment />}
+      {user.role === "finance_officer" && <FinanceAppointment />}
+      {user.role === "record_officer" && <RecordAppointment />}
+    </div>
+  );
+};
 
-export default Appointment
-
-
-
-
-
-
-
+export default Appointment;
 
 // import React, { useState, useMemo, useRef, useEffect } from "react";
 // import { Calendar, ConfigProvider, theme } from "antd";

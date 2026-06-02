@@ -8,7 +8,7 @@ import { useAppStore } from "../../store/useAppStore";
 import { useStore } from "../../store/store";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { HiUserAdd } from "react-icons/hi";
-import Modal from "../../components/Modal";
+import Modal from "../Modal";
 import CreateQueue from "../../components/CreateQueue";
 
 // Polished Empty State Component
@@ -67,24 +67,29 @@ const RecordQueue = () => {
     fetchData();
   }, [selectedDate, user?.role, getQueue]);
 
-  const filteredData = useMemo(() => {
-    if (!Array.isArray(queue)) return [];
-    return queue.filter((q) => {
-      const matchesDate =
-        dayjs(q.timeAdded || q.createdAt).format("YYYY-MM-DD") === selectedDate;
-      const matchesSearch = getPatientName(q)
-        .toLowerCase()
-        .includes(search.toLowerCase());
-      const matchesStatus =
-        statusFilter === "All" ||
-        q.status?.toLowerCase() === statusFilter.toLowerCase();
-      let matchesRole =
-        user?.role === "nurse"
-          ? q.currentStage === "TRIAGE" || !q.currentStage
-          : true;
-      return matchesDate && matchesSearch && matchesStatus && matchesRole;
-    });
-  }, [queue, selectedDate, search, statusFilter, user?.role]);
+
+    const filteredData = useMemo(() => {
+      if (!Array.isArray(queue)) return [];
+      return queue.filter((q) => {
+        const matchesDate =
+          dayjs(q.createdAt).format("YYYY-MM-DD") === selectedDate;
+        const patient = q.patientId || {};
+        const fullName =
+          `${patient.firstName || ""} ${patient.lastName || ""}`.toLowerCase();
+        const matchesSearch =
+          fullName.includes(search.toLowerCase()) ||
+          q.queueId?.toLowerCase().includes(search.toLowerCase());
+  
+        // Filter for Consultation stage if user is a doctor
+        const matchesRole =
+          user?.role === "doctor" ? q.currentStage === "CONSULTATION" : true;
+  
+        return (
+          matchesDate && matchesSearch && matchesRole && q.status === "active"
+        );
+      });
+    }, [queue, selectedDate, search, user?.role]);
+ 
 
   const stats = {
     total: filteredData.length,
@@ -126,7 +131,7 @@ const RecordQueue = () => {
             className={`${buttonStyle} flex items-center gap-2`}
           >
             <HiUserAdd size={20} className="mb-0.5" />
-            <span>Check-in Patient</span>
+            <span>Queue</span>
           </motion.button>
 
           <ConfigProvider
@@ -312,7 +317,8 @@ const RecordQueue = () => {
       <Modal
         isOpen={isQueueOpen}
         onClose={() => setIsQueueOpen(false)}
-        title="New Queue Entry"
+        title="Patient Queue"
+        size="2xl"
       >
         <CreateQueue onSuccess={() => setIsQueueOpen(false)} />
       </Modal>

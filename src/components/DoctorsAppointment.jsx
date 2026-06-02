@@ -351,38 +351,21 @@ const DoctorsAppointment = ({ onSuccess }) => {
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Select Doctor
-          </label>
+          <div>
+          <label className="block text-sm mb-2">Select a Doctor</label>
 
           <select
-            value={formData.doctorId}
-            onChange={(e) => {
-              const selectedDoc = doctors.find(
-                (doc) => doc.id === e.target.value,
-              );
-
-              setFormData({
-                ...formData,
-                doctorId: selectedDoc?.id,
-                doctor: selectedDoc?.name,
-                department: selectedDoc?.department || "",
-              });
-            }}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg 
-  bg-white text-black 
-  dark:bg-gray-800 dark:text-white dark:border-gray-600
-  focus:ring-1 outline-none"
-            required
+            value={formData.doctor}
+            onChange={(e) =>
+              setFormData({ ...formData, doctor: e.target.value })
+            }
+            className="px-3 py-2 w-full border rounded-lg border-gray-300"
           >
             <option value="">Choose Doctor</option>
-
-            {doctors.map((doc) => (
-              <option key={doc.id} value={doc.id}>
-                {doc.name}
-              </option>
-            ))}
+            <option value="Dr. John Doe">Dr. John Doe</option>
+            <option value="Dr. Sarah Smith">Dr. Sarah Smith</option>
+            <option value="Dr. Michael Adams">Dr. Michael Adams</option>
+            <option value="Dr. Grace Wilson">Dr. Grace Wilson</option>
           </select>
         </div>
 
