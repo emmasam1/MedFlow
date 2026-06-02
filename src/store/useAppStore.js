@@ -20,6 +20,7 @@ export const useAppStore = create((set) => ({
   doctorQueue: null,
   labTest: [],
   patientSummary: null,
+  transactions: [],
 
   login: async (identifier, password) => {
     set({ loading: true });
